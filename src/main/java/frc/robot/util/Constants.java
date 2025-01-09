@@ -111,4 +111,27 @@ public class Constants {
             public static final double kTurnD = 0;
         }
     }
+
+    public static class ElevatorConstants {
+            // Physical Constants
+        public static final int kMotorCount = 2;
+        public static final double kGearRatio = 0;
+        public static final double kCarriageMassKg = 0;
+        public static final double kDrumRadiusMeters = 0;
+        public static final double kMinHeightMeters = 0;
+        public static final double kMaxHeightMeters = 0;
+        public static final double kStartingHeightMeters = 0;
+        
+            // Ports
+        
+            // Feedforward Constants
+        public static final double kS = 0; // static gain in volts
+        public static final double kG = 0; // gravity gain in volts
+        public static final double kV = 0; // velocity gain in mps
+
+            // PID Constants
+        public static final double kP = 0;
+        public static final double kI = 0;
+        public static final double kD = 0;
+    }
 }
