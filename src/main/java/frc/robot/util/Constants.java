@@ -11,7 +11,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 
 public class Constants {
 
-    public static final RobotMode ROBOT_MODE = RobotMode.SIM;
+    public static final RobotMode ROBOT_MODE = RobotMode.STANDARD;
 
     public static enum RobotMode {
         STANDARD,
@@ -75,10 +75,10 @@ public class Constants {
             
              // Drive ID, Turn ID
             public static final int[][] MOTOR_IDS = {
-                {2, 3},
-                {4, 5},
-                {6, 7},
-                {8, 9}
+                {3, 4},
+                {5, 6},
+                {7, 8},
+                {9, 10}
             };
 
             public static final int[] ENCODER_IDS = {
