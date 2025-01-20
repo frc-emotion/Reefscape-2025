@@ -1,4 +1,4 @@
-package frc.robot.commands.teleop;
+package frc.robot.commands.teleop.Swerve;
 
 import java.util.function.Supplier;
 
@@ -63,6 +63,11 @@ public class SwerveDriveCommand extends Command {
         thetaLimiter = new SlewRateLimiter(UnitsUtil.convertToDPSS(maxAnglularAcceleration));
 
         addRequirements(swerveDrive);
+    }
+
+    @Override
+    public void initialize() {
+        swerveDrive.updateShuffleboard();
     }
 
     @Override

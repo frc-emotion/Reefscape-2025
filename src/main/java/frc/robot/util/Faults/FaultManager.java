@@ -1,4 +1,4 @@
-package frc.robot.util;
+package frc.robot.util.Faults;
 
 import com.revrobotics.REVLibError;
 import com.revrobotics.spark.SparkBase;
@@ -13,12 +13,12 @@ import edu.wpi.first.networktables.StringArrayPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.PowerDistribution;
-
 import frc.robot.util.Constants.Ports;
-import frc.robot.util.FaultTypes.FaultType;
-import frc.robot.util.FaultTypes.PDFaults;
-import frc.robot.util.FaultTypes.PDStickyFaults;
-import frc.robot.util.FaultTypes.SparkFaults;
+import frc.robot.util.Constants.Ports.CANID;
+import frc.robot.util.Faults.FaultTypes.FaultType;
+import frc.robot.util.Faults.FaultTypes.PDFaults;
+import frc.robot.util.Faults.FaultTypes.PDStickyFaults;
+import frc.robot.util.Faults.FaultTypes.SparkFaults;
 
 import java.util.ArrayList;
 import java.util.HashSet;

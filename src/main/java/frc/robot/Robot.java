@@ -6,23 +6,37 @@ package frc.robot;
 
 import org.ironmaple.simulation.SimulatedArena;
 
+import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.wpilibj.RobotController;
+import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.util.FaultManager;
+import frc.robot.util.Faults.FaultManager;
 
+@Logged
 public class Robot extends TimedRobot {
     private Command m_autonomousCommand;
 
     private final RobotContainer m_robotContainer;
 
     public Robot() {
+
+        RobotController.setBrownoutVoltage(6.0);
+
         m_robotContainer = new RobotContainer();
+
     }
 
     @Override
     public void robotPeriodic() {
+        // Switch thread to high priority to improve loop timing
+        Threads.setCurrentThreadPriority(true, 99);
+
         CommandScheduler.getInstance().run();
+
+        // Return to normal thread priority     
+        Threads.setCurrentThreadPriority(false, 10);
     }
 
     @Override
@@ -56,9 +70,9 @@ public class Robot extends TimedRobot {
     @Override
     public void teleopInit() {
         if (m_autonomousCommand != null) {
-        m_autonomousCommand.cancel();
+            m_autonomousCommand.cancel();
         }
-
+        
     }
 
     @Override

@@ -1,5 +1,6 @@
 package frc.robot.subsystems.swerve;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
@@ -34,6 +35,7 @@ public interface SwerveDrive extends Subsystem {
      * 
      * @return The heading as a Rotation2d object
      */
+    @Logged
     default Rotation2d getHeading() {
         return getPose().getRotation();
     }
@@ -85,26 +87,6 @@ public interface SwerveDrive extends Subsystem {
     SwerveModuleState[] getModuleStates();
     SwerveModuleState[] getDesiredModuleStates();
 
-    /*
-     * Fix later
-     */
-    default void updateTab() {
-        ShuffleboardTab tab = TabManager.getInstance().accessTab(SubsystemTab.DRIVETRAIN);
-
-        tab.add("Module Positions", getModulePositions().toString());
-        tab.add("Robot Heading", getHeading().getDegrees());
-        tab.add("Module States", getModuleStates().toString());
-        tab.add("Desired Module States", getDesiredModuleStates().toString());
-    }
-
-    // Do not use yet
-    
-    // /**
-    //  * Updates the Shuffleboard tab periodically.
-    //  */
-    // @Override
-    // default void periodic() {
-    //     updateTab();
-    // }
+    void updateShuffleboard();
 
 }

@@ -82,19 +82,23 @@ public class Constants {
             public static final double kDriveWheelFreeSpeed = 14.419; // rotations per second
 
             public static final double kDriveMotorRatio = 1;
-            public static final double kTurnMotorRatio = 1;
+            public static final double kAngleMotorRatio = 1;
 
             public static final int kDriveSmartCurrentLimit = 45;
             public static final int kDriveSecondaryCurrentLimit = 60;
-            public static final int kTurnSmartCurrentLimit = 20;
+            public static final int kAngleSmartCurrentLimit = 20;
 
             public static final double kDriveP = 0.04;
             public static final double kDriveI = 0;
             public static final double kDriveD = 0;
 
-            public static final double kTurnP = 1;
-            public static final double kTurnI = 0;
-            public static final double kTurnD = 0;
+            public static final double kAngleP = 1;
+            public static final double kAngleI = 0;
+            public static final double kAngleD = 0;
+
+            public static final double driveFactor = ModuleConstants.kWheelDiameter * 180 / ModuleConstants.kDriveMotorRatio;
+            public static final double angleFactor = 180 / ModuleConstants.kAngleMotorRatio;
+            public static final double driveVelocityFeedForward = 1 / ModuleConstants.kDriveWheelFreeSpeed;
         }
     }
 

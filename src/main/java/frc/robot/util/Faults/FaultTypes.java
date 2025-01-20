@@ -1,4 +1,4 @@
-package frc.robot.util;
+package frc.robot.util.Faults;
 
 import com.revrobotics.spark.SparkBase.Faults;
 
@@ -18,7 +18,7 @@ public class FaultTypes {
     /**
      * Enum representing faults from Spark motor controllers.
      */
-    public enum SparkFaults implements FaultCheckable<Faults> {
+    public enum SparkFaults {
         CAN("CAN Fault", FaultType.ERROR),
         ESC_EEPROM("EEPROM Memory Error", FaultType.ERROR),
         FIRMWARE("Firmware Fault", FaultType.ERROR),
@@ -50,7 +50,6 @@ public class FaultTypes {
          * @param faults The Faults object containing current faults.
          * @return True if the fault is present, false otherwise.
          */
-        @Override
         public boolean isPresent(Faults faults) {
             switch (this) {
                 case CAN:
@@ -78,7 +77,7 @@ public class FaultTypes {
     /**
      * Enum representing faults from the Power Distribution Hub (PDH).
      */
-    public enum PDFaults implements FaultCheckable<PowerDistributionFaults> {
+    public enum PDFaults {
         BROWN_OUT("Brownout Fault", FaultType.ERROR),
         CAN_WARNING("CAN Warning Fault", FaultType.ERROR),
         HARDWARE("Hardware Fault", FaultType.ERROR),
@@ -129,7 +128,6 @@ public class FaultTypes {
          * @param faults The PowerDistributionFaults object containing current faults.
          * @return True if the fault is present, false otherwise.
          */
-        @Override
         public boolean isPresent(PowerDistributionFaults faults) {
             switch (this) {
                 case BROWN_OUT:
@@ -195,7 +193,7 @@ public class FaultTypes {
     /**
      * Enum representing STICKY faults from the Power Distribution Hub (PDH).
      */
-    public enum PDStickyFaults implements FaultCheckable<PowerDistributionStickyFaults> {
+    public enum PDStickyFaults {
         BROWN_OUT("Brownout Fault", FaultType.ERROR),
         CAN_BUS_OFF("Bus Off event Fault", FaultType.ERROR),
         CAN_WARNING("CAN Warning Fault", FaultType.ERROR),
@@ -249,7 +247,6 @@ public class FaultTypes {
          * @param faults The PowerDistributionFaults object containing current faults.
          * @return True if the fault is present, false otherwise.
          */
-        @Override
         public boolean isPresent(PowerDistributionStickyFaults faults) {
             switch (this) {
                 case BROWN_OUT:

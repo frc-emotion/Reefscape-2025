@@ -9,39 +9,35 @@ import frc.robot.util.Constants.DriveConstants.ModuleConstants;
 public class Configs {
     public static class SwerveConfigs {
         public static final SparkMaxConfig DRIVE_CONFIG = new SparkMaxConfig();
-        public static final SparkMaxConfig TURN_CONFIG = new SparkMaxConfig();
+        public static final SparkMaxConfig ANGLE_CONFIG = new SparkMaxConfig();
 
         static {
-            double driveFactor = ModuleConstants.kWheelDiameter * 180 / ModuleConstants.kDriveMotorRatio;
-            double turnFactor = 180 / ModuleConstants.kTurnMotorRatio;
-            double driveVelocityFeedForward = 1 / ModuleConstants.kDriveWheelFreeSpeed;
-
             DRIVE_CONFIG
                 .idleMode(IdleMode.kBrake)
                 .smartCurrentLimit(ModuleConstants.kDriveSmartCurrentLimit)
                 .secondaryCurrentLimit(ModuleConstants.kDriveSecondaryCurrentLimit);
             DRIVE_CONFIG.encoder
-                .positionConversionFactor(driveFactor) // meters
-                .velocityConversionFactor(driveFactor / 60.0); // meters per second
+                .positionConversionFactor(ModuleConstants.driveFactor) // meters
+                .velocityConversionFactor(ModuleConstants.driveFactor / 60.0); // meters per second
             DRIVE_CONFIG.closedLoop
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
                 .pid(ModuleConstants.kDriveP, ModuleConstants.kDriveI, ModuleConstants.kDriveD)
-                .velocityFF(driveVelocityFeedForward)
+                .velocityFF(ModuleConstants.driveVelocityFeedForward)
                 .outputRange(-1, 1);
             
-            TURN_CONFIG
+            ANGLE_CONFIG
                 .idleMode(IdleMode.kBrake)
-                .smartCurrentLimit(ModuleConstants.kTurnSmartCurrentLimit)
-                .secondaryCurrentLimit(ModuleConstants.kTurnSmartCurrentLimit);
-            TURN_CONFIG.encoder
-                .positionConversionFactor(turnFactor) // degrees
-                .velocityConversionFactor(turnFactor / 60.0); // degrees per second
-            TURN_CONFIG.closedLoop
+                .smartCurrentLimit(ModuleConstants.kAngleSmartCurrentLimit)
+                .secondaryCurrentLimit(ModuleConstants.kAngleSmartCurrentLimit);
+            ANGLE_CONFIG.encoder
+                .positionConversionFactor(ModuleConstants.angleFactor) // degrees
+                .velocityConversionFactor(ModuleConstants.angleFactor / 60.0); // degrees per second
+            ANGLE_CONFIG.closedLoop
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
-                .pid(ModuleConstants.kTurnP, ModuleConstants.kTurnI, ModuleConstants.kTurnD)
+                .pid(ModuleConstants.kAngleP, ModuleConstants.kAngleI, ModuleConstants.kAngleD)
                 .outputRange(-1, 1)
                 .positionWrappingEnabled(true)
-                .positionWrappingInputRange(0, turnFactor);
+                .positionWrappingInputRange(0, ModuleConstants.angleFactor);
         }
     }
 }

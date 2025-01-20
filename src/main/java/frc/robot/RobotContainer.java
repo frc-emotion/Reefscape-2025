@@ -4,16 +4,19 @@
 
 package frc.robot;
 
+import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import frc.robot.commands.teleop.Swerve.SwerveDriveCommand;
+import frc.robot.commands.teleop.Swerve.SwerveXCommand;
 import frc.robot.subsystems.swerve.*;
 import frc.robot.util.Constants;
-import frc.robot.util.FaultManager;
 import frc.robot.util.Constants.IOConstants;
-import frc.robot.commands.teleop.SwerveDriveCommand;
+import frc.robot.util.Faults.FaultManager;
 
 public class RobotContainer {
     private final CommandXboxController m_driverController = new CommandXboxController(IOConstants.DRIVER_PORT);
@@ -21,10 +24,13 @@ public class RobotContainer {
 
     PowerDistribution m_PDH = new PowerDistribution(Constants.Ports.CANID.PDH.getId(), ModuleType.kRev);
 
+    @Logged(name="SwerveSubsystem")
     private final SwerveDrive m_swerveSubsystem;
 
     public RobotContainer() {
         FaultManager.register(m_PDH);
+
+        DataLogManager.start();
         
         switch (Constants.ROBOT_MODE) {
         case STANDARD:
@@ -53,6 +59,10 @@ public class RobotContainer {
     }
 
     private void configureBindings() {
+
+        // When driver presses x, set wheels in x formation
+        m_driverController.x().onTrue(SwerveXCommand.xCommand(m_swerveSubsystem));
+
     }
 
     public Command getAutonomousCommand() {

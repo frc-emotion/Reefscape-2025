@@ -1,10 +1,18 @@
 package frc.robot.subsystems.swerve;
 
+import java.util.Map;
+
+import org.dyn4j.geometry.Rotation;
+
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkBaseConfig;
+import com.revrobotics.spark.config.SparkMaxConfigAccessor;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -12,80 +20,158 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import edu.wpi.first.networktables.GenericEntry;
+import edu.wpi.first.networktables.NetworkTableEntry;
+import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
+import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import frc.robot.util.Configs;
 import frc.robot.util.Constants;
 import frc.robot.util.Constants.DriveConstants.ModuleConstants;
-import frc.robot.util.FaultManager;
+import frc.robot.util.Faults.FaultManager;
 
 public class NEOSwerveModule {
-    private final SparkMax driveMotor, turnMotor;
-    private final CANcoder absoluteTurnEncoder;
+    private final SparkMax driveMotor, angleMotor;
+    private final CANcoder absoluteAngleEncoder;
 
-    private final SparkClosedLoopController driveController, turnController;
+    private final SparkClosedLoopController driveController, angleController;
 
-    private final RelativeEncoder driveEncoder, turnEncoder;
+    private final RelativeEncoder driveEncoder, angleEncoder;
 
     private SwerveModuleState desiredState;
 
-    public NEOSwerveModule(int id) {
-        if(id < 0 || id > 3) throw new IndexOutOfBoundsException("Swerve Module index " + id + "out of bounds for length 4");
+    // NetworkTableEntries for PID, Setpoint, and Feedforward
+    private GenericEntry idleModeEntry;
 
+    // Drive PID Entries
+    private GenericEntry drivePEntry, driveIEntry, driveDEntry, driveFEntry;
+    private GenericEntry driveSetpointEntry;
+
+    // Angle PID Entries
+    private GenericEntry anglePEntry, angleIEntry, angleDEntry;
+    private GenericEntry angleSetpointEntry;
+
+    // Configuration Objects
+    private SparkMaxConfig driveConfig = new SparkMaxConfig().apply(Configs.SwerveConfigs.DRIVE_CONFIG);
+    private SparkMaxConfig angleConfig = new SparkMaxConfig().apply(Configs.SwerveConfigs.ANGLE_CONFIG);
+
+    public NEOSwerveModule(int id) {
+        if (id < 0 || id > Constants.Ports.CANID.SWERVE_IDS.length - 1)
+            throw new IndexOutOfBoundsException("Swerve Module index " + id + " out of bounds for length " + Constants.Ports.CANID.SWERVE_IDS.length);
+
+        // Initialize Drive Motor
         driveMotor = new SparkMax(Constants.Ports.CANID.SWERVE_IDS[id][0], MotorType.kBrushless);
         driveMotor.configure(
-            Configs.SwerveConfigs.DRIVE_CONFIG,
-            ResetMode.kResetSafeParameters,
-            PersistMode.kPersistParameters
-        );
+                driveConfig,
+                ResetMode.kResetSafeParameters,
+                PersistMode.kPersistParameters);
         driveEncoder = driveMotor.getEncoder();
         driveController = driveMotor.getClosedLoopController();
 
-        turnMotor = new SparkMax(Constants.Ports.CANID.SWERVE_IDS[id][1], MotorType.kBrushless);
-        turnMotor.configure(
-            Configs.SwerveConfigs.TURN_CONFIG,
-            ResetMode.kResetSafeParameters,
-            PersistMode.kPersistParameters
-        );
-        turnEncoder = turnMotor.getEncoder();
-        turnController = turnMotor.getClosedLoopController();
+        // Initialize Angle Motor
+        angleMotor = new SparkMax(Constants.Ports.CANID.SWERVE_IDS[id][1], MotorType.kBrushless);
+        angleMotor.configure(
+                angleConfig,
+                ResetMode.kResetSafeParameters,
+                PersistMode.kPersistParameters);
+        angleEncoder = angleMotor.getEncoder();
+        angleController = angleMotor.getClosedLoopController();
 
-        absoluteTurnEncoder = new CANcoder(Constants.Ports.CANID.CANCODER_IDS[id]);
+        // Initialize Absolute Angle Encoder
+        absoluteAngleEncoder = new CANcoder(Constants.Ports.CANID.CANCODER_IDS[id]);
 
+        // Configure Magnet Sensor
         MagnetSensorConfigs magnetSensorConfigs = new MagnetSensorConfigs();
         magnetSensorConfigs.withMagnetOffset(ModuleConstants.ENCODER_OFFSETS[id]);
 
-        resetTurnEncoder();
+        resetAngleEncoder();
 
-        desiredState = new SwerveModuleState(0, getTurnPosition());
+        desiredState = new SwerveModuleState(0, getAnglePosition());
 
+        // Register Motors with Fault Manager
         FaultManager.register(driveMotor);
-        FaultManager.register(turnMotor);
+        FaultManager.register(angleMotor);
     }
 
     /**
-     * Resets the RelativeEncoder of the NEO motor to the position of the CANcoder.
+     * Sets the Idle Mode of both drive and angle motors.
+     *
+     * @param mode The desired IdleMode (kBrake or kCoast)
      */
-    public void resetTurnEncoder() {
-        turnEncoder.setPosition(absoluteTurnEncoder.getPosition().getValueAsDouble());
+    public void setIdleMode(IdleMode mode) {
+        driveConfig.idleMode(mode);
+        angleConfig.idleMode(mode);
+        driveMotor.configure(driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        angleMotor.configure(angleConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
     /**
-     * Resets all module encoders 
+     * Updates the PID constants for drive motor along with Feedforward.
+     *
+     * @param p Proportional coefficient
+     * @param i Integral coefficient
+     * @param d Derivative coefficient
+     * @param f Feedforward coefficient
+     */
+    public void updateDrivePID(double p, double i, double d, double f) {
+        driveConfig.closedLoop.pidf(p, i, d, f);
+        driveMotor.configure(driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    }
+
+    /**
+     * Updates the PID constants for angle motor.
+     *
+     * @param p Proportional coefficient
+     * @param i Integral coefficient
+     * @param d Derivative coefficient
+     */
+    public void updateAnglePID(double p, double i, double d) {
+        angleConfig.closedLoop.pid(p, i, d);
+        angleMotor.configure(angleConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+    }
+
+    /**
+     * Sets the Setpoint for drive motor.
+     *
+     * @param setpoint The desired setpoint
+     */
+    public void setDriveSetpoint(double setpoint) {
+        driveController.setReference(setpoint, ControlType.kVelocity);
+    }
+
+    /**
+     * Sets the Setpoint for angle motor.
+     *
+     * @param setpoint The desired setpoint
+     */
+    public void setAngleSetpoint(double setpoint) {
+        angleController.setReference(setpoint, ControlType.kPosition);
+    }
+
+    /**
+     * Resets the RelativeEncoder of the angle motor to the position of the CANcoder.
+     */
+    public void resetAngleEncoder() {
+        angleEncoder.setPosition(absoluteAngleEncoder.getPosition().getValueAsDouble());
+    }
+
+    /**
+     * Resets all module encoders.
      */
     public void resetEncoders() {
-        resetTurnEncoder();
+        resetAngleEncoder();
         driveEncoder.setPosition(0);
     }
 
     /**
      * Sets the target module state.
-     *  
+     * 
      * @param desiredState The desired state of the module
      */
     public void setDesiredModuleState(SwerveModuleState desiredState) {
-        desiredState.optimize(getTurnPosition());
+        desiredState.optimize(getAnglePosition());
         this.desiredState = desiredState;
 
-        turnController.setReference(desiredState.angle.getDegrees(), ControlType.kPosition);
+        angleController.setReference(desiredState.angle.getDegrees(), ControlType.kPosition);
         driveController.setReference(desiredState.speedMetersPerSecond, ControlType.kVelocity);
     }
 
@@ -105,9 +191,8 @@ public class NEOSwerveModule {
      */
     public SwerveModuleState getModuleState() {
         return new SwerveModuleState(
-            getDriveVelocity(),
-            getTurnPosition()
-        );
+                getDriveVelocity(),
+                getAnglePosition());
     }
 
     /**
@@ -117,13 +202,19 @@ public class NEOSwerveModule {
      */
     public SwerveModulePosition getModulePosition() {
         return new SwerveModulePosition(
-            getDrivePosition(),
-            getTurnPosition()
-        );
+                getDrivePosition(),
+                getAnglePosition());
     }
 
-    private Rotation2d getTurnPosition() {
-        return Rotation2d.fromDegrees(turnEncoder.getPosition());
+    /**
+     * Stops the module by setting desired state to zero speed and current angle.
+     */
+    public void stop() {
+        setDesiredModuleState(new SwerveModuleState());
+    }
+
+    private Rotation2d getAnglePosition() {
+        return Rotation2d.fromDegrees(angleEncoder.getPosition());
     }
 
     private double getDriveVelocity() {
@@ -133,4 +224,21 @@ public class NEOSwerveModule {
     private double getDrivePosition() {
         return driveEncoder.getPosition();
     }
+
+    private Rotation2d getAbsolutePosition() {
+        return Rotation2d.fromDegrees(absoluteAngleEncoder.getAbsolutePosition().getValueAsDouble());
+    }
+
+    public void initShuffleboard(ShuffleboardLayout layout) {
+        layout.addNumber(
+                "Absolute Position",
+                () -> getAbsolutePosition().getDegrees());
+        layout.addNumber(
+                "Integrated Position",
+                () -> getAnglePosition().getDegrees());
+        layout.addNumber("Velocity", () -> getDriveVelocity());
+        layout.withSize(2, 4);
+    }
+
+    public void updateShuffleboard() {}
 }

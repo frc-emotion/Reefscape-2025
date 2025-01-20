@@ -49,7 +49,7 @@ public class MapleSwerveSubsystem implements SwerveDrive {
 
         swerveDriveSimulation.withCurrentLimits(
             Amps.of(ModuleConstants.kDriveSecondaryCurrentLimit), 
-            Amps.of(ModuleConstants.kTurnSmartCurrentLimit)
+            Amps.of(ModuleConstants.kAngleSmartCurrentLimit)
         );
 
         SimulatedArena.getInstance().addDriveTrainSimulation(swerveDriveSimulation.getDriveTrainSimulation());
@@ -115,4 +115,7 @@ public class MapleSwerveSubsystem implements SwerveDrive {
     public SwerveModuleState[] getDesiredModuleStates() {
         return swerveDriveSimulation.getSetPointsOptimized();
     }
+
+    @Override
+    public void updateShuffleboard() {}
 }
