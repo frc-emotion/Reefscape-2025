@@ -5,7 +5,9 @@ import java.util.Map;
 import org.dyn4j.geometry.Rotation;
 
 import com.ctre.phoenix6.configs.MagnetSensorConfigs;
+import com.ctre.phoenix6.controls.ControlRequest;
 import com.ctre.phoenix6.hardware.CANcoder;
+import com.ctre.phoenix6.signals.SensorDirectionValue;
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
@@ -17,6 +19,8 @@ import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
+
+import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
@@ -33,7 +37,8 @@ public class NEOSwerveModule {
     private final SparkMax driveMotor, angleMotor;
     private final CANcoder absoluteAngleEncoder;
 
-    private final SparkClosedLoopController driveController, angleController;
+    private final SparkClosedLoopController driveController;
+    private final PIDController angleController;
 
     private final RelativeEncoder driveEncoder, angleEncoder;
 
@@ -74,7 +79,13 @@ public class NEOSwerveModule {
                 ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
         angleEncoder = angleMotor.getEncoder();
-        angleController = angleMotor.getClosedLoopController();
+        // angleController = angleMotor.getClosedLoopController();
+        angleController = new PIDController(
+            Constants.DriveConstants.ModuleConstants.kAngleP, 
+            Constants.DriveConstants.ModuleConstants.kAngleI, 
+            Constants.DriveConstants.ModuleConstants.kAngleD);
+        angleController.setTolerance(5);
+        angleController.enableContinuousInput(0, 360);
 
         // Initialize Absolute Angle Encoder
         absoluteAngleEncoder = new CANcoder(Constants.Ports.CANID.CANCODER_IDS[id]);
@@ -82,6 +93,11 @@ public class NEOSwerveModule {
         // Configure Magnet Sensor
         MagnetSensorConfigs magnetSensorConfigs = new MagnetSensorConfigs();
         magnetSensorConfigs.withMagnetOffset(ModuleConstants.ENCODER_OFFSETS[id]);
+        magnetSensorConfigs.withSensorDirection(SensorDirectionValue.Clockwise_Positive);
+        //magnetSensorConfigs.withAbsoluteSensorDiscontinuityPoint(1);
+    
+
+        absoluteAngleEncoder.getConfigurator().apply(magnetSensorConfigs);
 
         resetAngleEncoder();
 
@@ -100,8 +116,8 @@ public class NEOSwerveModule {
     public void setIdleMode(IdleMode mode) {
         driveConfig.idleMode(mode);
         angleConfig.idleMode(mode);
-        driveMotor.configure(driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
-        angleMotor.configure(angleConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        driveMotor.configure(driveConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+        angleMotor.configure(angleConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
     }
 
     /**
@@ -114,7 +130,7 @@ public class NEOSwerveModule {
      */
     public void updateDrivePID(double p, double i, double d, double f) {
         driveConfig.closedLoop.pidf(p, i, d, f);
-        driveMotor.configure(driveConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        driveMotor.configure(driveConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
     }
 
     /**
@@ -125,33 +141,38 @@ public class NEOSwerveModule {
      * @param d Derivative coefficient
      */
     public void updateAnglePID(double p, double i, double d) {
-        angleConfig.closedLoop.pid(p, i, d);
-        angleMotor.configure(angleConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        //angleConfig.closedLoop.pid(p, i, d);
+        // angleMotor.configure(angleConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+        angleController.setPID(p, i, d);
     }
 
-    /**
-     * Sets the Setpoint for drive motor.
-     *
-     * @param setpoint The desired setpoint
-     */
-    public void setDriveSetpoint(double setpoint) {
-        driveController.setReference(setpoint, ControlType.kVelocity);
-    }
+    // /**
+    //  * Sets the Setpoint for drive motor.
+    //  *
+    //  * @param setpoint The desired setpoint
+    //  */
+    // public void setDriveSetpoint(double setpoint) {
+    //     driveController.setReference(setpoint, ControlType.kVelocity);
+    // }
 
-    /**
-     * Sets the Setpoint for angle motor.
-     *
-     * @param setpoint The desired setpoint
-     */
-    public void setAngleSetpoint(double setpoint) {
-        angleController.setReference(setpoint, ControlType.kPosition);
+    // /**
+    //  * Sets the Setpoint for angle motor.
+    //  *
+    //  * @param setpoint The desired setpoint
+    //  */
+    // public void setAngleSetpoint(double setpoint) {
+    //     angleController.setReference(setpoint, ControlType.kPosition);
+    // }
+
+    private double getAbsoluteEncoder() {
+        return (absoluteAngleEncoder.getPosition().getValueAsDouble() * 360);
     }
 
     /**
      * Resets the RelativeEncoder of the angle motor to the position of the CANcoder.
      */
     public void resetAngleEncoder() {
-        angleEncoder.setPosition(absoluteAngleEncoder.getPosition().getValueAsDouble());
+        angleEncoder.setPosition(getAbsoluteEncoder());
     }
 
     /**
@@ -171,7 +192,8 @@ public class NEOSwerveModule {
         desiredState.optimize(getAnglePosition());
         this.desiredState = desiredState;
 
-        angleController.setReference(desiredState.angle.getDegrees(), ControlType.kPosition);
+        // angleController.setReference(desiredState.angle.getDegrees(), ControlType.kPosition);
+        angleMotor.set(angleController.calculate(getAbsoluteEncoder(), desiredState.angle.getDegrees()));
         driveController.setReference(desiredState.speedMetersPerSecond, ControlType.kVelocity);
     }
 
@@ -226,7 +248,7 @@ public class NEOSwerveModule {
     }
 
     private Rotation2d getAbsolutePosition() {
-        return Rotation2d.fromDegrees(absoluteAngleEncoder.getAbsolutePosition().getValueAsDouble());
+        return Rotation2d.fromDegrees(getAbsoluteEncoder());
     }
 
     public void initShuffleboard(ShuffleboardLayout layout) {

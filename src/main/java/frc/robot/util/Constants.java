@@ -72,33 +72,35 @@ public class Constants {
         public static class ModuleConstants {
 
             public static final Angle[] ENCODER_OFFSETS = {
-                    Degrees.of(0),
-                    Degrees.of(0),
-                    Degrees.of(0),
-                    Degrees.of(0)
+                    Degrees.of(4.21 + 10 + 0.8),
+                    Degrees.of(178 - 35.7),
+                    Degrees.of(95.53 - 127.7),
+                    Degrees.of(155.6 - 90)
             };
 
             public static final double kWheelDiameter = 0.1016; // meters
             public static final double kDriveWheelFreeSpeed = 14.419; // rotations per second
 
-            public static final double kDriveMotorRatio = 1;
-            public static final double kAngleMotorRatio = 1;
+            public static final double kDriveMotorRatio = 6.75;
+            public static final double kAngleMotorRatio = 10;
 
             public static final int kDriveSmartCurrentLimit = 45;
             public static final int kDriveSecondaryCurrentLimit = 60;
             public static final int kAngleSmartCurrentLimit = 20;
 
-            public static final double kDriveP = 0.04;
+            public static final double kDriveP = 0.004;
             public static final double kDriveI = 0;
             public static final double kDriveD = 0;
 
-            public static final double kAngleP = 1;
-            public static final double kAngleI = 0;
+            public static final double kAngleP = 0.03;
+            public static final double kAngleI = 0.0005;
             public static final double kAngleD = 0;
 
             public static final double driveFactor = ModuleConstants.kWheelDiameter * 180 / ModuleConstants.kDriveMotorRatio;
             public static final double angleFactor = 180 / ModuleConstants.kAngleMotorRatio;
-            public static final double driveVelocityFeedForward = 1 / ModuleConstants.kDriveWheelFreeSpeed;
+            // public static final double driveVelocityFeedForward = 1 / ModuleConstants.kDriveWheelFreeSpeed;
+            public static final double driveVelocityFeedForward = 1 / 479;
+
         }
     }
 

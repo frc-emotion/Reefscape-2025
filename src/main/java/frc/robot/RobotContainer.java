@@ -61,7 +61,7 @@ public class RobotContainer {
     private void configureBindings() {
 
         // When driver presses x, set wheels in x formation
-        m_driverController.x().onTrue(SwerveXCommand.xCommand(m_swerveSubsystem));
+        // m_driverController.x().onTrue(SwerveXCommand.xCommand(m_swerveSubsystem));
 
     }
 

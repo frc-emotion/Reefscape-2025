@@ -31,7 +31,7 @@ public class Configs {
                 .secondaryCurrentLimit(ModuleConstants.kAngleSmartCurrentLimit);
             ANGLE_CONFIG.encoder
                 .positionConversionFactor(ModuleConstants.angleFactor) // degrees
-                .velocityConversionFactor(ModuleConstants.angleFactor / 60.0); // degrees per second
+                .velocityConversionFactor(ModuleConstants.angleFactor / 60.0);
             ANGLE_CONFIG.closedLoop
                 .feedbackSensor(FeedbackSensor.kPrimaryEncoder)
                 .pid(ModuleConstants.kAngleP, ModuleConstants.kAngleI, ModuleConstants.kAngleD)

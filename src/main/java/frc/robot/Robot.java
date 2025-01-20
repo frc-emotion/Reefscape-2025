@@ -6,6 +6,7 @@ package frc.robot;
 
 import org.ironmaple.simulation.SimulatedArena;
 
+import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Threads;
@@ -18,6 +19,8 @@ import frc.robot.util.Faults.FaultManager;
 public class Robot extends TimedRobot {
     private Command m_autonomousCommand;
 
+    @Logged(name="RobotContainer")
+
     private final RobotContainer m_robotContainer;
 
     public Robot() {
@@ -25,6 +28,8 @@ public class Robot extends TimedRobot {
         RobotController.setBrownoutVoltage(6.0);
 
         m_robotContainer = new RobotContainer();
+
+        Epilogue.bind(this);
 
     }
 

@@ -73,22 +73,20 @@ public class SwerveDriveCommand extends Command {
     @Override
     public void execute() {
         double x = xLimiter.calculate(
-            (Math.abs(xSupplier.get()) > IOConstants.DRIVER_DEADZONE ? xSupplier.get() : 0) * maxSpeed
-        );
-        
+            (Math.abs(xSupplier.get()) > IOConstants.DRIVER_DEADZONE ? xSupplier.get() : 0)
+        ) * maxSpeed;
+
         double y = yLimiter.calculate(
-            (Math.abs(ySupplier.get()) > IOConstants.DRIVER_DEADZONE ? ySupplier.get() : 0) * maxSpeed
-        );
+            (Math.abs(ySupplier.get()) > IOConstants.DRIVER_DEADZONE ? ySupplier.get() : 0) 
+        ) * maxSpeed;
 
         double theta = thetaLimiter.calculate(
-            (Math.abs(thetaSupplier.get()) > IOConstants.DRIVER_DEADZONE ? thetaSupplier.get() : 0) * maxAngularSpeed
-        );
+            (Math.abs(thetaSupplier.get()) > IOConstants.DRIVER_DEADZONE ? thetaSupplier.get() : 0) 
+        ) * maxAngularSpeed;
 
         ChassisSpeeds speeds = new ChassisSpeeds(x, y, theta);
 
-        if(DriverStation.getMatchTime() % 2 == 0) {
-            System.out.println("Swerve Speeds: " + x + " " + y + " " + theta);
-        } 
+        System.out.println("Swerve Speeds: " + x + " " + y + " " + theta);
         
         swerveDrive.drive(speeds, true);
     }
