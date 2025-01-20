@@ -45,7 +45,7 @@ public class SwerveSubsystem implements SwerveDrive {
 
     public SwerveSubsystem() {
         swerveModules = new NEOSwerveModule[4];
-        for (int i = 0; i < Constants.Ports.CANID.SWERVE_IDS.length - 1; i++) {
+        for (int i = 0; i < Constants.Ports.CANID.SWERVE_IDS.length; i++) {
             swerveModules[i] = new NEOSwerveModule(i);
         }
 
@@ -84,7 +84,7 @@ public class SwerveSubsystem implements SwerveDrive {
 
     @Override
     public void setModuleStates(SwerveModuleState[] states) {
-        for (int i = 0; i < swerveModules.length - 1; i++) {
+        for (int i = 0; i < swerveModules.length; i++) {
             swerveModules[i].setDesiredModuleState(states[i]);
         }
     }
@@ -122,7 +122,7 @@ public class SwerveSubsystem implements SwerveDrive {
     public SwerveModulePosition[] getModulePositions() {
         SwerveModulePosition[] swerveModulePositions = new SwerveModulePosition[4];
 
-        for (int i = 0; i < swerveModules.length - 1; i++) {
+        for (int i = 0; i <= swerveModules.length - 1; i++) {
             swerveModulePositions[i] = swerveModules[i].getModulePosition();
         }
 
@@ -134,7 +134,7 @@ public class SwerveSubsystem implements SwerveDrive {
     public SwerveModuleState[] getModuleStates() {
         SwerveModuleState[] swerveModuleStates = new SwerveModuleState[4];
 
-        for (int i = 0; i < swerveModules.length - 1; i++) {
+        for (int i = 0; i < swerveModules.length; i++) {
             swerveModuleStates[i] = swerveModules[i].getModuleState();
         }
 
@@ -146,7 +146,7 @@ public class SwerveSubsystem implements SwerveDrive {
     public SwerveModuleState[] getDesiredModuleStates() {
         SwerveModuleState[] desiredModuleStates = new SwerveModuleState[4];
 
-        for (int i = 0; i < swerveModules.length - 1; i++) {
+        for (int i = 0; i < swerveModules.length; i++) {
             desiredModuleStates[i] = swerveModules[i].getDesiredModuleState();
         }
 

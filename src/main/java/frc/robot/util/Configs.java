@@ -13,7 +13,7 @@ public class Configs {
 
         static {
             DRIVE_CONFIG
-                .idleMode(IdleMode.kBrake)
+                .idleMode(IdleMode.kCoast)
                 .smartCurrentLimit(ModuleConstants.kDriveSmartCurrentLimit)
                 .secondaryCurrentLimit(ModuleConstants.kDriveSecondaryCurrentLimit);
             DRIVE_CONFIG.encoder
@@ -26,7 +26,7 @@ public class Configs {
                 .outputRange(-1, 1);
             
             ANGLE_CONFIG
-                .idleMode(IdleMode.kBrake)
+                .idleMode(IdleMode.kCoast)
                 .smartCurrentLimit(ModuleConstants.kAngleSmartCurrentLimit)
                 .secondaryCurrentLimit(ModuleConstants.kAngleSmartCurrentLimit);
             ANGLE_CONFIG.encoder

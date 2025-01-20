@@ -28,7 +28,7 @@ public class RobotContainer {
     private final SwerveDrive m_swerveSubsystem;
 
     public RobotContainer() {
-        FaultManager.register(m_PDH);
+        //FaultManager.register(m_PDH);
 
         DataLogManager.start();
         

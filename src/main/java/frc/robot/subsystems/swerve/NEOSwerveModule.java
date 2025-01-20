@@ -55,7 +55,7 @@ public class NEOSwerveModule {
     private SparkMaxConfig angleConfig = new SparkMaxConfig().apply(Configs.SwerveConfigs.ANGLE_CONFIG);
 
     public NEOSwerveModule(int id) {
-        if (id < 0 || id > Constants.Ports.CANID.SWERVE_IDS.length - 1)
+        if (id < 0 || id > Constants.Ports.CANID.SWERVE_IDS.length)
             throw new IndexOutOfBoundsException("Swerve Module index " + id + " out of bounds for length " + Constants.Ports.CANID.SWERVE_IDS.length);
 
         // Initialize Drive Motor
@@ -88,8 +88,8 @@ public class NEOSwerveModule {
         desiredState = new SwerveModuleState(0, getAnglePosition());
 
         // Register Motors with Fault Manager
-        FaultManager.register(driveMotor);
-        FaultManager.register(angleMotor);
+        // FaultManager.register(driveMotor);
+        // FaultManager.register(angleMotor);
     }
 
     /**

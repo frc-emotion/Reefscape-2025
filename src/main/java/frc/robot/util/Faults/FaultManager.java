@@ -313,11 +313,11 @@ public final class FaultManager {
         });
 
         // Example: Register a warning if battery voltage is below a threshold
-        register(
-                () -> powerDistribution.getVoltage() < 11.5,
-                "Power Distribution Hub",
-                "Battery voltage below 11.5V",
-                FaultType.WARNING);
+        // register(
+        //         () -> powerDistribution.getVoltage() < 11.5,
+        //         "Power Distribution Hub",
+        //         "Battery voltage below 11.5V",
+        //         FaultType.WARNING);
     }
 
     /**
