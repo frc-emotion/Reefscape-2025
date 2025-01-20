@@ -9,6 +9,7 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
+import frc.robot.util.Constants;
 import frc.robot.util.Constants.DriveConstants;
 
 public class SwerveSubsystem implements SwerveDrive {
@@ -20,7 +21,7 @@ public class SwerveSubsystem implements SwerveDrive {
     
     public SwerveSubsystem() {
         swerveModules = new NEOSwerveModule[4];
-        for(int i = 0; i < 4; i++) {
+        for(int i = 0; i < Constants.Ports.CANID.SWERVE_IDS.length - 1; i++) {
             swerveModules[i] = new NEOSwerveModule(i);
         }
 

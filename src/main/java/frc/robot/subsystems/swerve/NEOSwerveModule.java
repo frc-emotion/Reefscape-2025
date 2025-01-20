@@ -13,7 +13,9 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.robot.util.Configs;
+import frc.robot.util.Constants;
 import frc.robot.util.Constants.DriveConstants.ModuleConstants;
+import frc.robot.util.FaultManager;
 
 public class NEOSwerveModule {
     private final SparkMax driveMotor, turnMotor;
@@ -28,7 +30,7 @@ public class NEOSwerveModule {
     public NEOSwerveModule(int id) {
         if(id < 0 || id > 3) throw new IndexOutOfBoundsException("Swerve Module index " + id + "out of bounds for length 4");
 
-        driveMotor = new SparkMax(ModuleConstants.MOTOR_IDS[id][0], MotorType.kBrushless);
+        driveMotor = new SparkMax(Constants.Ports.CANID.SWERVE_IDS[id][0], MotorType.kBrushless);
         driveMotor.configure(
             Configs.SwerveConfigs.DRIVE_CONFIG,
             ResetMode.kResetSafeParameters,
@@ -37,7 +39,7 @@ public class NEOSwerveModule {
         driveEncoder = driveMotor.getEncoder();
         driveController = driveMotor.getClosedLoopController();
 
-        turnMotor = new SparkMax(ModuleConstants.MOTOR_IDS[id][1], MotorType.kBrushless);
+        turnMotor = new SparkMax(Constants.Ports.CANID.SWERVE_IDS[id][1], MotorType.kBrushless);
         turnMotor.configure(
             Configs.SwerveConfigs.TURN_CONFIG,
             ResetMode.kResetSafeParameters,
@@ -46,7 +48,7 @@ public class NEOSwerveModule {
         turnEncoder = turnMotor.getEncoder();
         turnController = turnMotor.getClosedLoopController();
 
-        absoluteTurnEncoder = new CANcoder(ModuleConstants.ENCODER_IDS[id]);
+        absoluteTurnEncoder = new CANcoder(Constants.Ports.CANID.CANCODER_IDS[id]);
 
         MagnetSensorConfigs magnetSensorConfigs = new MagnetSensorConfigs();
         magnetSensorConfigs.withMagnetOffset(ModuleConstants.ENCODER_OFFSETS[id]);
@@ -54,6 +56,9 @@ public class NEOSwerveModule {
         resetTurnEncoder();
 
         desiredState = new SwerveModuleState(0, getTurnPosition());
+
+        FaultManager.register(driveMotor);
+        FaultManager.register(turnMotor);
     }
 
     /**
