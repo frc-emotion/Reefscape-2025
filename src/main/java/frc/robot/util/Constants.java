@@ -63,6 +63,9 @@ public class Constants {
         public static final AngularAcceleration kSlowDriveAngularAcceleration = kMaxDriveAngularAcceleration
                 .times(0.333);
 
+        public static final double tempVelMax = 4.8; // M/s
+        public static final double tempAngVelMax = 360; // Rotations
+
         public static final SwerveDriveKinematics swerveDriveKinematics = new SwerveDriveKinematics(
                 new Translation2d(kTrackWidth, kTrackWidth),
                 new Translation2d(kTrackWidth.times(-1), kTrackWidth),
@@ -92,11 +95,11 @@ public class Constants {
             public static final double kDriveMotorRatio = 6.75;
             public static final double kAngleMotorRatio = 10;
 
-            public static final int kDriveSmartCurrentLimit = 45;
+            public static final int kDriveSmartCurrentLimit = 50;
             public static final int kDriveSecondaryCurrentLimit = 60;
             public static final int kAngleSmartCurrentLimit = 20;
 
-            public static final double kDriveP = 0.004;
+            public static final double kDriveP = 0.04;
             public static final double kDriveI = 0;
             public static final double kDriveD = 0;
 

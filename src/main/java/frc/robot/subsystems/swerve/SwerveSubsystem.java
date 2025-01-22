@@ -37,9 +37,6 @@ public class SwerveSubsystem implements SwerveDrive {
 
     private GenericEntry idleModeEntry;
 
-    private GenericEntry driveSetpointEntry;
-    private GenericEntry angleSetpointEntry;
-
     private double driveP, driveI, driveD, driveF;
     private double angleP, angleI, angleD;
 
@@ -74,15 +71,15 @@ public class SwerveSubsystem implements SwerveDrive {
 
     }
 
-    @Override
     public void drive(ChassisSpeeds speeds, boolean fieldRelative) {
         if (fieldRelative) {
-            speeds = ChassisSpeeds.fromRobotRelativeSpeeds(speeds, getHeading());
-        } 
-        // else {
-        //     speeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getHeading());
-        // }
-
+            speeds = ChassisSpeeds.fromFieldRelativeSpeeds(
+                speeds.vxMetersPerSecond,
+                speeds.vyMetersPerSecond,
+                speeds.omegaRadiansPerSecond,
+                getHeading()
+            );
+        }
         setModuleStates(DriveConstants.swerveDriveKinematics.toSwerveModuleStates(speeds));
     }
 
@@ -134,11 +131,23 @@ public class SwerveSubsystem implements SwerveDrive {
     }
 
     @Logged
-    public double[] getSetpoints() {
+    public double[] getAngleSetpoints() {
         double[] setpoints = new double[swerveModules.length];
 
         for (int i = 0; i < setpoints.length; i++) {
-            setpoints[i] = swerveModules[i].getSetpoint();
+            setpoints[i] = swerveModules[i].getAngleSetpoint();
+        }
+
+        return setpoints;
+        
+    }
+
+    @Logged
+    public double[] getDriveSetpoints() {
+        double[] setpoints = new double[swerveModules.length];
+
+        for (int i = 0; i < setpoints.length; i++) {
+            setpoints[i] = swerveModules[i].getDriveSetpoint();
         }
 
         return setpoints;
@@ -233,17 +242,6 @@ public class SwerveSubsystem implements SwerveDrive {
                 
                 .getEntry();
 
-        // driveSetpointEntry = globalLayout.add("Drive Setpoint", 0.0)
-        //         .withWidget("Text View")
-        //         .withSize(2, 1)
-        //         .withProperties(Map.of("min", -100.0, "max", 100.0))
-        //         .getEntry();
-        angleSetpointEntry = globalLayout.add("Angle Setpoint", 0.0)
-                .withWidget("Text View")
-                .withSize(2, 1)
-                .withProperties(Map.of("min", -180.0, "max", 180.0))
-                .getEntry();
-
         for (int i = 0; i < swerveModules.length; i++) {
             NEOSwerveModule module = swerveModules[i];
             
@@ -283,52 +281,17 @@ public class SwerveSubsystem implements SwerveDrive {
         if (idleModeEntry != null) {
             applyIdleModeToAllModules();
         }
-
+    
+        // Apply PID values from Shuffleboard
+        driveP = drivePEntry.getDouble(driveP);
+        driveI = driveIEntry.getDouble(driveI);
+        driveD = driveDEntry.getDouble(driveD);
+        driveF = driveFEntry.getDouble(driveF);
+        angleP = anglePEntry.getDouble(angleP);
+        angleI = angleIEntry.getDouble(angleI);
+        angleD = angleDEntry.getDouble(angleD);
+    
         applyPIDToAllModules();
-
-        // if (drivePEntry != null && driveIEntry != null && driveDEntry != null && driveFEntry != null) {
-        //     double newDriveP = drivePEntry.getDouble(driveP);
-        //     double newDriveI = driveIEntry.getDouble(driveI);
-        //     double newDriveD = driveDEntry.getDouble(driveD);
-        //     double newDriveF = driveFEntry.getDouble(driveF);
-        //     if (newDriveP != driveP || newDriveI != driveI || newDriveD != driveD || newDriveF != driveF) {
-        //         driveP = newDriveP;
-        //         driveI = newDriveI;
-        //         driveD = newDriveD;
-        //         driveF = newDriveF;
-        //         for (NEOSwerveModule module : swerveModules) {
-        //             module.updateDrivePID(driveP, driveI, driveD, driveF);
-        //         }
-        //     }
-        // }
-
-        // if (anglePEntry != null && angleIEntry != null && angleDEntry != null) {
-        //     double newAngleP = anglePEntry.getDouble(angleP);
-        //     double newAngleI = angleIEntry.getDouble(angleI);
-        //     double newAngleD = angleDEntry.getDouble(angleD);
-        //     if (newAngleP != angleP || newAngleI != angleI || newAngleD != angleD) {
-        //         angleP = newAngleP;
-        //         angleI = newAngleI;
-        //         angleD = newAngleD;
-        //         for (NEOSwerveModule module : swerveModules) {
-        //             module.updateAnglePID(angleP, angleI, angleD);
-        //         }
-        //     }
-        // }
-
-        // if (driveSetpointEntry != null) {
-        //     double setpoint = driveSetpointEntry.getDouble(0.0);
-        //     for (NEOSwerveModule module : swerveModules) {
-        //         module.setDriveSetpoint(setpoint);
-        //     }
-        // }
-
-        // if (angleSetpointEntry != null) {
-        //     double setpoint = angleSetpointEntry.getDouble(0.0);
-        //     for (NEOSwerveModule module : swerveModules) {
-        //         module.setAngleSetpoint(setpoint);
-        //     }
-        // }
     }
 
     @Override

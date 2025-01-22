@@ -38,8 +38,8 @@ public class NEOSwerveModule {
     private final SparkMax driveMotor, angleMotor;
     private final CANcoder absoluteAngleEncoder;
 
-    private final SparkClosedLoopController driveController;
-    private final PIDController angleController;
+    private final SparkClosedLoopController driveController, angleController;
+    private double angleSetpoint, driveSetpoint;
 
     private final RelativeEncoder driveEncoder, angleEncoder;
 
@@ -75,19 +75,15 @@ public class NEOSwerveModule {
 
         // Initialize Angle Motor
         angleMotor = new SparkMax(Constants.Ports.CANID.SWERVE_IDS[id][1], MotorType.kBrushless);
+
         angleMotor.configure(
                 angleConfig,
                 ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
-        angleEncoder = angleMotor.getEncoder();
-        // angleController = angleMotor.getClosedLoopController();
-        angleController = new PIDController(
-            Constants.DriveConstants.ModuleConstants.kAngleP, 
-            Constants.DriveConstants.ModuleConstants.kAngleI, 
-            Constants.DriveConstants.ModuleConstants.kAngleD);
-        angleController.setTolerance(5);
-        angleController.enableContinuousInput(-180, 180);
 
+        angleEncoder = angleMotor.getEncoder();
+        angleController = angleMotor.getClosedLoopController();
+        
         // Initialize Absolute Angle Encoder
         absoluteAngleEncoder = new CANcoder(Constants.Ports.CANID.CANCODER_IDS[id]);
 
@@ -96,11 +92,11 @@ public class NEOSwerveModule {
         magnetSensorConfigs.withMagnetOffset(ModuleConstants.ENCODER_OFFSETS[id]);
         magnetSensorConfigs.withSensorDirection(SensorDirectionValue.Clockwise_Positive);
         //magnetSensorConfigs.withAbsoluteSensorDiscontinuityPoint(1);
-    
 
         absoluteAngleEncoder.getConfigurator().apply(magnetSensorConfigs);
 
         resetAngleEncoder();
+        driveEncoder.setPosition(0);
 
         desiredState = new SwerveModuleState(0, getAnglePosition());
 
@@ -142,28 +138,9 @@ public class NEOSwerveModule {
      * @param d Derivative coefficient
      */
     public void updateAnglePID(double p, double i, double d) {
-        //angleConfig.closedLoop.pid(p, i, d);
-        // angleMotor.configure(angleConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
-        angleController.setPID(p, i, d);
+        angleConfig.closedLoop.pid(p, i, d);
+        angleMotor.configure(angleConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
     }
-
-    // /**
-    //  * Sets the Setpoint for drive motor.
-    //  *
-    //  * @param setpoint The desired setpoint
-    //  */
-    // public void setDriveSetpoint(double setpoint) {
-    //     driveController.setReference(setpoint, ControlType.kVelocity);
-    // }
-
-    // /**
-    //  * Sets the Setpoint for angle motor.
-    //  *
-    //  * @param setpoint The desired setpoint
-    //  */
-    // public void setAngleSetpoint(double setpoint) {
-    //     angleController.setReference(setpoint, ControlType.kPosition);
-    // }
 
     private double getRawAbsoluteEncoder() {
         return absoluteAngleEncoder.getAbsolutePosition().getValueAsDouble();
@@ -194,13 +171,17 @@ public class NEOSwerveModule {
      * @param desiredState The desired state of the module
      */
     public void setDesiredModuleState(SwerveModuleState desiredState) {
-        desiredState.optimize(getAbsolutePosition());
+        desiredState = SwerveModuleState.optimize(desiredState, getAnglePosition());
         this.desiredState = desiredState;
+    
+        angleSetpoint = desiredState.angle.getDegrees();
+        driveSetpoint = desiredState.speedMetersPerSecond;
 
-        // angleController.setReference(desiredState.angle.getDegrees(), ControlType.kPosition);
-        angleMotor.set(angleController.calculate(getAbsoluteEncoder(), desiredState.angle.getDegrees()));
+        angleController.setReference(desiredState.angle.getDegrees(), ControlType.kPosition);
         driveController.setReference(desiredState.speedMetersPerSecond, ControlType.kVelocity);
     }
+
+    
 
     /**
      * Retrieves the last desired module state.
@@ -257,8 +238,13 @@ public class NEOSwerveModule {
     }
 
     @Logged
-    public double getSetpoint() {
-       return angleController.getSetpoint();
+    public double getAngleSetpoint() {
+       return angleSetpoint;
+    }
+
+    @Logged
+    public double getDriveSetpoint() {
+       return driveSetpoint;
     }
 
     public void initShuffleboard(ShuffleboardLayout layout) {
