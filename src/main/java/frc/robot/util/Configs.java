@@ -28,7 +28,8 @@ public class Configs {
             ANGLE_CONFIG
                 .idleMode(IdleMode.kCoast)
                 .smartCurrentLimit(ModuleConstants.kAngleSmartCurrentLimit)
-                .secondaryCurrentLimit(ModuleConstants.kAngleSmartCurrentLimit);
+                .secondaryCurrentLimit(ModuleConstants.kAngleSmartCurrentLimit)
+                .voltageCompensation(12);
             ANGLE_CONFIG.encoder
                 .positionConversionFactor(ModuleConstants.angleFactor) // degrees
                 .velocityConversionFactor(ModuleConstants.angleFactor / 60.0);

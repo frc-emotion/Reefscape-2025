@@ -2,6 +2,7 @@ package frc.robot.commands.teleop.Swerve;
 
 import java.util.function.Supplier;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.units.measure.*;
@@ -22,7 +23,7 @@ public class SwerveDriveCommand extends Command {
      * acceleration of each of the modules, rather than the directions the robot can move.
      */
     private final SlewRateLimiter xLimiter, yLimiter, thetaLimiter;
-
+    @Logged
     private double maxSpeed, maxAngularSpeed;
 
     public SwerveDriveCommand(
@@ -67,7 +68,7 @@ public class SwerveDriveCommand extends Command {
 
     @Override
     public void initialize() {
-        swerveDrive.updateShuffleboard();
+        //swerveDrive.updateShuffleboard();
     }
 
     @Override

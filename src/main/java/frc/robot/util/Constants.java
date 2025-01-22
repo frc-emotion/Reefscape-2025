@@ -71,12 +71,20 @@ public class Constants {
 
         public static class ModuleConstants {
 
+            // public static final Angle[] ENCODER_OFFSETS = {
+            //         Degrees.of(4.21 + 10 + 0.8),
+            //         Degrees.of(178 - 35.7),
+            //         Degrees.of(95.53 - 127.7),
+            //         Degrees.of(155.6 - 90)
+            // };
+
             public static final Angle[] ENCODER_OFFSETS = {
-                    Degrees.of(4.21 + 10 + 0.8),
-                    Degrees.of(178 - 35.7),
-                    Degrees.of(95.53 - 127.7),
-                    Degrees.of(155.6 - 90)
+                    Degrees.of(125.63),
+                    Degrees.of(-156.09),
+                    Degrees.of(-107.35),
+                    Degrees.of(-56.55)
             };
+
 
             public static final double kWheelDiameter = 0.1016; // meters
             public static final double kDriveWheelFreeSpeed = 14.419; // rotations per second
@@ -92,8 +100,8 @@ public class Constants {
             public static final double kDriveI = 0;
             public static final double kDriveD = 0;
 
-            public static final double kAngleP = 0.03;
-            public static final double kAngleI = 0.0005;
+            public static final double kAngleP = 0.0001;
+            public static final double kAngleI = 0;
             public static final double kAngleD = 0;
 
             public static final double driveFactor = ModuleConstants.kWheelDiameter * 180 / ModuleConstants.kDriveMotorRatio;

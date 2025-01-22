@@ -78,7 +78,10 @@ public class SwerveSubsystem implements SwerveDrive {
     public void drive(ChassisSpeeds speeds, boolean fieldRelative) {
         if (fieldRelative) {
             speeds = ChassisSpeeds.fromRobotRelativeSpeeds(speeds, getHeading());
-        }
+        } 
+        // else {
+        //     speeds = ChassisSpeeds.fromFieldRelativeSpeeds(speeds, getHeading());
+        // }
 
         setModuleStates(DriveConstants.swerveDriveKinematics.toSwerveModuleStates(speeds));
     }
@@ -128,6 +131,18 @@ public class SwerveSubsystem implements SwerveDrive {
         }
 
         return swerveModulePositions;
+    }
+
+    @Logged
+    public double[] getSetpoints() {
+        double[] setpoints = new double[swerveModules.length];
+
+        for (int i = 0; i < setpoints.length; i++) {
+            setpoints[i] = swerveModules[i].getSetpoint();
+        }
+
+        return setpoints;
+        
     }
 
     @Override
@@ -321,10 +336,10 @@ public class SwerveSubsystem implements SwerveDrive {
         SwerveDrive.super.periodic();
 
         // When robot is disabled, ensure wheels are stopped
-        if (DriverStation.isDisabled()) {
-            for (var module : swerveModules) {
-                module.stop();
-            }
-        }
+        // if (DriverStation.isDisabled()) {
+        //     for (var module : swerveModules) {
+        //         module.stop();
+        //     }
+        // }
     }
 }

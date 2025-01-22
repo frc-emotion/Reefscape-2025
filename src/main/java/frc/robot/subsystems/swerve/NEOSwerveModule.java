@@ -20,6 +20,7 @@ import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
+import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.controller.PIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
@@ -85,7 +86,7 @@ public class NEOSwerveModule {
             Constants.DriveConstants.ModuleConstants.kAngleI, 
             Constants.DriveConstants.ModuleConstants.kAngleD);
         angleController.setTolerance(5);
-        angleController.enableContinuousInput(0, 360);
+        angleController.enableContinuousInput(-180, 180);
 
         // Initialize Absolute Angle Encoder
         absoluteAngleEncoder = new CANcoder(Constants.Ports.CANID.CANCODER_IDS[id]);
@@ -164,8 +165,12 @@ public class NEOSwerveModule {
     //     angleController.setReference(setpoint, ControlType.kPosition);
     // }
 
+    private double getRawAbsoluteEncoder() {
+        return absoluteAngleEncoder.getAbsolutePosition().getValueAsDouble();
+    }
+
     private double getAbsoluteEncoder() {
-        return (absoluteAngleEncoder.getPosition().getValueAsDouble() * 360);
+        return (absoluteAngleEncoder.getAbsolutePosition().getValueAsDouble() * 180);
     }
 
     /**
@@ -189,7 +194,7 @@ public class NEOSwerveModule {
      * @param desiredState The desired state of the module
      */
     public void setDesiredModuleState(SwerveModuleState desiredState) {
-        desiredState.optimize(getAnglePosition());
+        desiredState.optimize(getAbsolutePosition());
         this.desiredState = desiredState;
 
         // angleController.setReference(desiredState.angle.getDegrees(), ControlType.kPosition);
@@ -231,9 +236,9 @@ public class NEOSwerveModule {
     /**
      * Stops the module by setting desired state to zero speed and current angle.
      */
-    public void stop() {
-        setDesiredModuleState(new SwerveModuleState());
-    }
+    // public void stop() {
+    //     setDesiredModuleState(new SwerveModuleState());
+    // }
 
     private Rotation2d getAnglePosition() {
         return Rotation2d.fromDegrees(angleEncoder.getPosition());
@@ -251,10 +256,18 @@ public class NEOSwerveModule {
         return Rotation2d.fromDegrees(getAbsoluteEncoder());
     }
 
+    @Logged
+    public double getSetpoint() {
+       return angleController.getSetpoint();
+    }
+
     public void initShuffleboard(ShuffleboardLayout layout) {
         layout.addNumber(
                 "Absolute Position",
                 () -> getAbsolutePosition().getDegrees());
+        layout.addNumber("Absolute Raw Position",
+            () -> getRawAbsoluteEncoder()
+        );
         layout.addNumber(
                 "Integrated Position",
                 () -> getAnglePosition().getDegrees());
