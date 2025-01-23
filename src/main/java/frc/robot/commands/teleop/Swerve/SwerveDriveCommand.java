@@ -81,9 +81,11 @@ public class SwerveDriveCommand extends Command {
             (Math.abs(ySupplier.get()) > IOConstants.DRIVER_DEADZONE ? ySupplier.get() : 0) 
         ) * maxSpeed;
 
-        double theta = thetaLimiter.calculate(
-            (Math.abs(thetaSupplier.get()) > IOConstants.DRIVER_DEADZONE ? thetaSupplier.get() : 0) 
-        ) * maxAngularSpeed;
+        // double theta = thetaLimiter.calculate(
+        //     (Math.abs(thetaSupplier.get()) > IOConstants.DRIVER_DEADZONE ? thetaSupplier.get() : 0) 
+        // ) * maxAngularSpeed;
+
+        double theta = (Math.abs(thetaSupplier.get()) > IOConstants.DRIVER_DEADZONE ? thetaSupplier.get() : 0) * maxAngularSpeed;
 
         ChassisSpeeds speeds = new ChassisSpeeds(x, y, theta);
 

@@ -173,7 +173,7 @@ public class NEOSwerveModule {
     public void setDesiredModuleState(SwerveModuleState desiredState) {
         desiredState = SwerveModuleState.optimize(desiredState, getAnglePosition());
         this.desiredState = desiredState;
-    
+        
         angleSetpoint = desiredState.angle.getDegrees();
         driveSetpoint = desiredState.speedMetersPerSecond;
 

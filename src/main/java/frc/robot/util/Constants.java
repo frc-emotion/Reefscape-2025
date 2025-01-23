@@ -108,7 +108,8 @@ public class Constants {
             public static final double kAngleD = 0;
 
             public static final double driveFactor = ModuleConstants.kWheelDiameter * 180 / ModuleConstants.kDriveMotorRatio;
-            public static final double angleFactor = 180 / ModuleConstants.kAngleMotorRatio;
+            // public static final double angleFactor = 180 / ModuleConstants.kAngleMotorRatio;
+            public static final double angleFactor = 360;
             // public static final double driveVelocityFeedForward = 1 / ModuleConstants.kDriveWheelFreeSpeed;
             public static final double driveVelocityFeedForward = 1 / 479;
 
