@@ -82,6 +82,7 @@ public class NEOSwerveModule {
                 PersistMode.kPersistParameters);
 
         angleEncoder = angleMotor.getEncoder();
+
         angleController = angleMotor.getClosedLoopController();
         
         // Initialize Absolute Angle Encoder
@@ -147,7 +148,9 @@ public class NEOSwerveModule {
     }
 
     private double getAbsoluteEncoder() {
-        return (absoluteAngleEncoder.getAbsolutePosition().getValueAsDouble() * 180);
+        return (absoluteAngleEncoder.getAbsolutePosition().getValueAsDouble() + 1) * 180;
+
+        //return (absoluteAngleEncoder.getAbsolutePosition().getValueAsDouble() * 180) < 0 ;
     }
 
     /**
