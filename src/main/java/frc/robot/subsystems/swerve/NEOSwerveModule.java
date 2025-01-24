@@ -92,7 +92,7 @@ public class NEOSwerveModule {
         MagnetSensorConfigs magnetSensorConfigs = new MagnetSensorConfigs();
         magnetSensorConfigs.withMagnetOffset(ModuleConstants.ENCODER_OFFSETS[id]);
         magnetSensorConfigs.withSensorDirection(SensorDirectionValue.Clockwise_Positive);
-        //magnetSensorConfigs.withAbsoluteSensorDiscontinuityPoint(1);
+        magnetSensorConfigs.withAbsoluteSensorDiscontinuityPoint(0.5);
 
         absoluteAngleEncoder.getConfigurator().apply(magnetSensorConfigs);
 
@@ -148,8 +148,8 @@ public class NEOSwerveModule {
     }
 
     private double getAbsoluteEncoder() {
-        return (absoluteAngleEncoder.getAbsolutePosition().getValueAsDouble() + 1) * 180;
-
+        //return (absoluteAngleEncoder.getAbsolutePosition().getValueAsDouble() + 1) * 180;
+        return (absoluteAngleEncoder.getAbsolutePosition().getValueAsDouble() + 0.5) * 360;
         //return (absoluteAngleEncoder.getAbsolutePosition().getValueAsDouble() * 180) < 0 ;
     }
 
@@ -225,8 +225,30 @@ public class NEOSwerveModule {
     // }
 
     private Rotation2d getAnglePosition() {
+
+
+        // if(angleEncoder.getPosition() > 360)
+        // {
+        //     return Rotation2d.fromDegrees(angleEncoder.getPosition());
+        // }
+
+        // return Rotation2d.fromDegrees(angleEncoder.getPosition());
+        // //return new Rotation2d(Math.IEEEremainder(angleEncoder.getPosition(),360));
+        // //return new Rotation2d(10);
+        
+        //if angleEncoder.getPosition() > 360:
+
+        // System.out.println(angleEncoder.getPosition());
+        // System.out.println(Math.IEEEremainder(Math.abs(angleEncoder.getPosition()), 360));
+        // return Rotation2d.fromDegrees(Math.IEEEremainder(Math.abs(angleEncoder.getPosition()), 360));
+        // return Rotation2d.fromDegrees(Math.IEEEremainder(Math.abs(angleEncoder.getPosition()), 360));
+        
         return Rotation2d.fromDegrees(angleEncoder.getPosition());
+
     }
+
+
+    
 
     private double getDriveVelocity() {
         return driveEncoder.getVelocity();
@@ -253,7 +275,7 @@ public class NEOSwerveModule {
     public void initShuffleboard(ShuffleboardLayout layout) {
         layout.addNumber(
                 "Absolute Position",
-                () -> getAbsolutePosition().getDegrees());
+                () -> getAbsolutePosition().getDegrees() % 360);
         layout.addNumber("Absolute Raw Position",
             () -> getRawAbsoluteEncoder()
         );
