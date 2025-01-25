@@ -58,7 +58,6 @@ public class NEOSwerveModule {
 
     // Configuration Objects
     private SparkMaxConfig driveConfig = new SparkMaxConfig().apply(Configs.SwerveConfigs.DRIVE_CONFIG);
-    private SparkMaxConfig angleConfig = new SparkMaxConfig().apply(Configs.SwerveConfigs.ANGLE_CONFIG);
 
     public NEOSwerveModule(int id) {
         if (id < 0 || id > Constants.Ports.CANID.SWERVE_IDS.length)
@@ -77,7 +76,7 @@ public class NEOSwerveModule {
         angleMotor = new SparkMax(Constants.Ports.CANID.SWERVE_IDS[id][1], MotorType.kBrushless);
 
         angleMotor.configure(
-                angleConfig,
+                Configs.SwerveConfigs.ANGLE_CONFIG,
                 ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
 
@@ -112,10 +111,13 @@ public class NEOSwerveModule {
      * @param mode The desired IdleMode (kBrake or kCoast)
      */
     public void setIdleMode(IdleMode mode) {
+        SparkMaxConfig temp = new SparkMaxConfig().apply(Configs.SwerveConfigs.ANGLE_CONFIG);
+        temp.idleMode(mode);
+
         driveConfig.idleMode(mode);
-        angleConfig.idleMode(mode);
+
         driveMotor.configure(driveConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
-        angleMotor.configure(angleConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+        angleMotor.configure(temp, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
     }
 
     /**
@@ -139,8 +141,11 @@ public class NEOSwerveModule {
      * @param d Derivative coefficient
      */
     public void updateAnglePID(double p, double i, double d) {
-        angleConfig.closedLoop.pid(p, i, d);
-        angleMotor.configure(angleConfig, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
+        System.out.printf("P: %s | I: %s | D: %s %n", p, i, d);
+        SparkMaxConfig temp = new SparkMaxConfig().apply(Configs.SwerveConfigs.ANGLE_CONFIG);
+        temp.closedLoop.pid(p, i, d);
+
+        angleMotor.configure(temp, ResetMode.kResetSafeParameters, PersistMode.kNoPersistParameters);
     }
 
     private double getRawAbsoluteEncoder() {
@@ -287,8 +292,8 @@ public class NEOSwerveModule {
             () -> getRawAbsoluteEncoder()
         );
         layout.addNumber(
-                "Integrated Position",
-                () -> getAnglePosition().getDegrees());
+                "Integrated Position", 
+                () -> (getAnglePosition().getDegrees() % 360 + 360) % 360);
         layout.addNumber("Velocity", () -> getDriveVelocity());
         layout.withSize(2, 4);
     }

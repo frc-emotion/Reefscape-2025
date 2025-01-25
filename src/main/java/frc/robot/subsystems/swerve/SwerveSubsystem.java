@@ -35,7 +35,7 @@ public class SwerveSubsystem extends SubsystemBase {
     private final SwerveDrivePoseEstimator poseEstimator;
 
     private GenericEntry drivePEntry, driveIEntry, driveDEntry, driveFEntry;
-    private GenericEntry anglePEntry, angleIEntry, angleDEntry;
+    private GenericEntry anglePEntry, angleIEntry, angleDEntry, anglePtest;
 
     private GenericEntry idleModeEntry;
 
@@ -197,6 +197,8 @@ public class SwerveSubsystem extends SubsystemBase {
    private void initShuffleboardTab() {
         ShuffleboardTab tab = TabManager.getInstance().accessTab(SubsystemTab.DRIVETRAIN);
 
+        anglePtest = tab.add("test angle", angleP).withWidget("Text View").getEntry();
+
         ShuffleboardLayout globalLayout = tab.getLayout("Global PID & Settings", BuiltInLayouts.kList)
             .withSize(4, 6)
             .withPosition(0, 0);
@@ -291,6 +293,12 @@ public class SwerveSubsystem extends SubsystemBase {
         angleP = anglePEntry.getDouble(angleP);
         angleI = angleIEntry.getDouble(angleI);
         angleD = angleDEntry.getDouble(angleD);
+
+        
+
+
+        System.out.printf("Get double: %s", anglePtest.getDouble(100));
+        System.out.printf("Get string: %s", anglePtest.getString("yurr"));
     
         applyPIDToAllModules();
     }

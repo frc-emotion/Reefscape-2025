@@ -68,7 +68,9 @@ public class SwerveDriveCommand extends Command {
 
     @Override
     public void initialize() {
-        //swerveDrive.updateShuffleboard();
+        System.out.println("This ran");
+        swerveDrive.updateShuffleboard();
+        System.out.println("This completed");
     }
 
     @Override
