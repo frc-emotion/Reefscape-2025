@@ -19,6 +19,7 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.shuffleboard.BuiltInLayouts;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardLayout;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.util.Constants;
 import frc.robot.util.Constants.DriveConstants;
 import frc.robot.util.Constants.DriveConstants.ModuleConstants;
@@ -26,7 +27,7 @@ import frc.robot.util.TabManager;
 import frc.robot.util.TabManager.SubsystemTab;
 
 @Logged
-public class SwerveSubsystem implements SwerveDrive {
+public class SwerveSubsystem extends SubsystemBase {
     private final NEOSwerveModule[] swerveModules;
 
     private final AHRS gyro = new AHRS(NavXComType.kMXP_SPI);
@@ -84,7 +85,6 @@ public class SwerveSubsystem implements SwerveDrive {
         setModuleStates(DriveConstants.swerveDriveKinematics.toSwerveModuleStates(speeds));
     }
 
-    @Override
     public void setModuleStates(SwerveModuleState[] states) {
         SwerveDriveKinematics.desaturateWheelSpeeds(
             states, Constants.DriveConstants.tempVelMax);
@@ -94,36 +94,31 @@ public class SwerveSubsystem implements SwerveDrive {
         }
     }
 
-    @Override
     @Logged
     public Rotation2d getHeading() {
         return gyro.getRotation2d();
     }
 
-    @Override
     @Logged
     public Pose2d getPose() {
         return poseEstimator.getEstimatedPosition();
     }
 
-    @Override
     public void setHeading(Rotation2d rotation) {
+        // TODO: Check if this is right
         gyro.setAngleAdjustment(rotation.getDegrees());
         gyro.reset();
     }
 
-    @Override
     public void addVisionMeasurement(Pose2d visionRobotPose, double timestampSeconds) {
         poseEstimator.addVisionMeasurement(visionRobotPose, timestampSeconds);
     }
 
-    @Override
     public void setPose(Pose2d pose) {
         setHeading(pose.getRotation());
         poseEstimator.resetPosition(getHeading(), getModulePositions(), pose);
     }
 
-    @Override
     public SwerveModulePosition[] getModulePositions() {
         SwerveModulePosition[] swerveModulePositions = new SwerveModulePosition[4];
 
@@ -158,7 +153,6 @@ public class SwerveSubsystem implements SwerveDrive {
         
     }
 
-    @Override
     @Logged
     public SwerveModuleState[] getModuleStates() {
         SwerveModuleState[] swerveModuleStates = new SwerveModuleState[4];
@@ -170,7 +164,6 @@ public class SwerveSubsystem implements SwerveDrive {
         return swerveModuleStates;
     }
 
-    @Override
     @Logged
     public SwerveModuleState[] getDesiredModuleStates() {
         SwerveModuleState[] desiredModuleStates = new SwerveModuleState[4];
@@ -180,6 +173,10 @@ public class SwerveSubsystem implements SwerveDrive {
         }
 
         return desiredModuleStates;
+    }
+
+    private void resetHeading() {
+        setHeading(new Rotation2d());
     }
 
     private String nameFromIndex(int i) {
@@ -250,7 +247,7 @@ public class SwerveSubsystem implements SwerveDrive {
             NEOSwerveModule module = swerveModules[i];
             
             ShuffleboardLayout moduleLayout = tab.getLayout(nameFromIndex(i), BuiltInLayouts.kList)
-                .withSize(4, 6)
+                .withSize(4, 8)
                 .withPosition(5 + (i * 2), 2);
                 
             module.initShuffleboard(moduleLayout);
@@ -298,9 +295,11 @@ public class SwerveSubsystem implements SwerveDrive {
         applyPIDToAllModules();
     }
 
-    @Override
     public void periodic() {
-        SwerveDrive.super.periodic();
+        poseEstimator.update(
+            getHeading(), 
+            getModulePositions()
+        );
 
         // When robot is disabled, ensure wheels are stopped
         // if (DriverStation.isDisabled()) {

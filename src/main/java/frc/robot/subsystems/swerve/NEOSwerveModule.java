@@ -92,7 +92,7 @@ public class NEOSwerveModule {
         MagnetSensorConfigs magnetSensorConfigs = new MagnetSensorConfigs();
         magnetSensorConfigs.withMagnetOffset(ModuleConstants.ENCODER_OFFSETS[id]);
         magnetSensorConfigs.withSensorDirection(SensorDirectionValue.Clockwise_Positive);
-        magnetSensorConfigs.withAbsoluteSensorDiscontinuityPoint(0.5);
+        magnetSensorConfigs.withAbsoluteSensorDiscontinuityPoint(1);
 
         absoluteAngleEncoder.getConfigurator().apply(magnetSensorConfigs);
 
@@ -149,7 +149,7 @@ public class NEOSwerveModule {
 
     private double getAbsoluteEncoder() {
         //return (absoluteAngleEncoder.getAbsolutePosition().getValueAsDouble() + 1) * 180;
-        return (absoluteAngleEncoder.getAbsolutePosition().getValueAsDouble() + 0.5) * 360;
+        return (absoluteAngleEncoder.getAbsolutePosition().getValueAsDouble()) * 360;
         //return (absoluteAngleEncoder.getAbsolutePosition().getValueAsDouble() * 180) < 0 ;
     }
 
@@ -157,7 +157,11 @@ public class NEOSwerveModule {
      * Resets the RelativeEncoder of the angle motor to the position of the CANcoder.
      */
     public void resetAngleEncoder() {
-        angleEncoder.setPosition(getAbsoluteEncoder());
+        double absAngle = getAbsoluteEncoder();
+        // Force it into [0..360)
+        absAngle = (absAngle % 360 + 360) % 360;
+        angleEncoder.setPosition(absAngle);
+    
     }
 
     /**
@@ -174,17 +178,20 @@ public class NEOSwerveModule {
      * @param desiredState The desired state of the module
      */
     public void setDesiredModuleState(SwerveModuleState desiredState) {
-        desiredState = SwerveModuleState.optimize(desiredState, getAnglePosition());
-        this.desiredState = desiredState;
-        
-        angleSetpoint = desiredState.angle.getDegrees();
-        driveSetpoint = desiredState.speedMetersPerSecond;
-
-        angleController.setReference(desiredState.angle.getDegrees(), ControlType.kPosition);
-        driveController.setReference(desiredState.speedMetersPerSecond, ControlType.kVelocity);
-    }
-
+        // Optimize around the current angle
+        desiredState.optimize(getAnglePosition());
     
+        // The optimized angle can be [-180,180). Convert to a 0 - 360
+        double angleDeg = desiredState.angle.getDegrees();  // might be -10
+        angleDeg = (angleDeg % 360 + 360) % 360;         // now it’s in [0,360)
+    
+        angleSetpoint = angleDeg;
+        driveSetpoint = desiredState.speedMetersPerSecond;
+    
+        angleController.setReference(angleDeg, ControlType.kPosition); 
+        driveController.setReference(driveSetpoint, ControlType.kVelocity);
+        
+    }    
 
     /**
      * Retrieves the last desired module state.

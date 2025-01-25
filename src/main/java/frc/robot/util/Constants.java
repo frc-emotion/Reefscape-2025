@@ -15,13 +15,6 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 
 public class Constants {
 
-    public static final RobotMode ROBOT_MODE = RobotMode.STANDARD;
-
-    public static enum RobotMode {
-        STANDARD,
-        SIM;
-    }
-
     public static class IOConstants {
         public static final int DRIVER_PORT = 0;
         public static final int OPERATOR_PORT = 1;
@@ -107,7 +100,8 @@ public class Constants {
             public static final double kAngleI = 0.1;
             public static final double kAngleD = 0;
 
-            public static final double driveFactor = ModuleConstants.kWheelDiameter * 180 / ModuleConstants.kDriveMotorRatio;
+            public static final double driveFactor = (ModuleConstants.kWheelDiameter * Math.PI) / ModuleConstants.kDriveMotorRatio;
+            
             // public static final double angleFactor = 180 / ModuleConstants.kAngleMotorRatio;
             public static final double angleFactor = 360;
             // public static final double driveVelocityFeedForward = 1 / ModuleConstants.kDriveWheelFreeSpeed;

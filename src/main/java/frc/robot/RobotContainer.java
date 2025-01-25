@@ -25,23 +25,14 @@ public class RobotContainer {
     PowerDistribution m_PDH = new PowerDistribution(Constants.Ports.CANID.PDH.getId(), ModuleType.kRev);
 
     @Logged(name="SwerveSubsystem")
-    private final SwerveDrive m_swerveSubsystem;
+    private final SwerveSubsystem m_swerveSubsystem;
 
     public RobotContainer() {
         //FaultManager.register(m_PDH);
 
         DataLogManager.start();
         
-        switch (Constants.ROBOT_MODE) {
-        case STANDARD:
-            m_swerveSubsystem = new SwerveSubsystem();
-            break;
-        case SIM:
-            m_swerveSubsystem = new MapleSwerveSubsystem();
-            break;
-        default:
-            m_swerveSubsystem = new SwerveSubsystem();
-        }
+        m_swerveSubsystem = new SwerveSubsystem();
 
         configureBindings();
         configureCommands();

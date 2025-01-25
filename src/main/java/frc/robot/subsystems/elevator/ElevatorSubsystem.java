@@ -2,61 +2,47 @@ package frc.robot.subsystems.elevator;
 
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.wpilibj2.command.Subsystem;
+import edu.wpi.first.wpilibj2.command.SubsystemBase;
 
-/**
- * Provides all the method templates for all versions of the Elevator (Sim and Real).
- */
-public interface ElevatorSubsystem extends Subsystem {
+public class ElevatorSubsystem extends SubsystemBase {
+
+    public ElevatorSubsystem() {
+
+    }
+
+    public void setTargetPosition(double position) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setTargetPosition'");
+    }
+
+    public void setTargetHeight(Distance height) {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'setTargetHeight'");
+    }
+
+    public double getPosition() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getPosition'");
+    }
+
+    public Distance getHeight() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getHeight'");
+    }
+
+    public double getTargetPosition() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getTargetPosition'");
+    }
+
+    public Distance getTargetHeight() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getTargetHeight'");
+    }
+
+    public LinearVelocity getVelocity() {
+        // TODO Auto-generated method stub
+        throw new UnsupportedOperationException("Unimplemented method 'getVelocity'");
+    }
     
-    
-    /**
-     * Sets the target position for the elevator.
-     * 
-     * @param position The target elevator position in encoder counts.
-     */
-    void setTargetPosition(double position);
-
-
-    /**
-     * Sets the target height for the elevator.
-     * 
-     * @param height The target elevator height.
-     */
-    void setTargetHeight(Distance height);
-
-    /**
-     * Retrieves the current position of the elevator.
-     * 
-     * @return The current position in encoder counts.
-     */
-    double getPosition();
-
-    /**
-     * Retrieves the current height of the elevator.
-     * 
-     * @return The current height of the elevator.
-     */
-    Distance getHeight();
-
-    /**
-     * Retrieves the target position for the elevator.
-     * 
-     * @return The target position of the elevator in encoder counts.
-     */
-    double getTargetPosition();
-
-    /**
-     * Retrieves the target height for the elevator.
-     * 
-     * @return The target height of the elevator.
-     */
-    Distance getTargetHeight();
-
-    /**
-     * Retrieves the current velocity of the elevator.
-     * 
-     * @return The current velocity of the elevator.
-     */
-    LinearVelocity getVelocity();
 }
