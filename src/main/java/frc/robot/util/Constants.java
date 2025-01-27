@@ -10,6 +10,7 @@ import com.revrobotics.spark.SparkBase.Faults;
 import edu.wpi.first.units.measure.*;
 import frc.robot.util.Constants.DriveConstants.ModuleConstants;
 import edu.wpi.first.hal.PowerDistributionFaults;
+import edu.wpi.first.math.geometry.Transform3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 
@@ -138,6 +139,13 @@ public class Constants {
         public static final double kI = 0;
         public static final double kD = 0;
     }
+    
+    public static class VisionConstants {
+        public static final Transform3d kFrontRightTransform = new Transform3d();
+        public static final Transform3d kFrontLeftTransform = new Transform3d();
+        public static final Transform3d kBackTransform = new Transform3d();
+    }
+
     public static class Ports {
 
         public enum CANID {
