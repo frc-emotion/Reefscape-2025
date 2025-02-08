@@ -1,71 +1,3 @@
-// // Copyright (c) FIRST and other WPILib contributors.
-// // Open Source Software; you can modify and/or share it under the terms of
-// // the WPILib BSD license file in the root directory of this project.
-
-// package frc.robot;
-
-// import edu.wpi.first.epilogue.Logged;
-// import edu.wpi.first.wpilibj.DataLogManager;
-// import edu.wpi.first.wpilibj.PowerDistribution;
-// import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
-// import edu.wpi.first.wpilibj2.command.Command;
-// import edu.wpi.first.wpilibj2.command.Commands;
-// import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-// import frc.robot.commands.teleop.Swerve.SwerveDriveCommand;
-// import frc.robot.commands.teleop.Swerve.SwerveXCommand;
-// import frc.robot.subsystems.swerve.*;
-// import frc.robot.util.Constants;
-// import frc.robot.util.Constants.IOConstants;
-// import frc.robot.util.Faults.FaultManager;
-
-// public class RobotContainer {
-//     private final CommandXboxController m_driverController = new CommandXboxController(IOConstants.DRIVER_PORT);
-//     private final CommandXboxController m_operatorController = new CommandXboxController(IOConstants.OPERATOR_PORT);
-
-//     PowerDistribution m_PDH = new PowerDistribution(Constants.Ports.CANID.PDH.getId(), ModuleType.kRev);
-
-//     @Logged(name="SwerveSubsystem")
-//     private final SwerveSubsystemOLD m_swerveSubsystem;
-
-//     public RobotContainer() {
-//         //FaultManager.register(m_PDH);
-
-//         DataLogManager.start();
-        
-//         m_swerveSubsystem = new SwerveSubsystemOLD();
-
-//         configureBindings();
-//         configureCommands();
-//     }
-
-//     private void configureCommands() {
-//         m_swerveSubsystem.setDefaultCommand(
-//             new SwerveDriveCommand(
-//                 m_swerveSubsystem,
-//                 () -> m_driverController.getLeftX(),
-//                 () -> -m_driverController.getLeftY(),
-//                 () -> m_driverController.getRightX()
-//             )
-//         );
-//     }
-
-//     private void configureBindings() {
-
-//         // When driver presses x, set wheels in x formation
-//         // m_driverController.x().onTrue(SwerveXCommand.xCommand(m_swerveSubsystem));
-
-//     }
-
-//     public Command getAutonomousCommand() {
-//         return Commands.print("No autonomous command configured");
-//     }
-// }
-
-
-// Copyright (c) FIRST and other WPILib contributors.
-// Open Source Software; you can modify and/or share it under the terms of
-// the WPILib BSD license file in the root directory of this project.
-
 package frc.robot;
 
 import com.pathplanner.lib.auto.NamedCommands;
@@ -74,6 +6,8 @@ import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.PowerDistribution;
+import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -81,7 +15,9 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
+import frc.robot.util.Constants;
 import frc.robot.util.Constants.OperatorConstants;
+import frc.robot.util.Faults.FaultManager;
 
 import java.io.File;
 import swervelib.SwerveInputStream;
@@ -95,10 +31,12 @@ public class RobotContainer
 {
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
-  final         CommandXboxController driverXbox = new CommandXboxController(0);
+  private final         CommandXboxController driverXbox = new CommandXboxController(0);
   // The robot's subsystems and commands are defined here...
   private final SwerveSubsystem       drivebase  = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
                                                                                 "swerve/neo"));
+
+  private final PowerDistribution m_PDH = new PowerDistribution(Constants.Ports.CANID.PDH.getId(), ModuleType.kRev);
 
   /**
    * Converts driver input into a field-relative ChassisSpeeds that is controlled by angular velocity.
@@ -170,6 +108,7 @@ SwerveInputStream driveAngularVelocityTurbo = SwerveInputStream.of(drivebase.get
    */
   public RobotContainer()
   {
+    FaultManager.register(m_PDH);
     // Configure the trigger bindings
     configureBindings();
     DriverStation.silenceJoystickConnectionWarning(true);
@@ -231,10 +170,10 @@ SwerveInputStream driveAngularVelocityTurbo = SwerveInputStream.of(drivebase.get
       // driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
       driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
 
-      // driverXbox.b().whileTrue(
-      //     drivebase.driveToPose(
-      //         new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
-      //                         );
+      driverXbox.b().whileTrue(
+          drivebase.driveToPose(
+              new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0)))
+                              );
       driverXbox.start().whileTrue(Commands.none());
       driverXbox.back().whileTrue(Commands.none());
       // driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
@@ -255,9 +194,7 @@ SwerveInputStream driveAngularVelocityTurbo = SwerveInputStream.of(drivebase.get
    */
   public Command getAutonomousCommand()
   {
-    // An example command will be run in autonomous
-    // return drivebase.getAutonomousCommand("New Auto");
-    return new WaitCommand(1);
+    return drivebase.getAutonomousCommand("Straight Test");
   }
 
   public void setMotorBrake(boolean brake)

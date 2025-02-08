@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 // import frc.robot.util.Faults.FaultManager;
+import frc.robot.util.Faults.FaultManager;
 
 @Logged
 public class Robot extends TimedRobot {
@@ -25,13 +26,13 @@ public class Robot extends TimedRobot {
     private final RobotContainer m_robotContainer;
 
     public Robot() {
+        Epilogue.bind(this);
 
         RobotController.setBrownoutVoltage(6.0);
 
         m_robotContainer = new RobotContainer();
 
-        //Epilogue.bind(this);
-
+        
         WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
 
     }
@@ -54,7 +55,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledPeriodic() {
-        // FaultManager.update();
+        FaultManager.update();
     }
 
     @Override
@@ -85,7 +86,7 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
-        // FaultManager.update();
+        FaultManager.update();
     }
 
     @Override

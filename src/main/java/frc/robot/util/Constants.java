@@ -132,82 +132,6 @@
 //         public static final double kI = 0;
 //         public static final double kD = 0;
 //     }
-//     public static class Ports {
-
-//         public enum CANID {
-//             PDH(1, "Power Distribution Hub"),
-
-//             FRONT_LEFT_CANCODER(11, "Front Left Cancoder"),
-//             FRONT_RIGHT_CANCODER(12, "Front Right Cancoder"),
-//             BACK_LEFT_CANCODER(13, "Back Left Cancoder"),
-//             BACK_RIGHT_CANCODER(14, "Back Right Cancoder"),
-
-//             FRONT_LEFT_DRIVE(3, "Front Left Drive"),
-//             FRONT_LEFT_TURN(4, "Front Left Turn"),
-
-//             FRONT_RIGHT_DRIVE(5, "Front Right Drive"),
-//             FRONT_RIGHT_TURN(6, "Front Right Turn"),
-
-//             BACK_LEFT_DRIVE(7, "Back Left Drive"),
-//             BACK_LEFT_TURN(8, "Back Left Turn"),
-
-//             BACK_RIGHT_DRIVE(9, "Back Right Drive"),
-//             BACK_RIGHT_TURN(10, "Back Right Turn");
-
-//             private final int id;
-//             private final String name;
-
-//             private static final Map<Integer, String> CAN_ID_MAP = new HashMap<>();
-
-//             /*
-//              * Order:
-//              * 0 - Front Left
-//              * 1 - Front Right
-//              * 2 - Back Left
-//              * 3 - Back Right
-//              */
-
-//             // Drive ID, Turn ID
-//             public static final int[][] SWERVE_IDS = {
-//                     { FRONT_LEFT_DRIVE.id, FRONT_LEFT_TURN.id },
-//                     { FRONT_RIGHT_DRIVE.id, FRONT_RIGHT_TURN.id },
-//                     { BACK_LEFT_DRIVE.id, BACK_LEFT_TURN.id },
-//                     { BACK_RIGHT_DRIVE.id, BACK_RIGHT_TURN.id }
-//             };
-
-//             public static final int[] CANCODER_IDS = {
-//                     FRONT_LEFT_CANCODER.id,
-//                     FRONT_RIGHT_CANCODER.id,
-//                     BACK_LEFT_CANCODER.id,
-//                     BACK_RIGHT_CANCODER.id
-//             };
-
-//             static {
-//                 for (CANID canId : CANID.values()) {
-//                     CAN_ID_MAP.put(canId.getId(), canId.getName());
-//                 }
-//             }
-
-//             CANID(int id, String name) {
-//                 this.id = id;
-//                 this.name = name;
-//             }
-
-//             public int getId() {
-//                 return id;
-//             }
-
-//             public String getName() {
-//                 return name;
-//             }
-
-//             public static String getNameById(int id) {
-//                 return CAN_ID_MAP.getOrDefault(id, "Unknown CAN ID");
-//             }
-//         }
-//     }
-
-
 
 // }
 
@@ -216,6 +140,9 @@
 // the WPILib BSD license file in the root directory of this project.
 
 package frc.robot.util;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.util.Units;
@@ -261,4 +188,82 @@ public final class Constants
     public static final double RIGHT_X_DEADBAND = 0.1;
     public static final double TURN_CONSTANT    = 6;
   }
+
+  public static class Ports {
+
+    public enum CANID {
+        PDH(1, "Power Distribution Hub"),
+
+        FRONT_LEFT_CANCODER(11, "Front Left Cancoder"),
+        FRONT_RIGHT_CANCODER(12, "Front Right Cancoder"),
+        BACK_LEFT_CANCODER(13, "Back Left Cancoder"),
+        BACK_RIGHT_CANCODER(14, "Back Right Cancoder"),
+
+        FRONT_LEFT_DRIVE(3, "Front Left Drive"),
+        FRONT_LEFT_TURN(4, "Front Left Turn"),
+
+        FRONT_RIGHT_DRIVE(5, "Front Right Drive"),
+        FRONT_RIGHT_TURN(6, "Front Right Turn"),
+
+        BACK_LEFT_DRIVE(7, "Back Left Drive"),
+        BACK_LEFT_TURN(8, "Back Left Turn"),
+
+        BACK_RIGHT_DRIVE(9, "Back Right Drive"),
+        BACK_RIGHT_TURN(10, "Back Right Turn");
+
+        private final int id;
+        private final String name;
+
+        private static final Map<Integer, String> CAN_ID_MAP = new HashMap<>();
+
+        /*
+         * Order:
+         * 0 - Front Left
+         * 1 - Front Right
+         * 2 - Back Left
+         * 3 - Back Right
+         */
+
+        // Drive ID, Turn ID
+        public static final int[][] SWERVE_IDS = {
+                { FRONT_LEFT_DRIVE.id, FRONT_LEFT_TURN.id },
+                { FRONT_RIGHT_DRIVE.id, FRONT_RIGHT_TURN.id },
+                { BACK_LEFT_DRIVE.id, BACK_LEFT_TURN.id },
+                { BACK_RIGHT_DRIVE.id, BACK_RIGHT_TURN.id }
+        };
+
+        public static final int[] CANCODER_IDS = {
+                FRONT_LEFT_CANCODER.id,
+                FRONT_RIGHT_CANCODER.id,
+                BACK_LEFT_CANCODER.id,
+                BACK_RIGHT_CANCODER.id
+        };
+
+        static {
+            for (CANID canId : CANID.values()) {
+                CAN_ID_MAP.put(canId.getId(), canId.getName());
+            }
+        }
+
+        CANID(int id, String name) {
+            this.id = id;
+            this.name = name;
+        }
+
+        public int getId() {
+            return id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public static String getNameById(int id) {
+            return CAN_ID_MAP.getOrDefault(id, "Unknown CAN ID");
+        }
+    }
+}
+
+
+
 }
