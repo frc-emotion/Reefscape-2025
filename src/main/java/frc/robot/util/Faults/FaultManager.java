@@ -13,14 +13,16 @@ import edu.wpi.first.networktables.StringArrayPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.PowerDistribution;
-import frc.robot.util.Constants.Ports;
-import frc.robot.util.Constants.Ports.CANID;
+import frc.robot.Constants;
+import frc.robot.Constants.Ports;
+import frc.robot.Constants.Ports.CANID;
 import frc.robot.util.Faults.FaultTypes.FaultType;
 import frc.robot.util.Faults.FaultTypes.PDFaults;
 import frc.robot.util.Faults.FaultTypes.PDStickyFaults;
 import frc.robot.util.Faults.FaultTypes.SparkFaults;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -291,8 +293,13 @@ public final class FaultManager {
         faultReporters.add(() -> {
             PowerDistributionFaults faults = powerDistribution.getFaults();
             String identifier = "Power Distribution Hub";
-
             for (PDFaults fault : PDFaults.values()) {
+
+                if (Constants.KNOWN_PD_FAULTS.contains(fault.name())) {
+                    System.out.println("Skipping fault: " + fault.name() + "for PowerDistribution");
+                    continue;
+                }
+
                 if (fault.isPresent(faults)) {
                     report(
                             identifier,
@@ -303,6 +310,10 @@ public final class FaultManager {
 
             PowerDistributionStickyFaults stickyFaults = powerDistribution.getStickyFaults();
             for (PDStickyFaults fault : PDStickyFaults.values()) {
+                if (Constants.KNOWN_PD_FAULTS.contains(fault.name())) {
+                    continue;
+                }
+
                 if (fault.isPresent(stickyFaults)) {
                     report(
                             identifier,

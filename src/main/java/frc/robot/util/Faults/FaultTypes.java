@@ -18,7 +18,7 @@ public class FaultTypes {
     /**
      * Enum representing faults from Spark motor controllers.
      */
-    public enum SparkFaults {
+    public static enum SparkFaults {
         CAN("CAN Fault", FaultType.ERROR),
         ESC_EEPROM("EEPROM Memory Error", FaultType.ERROR),
         FIRMWARE("Firmware Fault", FaultType.ERROR),
