@@ -1,5 +1,6 @@
 package frc.robot.commands.teleop.Elevator;
 
+import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj.Joystick;
@@ -9,9 +10,9 @@ import frc.robot.subsystems.elevator.ElevatorSubsystem;
 public class MoveElevatorManual extends Command {
     private ElevatorSubsystem elevatorSubsystem;
 
-    private Supplier<Double> yAxis;
+    private DoubleSupplier yAxis;
 
-    public MoveElevatorManual(ElevatorSubsystem elevatorSubsystem, Supplier<Double> yAxis) {
+    public MoveElevatorManual(ElevatorSubsystem elevatorSubsystem, DoubleSupplier yAxis) {
         this.yAxis = yAxis;
         this.elevatorSubsystem = elevatorSubsystem;
         addRequirements(elevatorSubsystem);
@@ -24,7 +25,7 @@ public class MoveElevatorManual extends Command {
 
     @Override
     public void execute() {
-        elevatorSubsystem.moveSpeed(yAxis.get() * 0.75);
+        elevatorSubsystem.moveSpeed(yAxis.getAsDouble() * 0.75);
     }
 
     @Override

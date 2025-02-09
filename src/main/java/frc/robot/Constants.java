@@ -126,7 +126,62 @@ public final class Constants {
             
         }
 
+        public static class GrabberConstants {      
+  
+          public static final double CURRENT_LIMIT = 4.5; 
+          public static final double CURRENT_LIMIT_SMART = 40;
+  
+          public static final double GRABBER_CORAL_SPEED = 0.7; //TBD
+          public static final double GRABBER_ALGAE_SPEED = 1; //TBD
+          public static final double GRABBER_ALGAE_HOLD_SPEED = 0.1; //TBD
+          public static final double GRABBER_CORAL_HOLD_SPEED = 0.3; //TBD
+          public static final double ZERO_SPEED = 0;
+          public static final double DETECT_RANGE = 0;
+
+          public static final int kSmartCurrentLimit = 45;
+          public static final double kSecondaryCurrentLimit = 45;
+        public static final int NORMAL_OPERATION_CURRENT = 0;
+        public static final int CURRENT_SPIKE_THRESHOLD = 0;
+        public static final int NORMAL_OPERATION_TEMP = 0;
+        public static final int TEMP_SPIKE_THRESHOLD = 0;
+  
+  
+      }
+
   public static class Ports {
+
+    public enum DIO {
+      CORAL_BEAM_BREAK(1, "Coral Beam Break");
+
+      private final int id;
+      private final String name;
+
+      private static final Map<Integer, String> DIO_ID_MAP = new HashMap<>();
+
+
+      static {
+        for (DIO dioID : DIO.values()) {
+          DIO_ID_MAP.put(dioID.getId(), dioID.getName());
+        }
+      }
+
+      DIO(int id, String name) {
+        this.id = id;
+        this.name = name;
+      }
+
+      public int getId() {
+        return id;
+      }
+
+      public String getName() {
+        return name;
+      }
+
+      public static String getNameById(int id) {
+        return DIO_ID_MAP.getOrDefault(id, "Unknown DIO ID");
+      }
+    }
 
     public enum CANID {
       PDH(1, "Power Distribution Hub"),
@@ -149,7 +204,10 @@ public final class Constants {
       // BACK_RIGHT_TURN(10, "Back Right Turn");
 
       ELEVATOR_DRIVE_1(69, "Elevator Drive 1"),
-      ELEVATOR_DRIVE_2(70, "Elevator Drive 1");
+      ELEVATOR_DRIVE_2(70, "Elevator Drive 1"),
+      
+      GRABBER_DRIVE(71, "Grabber Drive"),
+      ALGAE_TOF(72, "Algae Time of Flight");
 
       private final int id;
       private final String name;

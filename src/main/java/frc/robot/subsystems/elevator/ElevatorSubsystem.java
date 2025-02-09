@@ -47,7 +47,8 @@ public class ElevatorSubsystem extends SubsystemBase {
         driveMotor.configure(ElevatorConfigs.ELEVATOR_CONFIG, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
 
-        driveMotor2.configure(new SparkMaxConfig().follow(Ports.CANID.ELEVATOR_DRIVE_1.getId()),
+        driveMotor2.configure(
+            ElevatorConfigs.ELEVATOR_FOLLOWER_CONFIG,
                 ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
 
@@ -72,6 +73,8 @@ public class ElevatorSubsystem extends SubsystemBase {
                 (newMaxVel) -> config.closedLoop.maxMotion.maxVelocity(newMaxVel),
                 (newMaxAccel) -> config.closedLoop.maxMotion.maxAcceleration(newMaxAccel),
                 (newAllowedError) -> config.closedLoop.maxMotion.allowedClosedLoopError(newAllowedError));
+
+        safetyChecks();
     }
 
     private void safetyChecks() {
@@ -108,6 +111,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Elevator/1/Voltage", driveMotor.getBusVoltage());
         SmartDashboard.putNumber("Elevator/1/Current", driveMotor.getOutputCurrent());
         SmartDashboard.putNumber("Elevator/1/Temp", driveMotor.getMotorTemperature());
+        SmartDashboard.putNumber("Elevator/1/Target", currentGoal);
 
         SmartDashboard.putNumber("Elevator/2/Output", driveMotor2.get());
         SmartDashboard.putNumber("Elevator/2/Voltage", driveMotor2.getBusVoltage());

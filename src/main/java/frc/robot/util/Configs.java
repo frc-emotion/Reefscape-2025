@@ -5,6 +5,8 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.units.Units;
 
 import frc.robot.Constants.ElevatorConstants;
+import frc.robot.Constants.GrabberConstants;
+import frc.robot.Constants.Ports;
 
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
@@ -12,9 +14,11 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 public class Configs {
     public static class ElevatorConfigs {
         public static final SparkMaxConfig ELEVATOR_CONFIG = new SparkMaxConfig();
+        public static final SparkMaxConfig ELEVATOR_FOLLOWER_CONFIG = new SparkMaxConfig();
 
         static {
-            ELEVATOR_CONFIG.idleMode(IdleMode.kCoast)
+            ELEVATOR_CONFIG
+            .idleMode(IdleMode.kBrake)
             .smartCurrentLimit(ElevatorConstants.kSmartCurrentLimit)
             .secondaryCurrentLimit(ElevatorConstants.kSecondaryCurrentLimit);
 
@@ -35,6 +39,27 @@ public class Configs {
             
             ELEVATOR_CONFIG.closedLoop.pid(ElevatorConstants.kP, ElevatorConstants.kI, ElevatorConstants.kD);
             
+            ELEVATOR_FOLLOWER_CONFIG
+            .follow(Ports.CANID.ELEVATOR_DRIVE_1.getId())
+            .signals
+            .absoluteEncoderPositionAlwaysOn(false)
+            .analogPositionAlwaysOn(false)
+            .absoluteEncoderVelocityAlwaysOn(false)
+            .analogVelocityAlwaysOn(false)
+            .externalOrAltEncoderPositionAlwaysOn(false)
+            .externalOrAltEncoderVelocityAlwaysOn(false);
+        }
+    }
+
+    public static class GrabberConfigs { 
+        public static final SparkMaxConfig GRABBER_CONFIG = new SparkMaxConfig();
+
+        static {
+            GRABBER_CONFIG
+            .idleMode(IdleMode.kBrake)
+            .smartCurrentLimit(GrabberConstants.kSmartCurrentLimit)
+            .secondaryCurrentLimit(GrabberConstants.kSecondaryCurrentLimit);
+
         }
     }
     
