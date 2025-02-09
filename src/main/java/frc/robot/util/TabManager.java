@@ -5,6 +5,7 @@ import edu.wpi.first.wpilibj.DataLogManager;
 import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
 import edu.wpi.first.wpilibj.shuffleboard.ShuffleboardTab;
 
+
 public class TabManager {
 
     private static TabManager instance;
@@ -71,20 +72,6 @@ public class TabManager {
         }
         return names;
     }
-
-    /**
-     * Retrieves the ShuffleboardTab for every SubystemTab.
-     * 
-     * @return All the ShuffleboardTabs managed by the TabManager.
-     */
-    public ShuffleboardTab[] getTabs() {
-        ShuffleboardTab[] shuffleboardTabs = new ShuffleboardTab[tabs.length];
-        for (int i = 0; i < tabs.length; i++) {
-            shuffleboardTabs[i] = accessTab(tabs[i]);
-        }
-        return shuffleboardTabs;
-    }
-
     // public GenericEntry addWidget(
     // ShuffleboardTab tab,
     // BuiltInWidgets widgetType,

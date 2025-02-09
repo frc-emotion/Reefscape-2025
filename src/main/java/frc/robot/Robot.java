@@ -6,8 +6,10 @@ package frc.robot;
 
 import org.ironmaple.simulation.SimulatedArena;
 
-import edu.wpi.first.epilogue.Epilogue;
+// import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.net.WebServer;
+import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -19,17 +21,21 @@ import frc.robot.util.Faults.FaultManager;
 public class Robot extends TimedRobot {
     private Command m_autonomousCommand;
 
-    @Logged(name="RobotContainer")
-
+    // @Logged(name="RobotContainer")
     private final RobotContainer m_robotContainer;
 
     public Robot() {
+        //Epilogue.bind(this);
 
         RobotController.setBrownoutVoltage(6.0);
 
         m_robotContainer = new RobotContainer();
 
-        Epilogue.bind(this);
+        
+        WebServer.start(5800, Filesystem.getDeployDirectory().getPath());
+
+        // Run da fault manager once a seocond
+        addPeriodic(() -> FaultManager.update(), 1);
 
     }
 
@@ -51,7 +57,6 @@ public class Robot extends TimedRobot {
 
     @Override
     public void disabledPeriodic() {
-        FaultManager.update();
     }
 
     @Override
@@ -82,7 +87,6 @@ public class Robot extends TimedRobot {
 
     @Override
     public void teleopPeriodic() {
-        FaultManager.update();
     }
 
     @Override
