@@ -49,8 +49,8 @@ public class RobotContainer {
     private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
             "swerve/neo"));
 
-    private final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
-    private final GrabberSubsystem grabberSubsystem = new GrabberSubsystem();
+    // private final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
+    // private final GrabberSubsystem grabberSubsystem = new GrabberSubsystem();
 
     // private final PowerDistribution m_PDH = new
     // PowerDistribution(Constants.Ports.CANID.PDH.getId(), ModuleType.kRev);
@@ -207,23 +207,23 @@ public class RobotContainer {
 
             driverXbox.leftBumper().whileTrue(driveFieldOrientedAnglularVelocitySlow);
 
-            operatorXbox.povDown()
-                    .onTrue(Commands
-                            .runOnce(() -> elevatorSubsystem.setTargetHeight(ElevatorConstants.CORAL_L1_HEIGHT)));
-            operatorXbox.povLeft()
-                    .onTrue(Commands
-                            .runOnce(() -> elevatorSubsystem.setTargetHeight(ElevatorConstants.CORAL_L2_HEIGHT)));
-            operatorXbox.povRight()
-                    .onTrue(Commands
-                            .runOnce(() -> elevatorSubsystem.setTargetHeight(ElevatorConstants.CORAL_L3_HEIGHT)));
-            operatorXbox.povUp()
-                    .onTrue(Commands
-                            .runOnce(() -> elevatorSubsystem.setTargetHeight(ElevatorConstants.CORAL_L4_HEIGHT)));
+            // operatorXbox.povDown()
+            //         .onTrue(Commands
+            //                 .runOnce(() -> elevatorSubsystem.setTargetHeight(ElevatorConstants.CORAL_L1_HEIGHT)));
+            // operatorXbox.povLeft()
+            //         .onTrue(Commands
+            //                 .runOnce(() -> elevatorSubsystem.setTargetHeight(ElevatorConstants.CORAL_L2_HEIGHT)));
+            // operatorXbox.povRight()
+            //         .onTrue(Commands
+            //                 .runOnce(() -> elevatorSubsystem.setTargetHeight(ElevatorConstants.CORAL_L3_HEIGHT)));
+            // operatorXbox.povUp()
+            //         .onTrue(Commands
+            //                 .runOnce(() -> elevatorSubsystem.setTargetHeight(ElevatorConstants.CORAL_L4_HEIGHT)));
 
-            operatorXbox.y().onTrue(Commands.runOnce(() -> elevatorSubsystem.setTargetPosition(0))); // Bottom Most
-                                                                                                     // Position
+            // operatorXbox.y().onTrue(Commands.runOnce(() -> elevatorSubsystem.setTargetPosition(0))); // Bottom Most
+            //                                                                                          // Position
 
-            operatorXbox.x().onTrue(new ZeroElevatorCurrent(elevatorSubsystem)); // Zero Elevator
+            // operatorXbox.x().onTrue(new ZeroElevatorCurrent(elevatorSubsystem)); // Zero Elevator
 
             // right trigger coral outtake
             // right bumper algae outtake
@@ -231,41 +231,41 @@ public class RobotContainer {
             // left trigger coral intake
             // left bumper algae intake
 
-            operatorXbox.rightTrigger()
-                    .onTrue(
-                            new ParallelCommandGroup(
-                                    Commands.runOnce(() -> grabberSubsystem.setTargetType(GrabType.CORAL)),
-                                    Commands.runOnce(() -> grabberSubsystem.setTargetDirection(GrabDirection.OUTTAKE))))
-                    .whileTrue(new GrabberCommand(grabberSubsystem, false));
+            // operatorXbox.rightTrigger()
+            //         .onTrue(
+            //                 new ParallelCommandGroup(
+            //                         Commands.runOnce(() -> grabberSubsystem.setTargetType(GrabType.CORAL)),
+            //                         Commands.runOnce(() -> grabberSubsystem.setTargetDirection(GrabDirection.OUTTAKE))))
+            //         .whileTrue(new GrabberCommand(grabberSubsystem, false));
 
-            operatorXbox.rightBumper()
-                    .onTrue(
-                            new ParallelCommandGroup(
-                                    Commands.runOnce(() -> grabberSubsystem.setTargetType(GrabType.ALGAE)),
-                                    Commands.runOnce(() -> grabberSubsystem.setTargetDirection(GrabDirection.OUTTAKE))))
-                    .whileTrue(new GrabberCommand(grabberSubsystem, false));
+            // operatorXbox.rightBumper()
+            //         .onTrue(
+            //                 new ParallelCommandGroup(
+            //                         Commands.runOnce(() -> grabberSubsystem.setTargetType(GrabType.ALGAE)),
+            //                         Commands.runOnce(() -> grabberSubsystem.setTargetDirection(GrabDirection.OUTTAKE))))
+            //         .whileTrue(new GrabberCommand(grabberSubsystem, false));
 
-            operatorXbox.leftTrigger()
-                    .onTrue(
-                            new ParallelCommandGroup(
-                                    Commands.runOnce(() -> grabberSubsystem.setTargetType(GrabType.CORAL)),
-                                    Commands.runOnce(() -> grabberSubsystem.setTargetDirection(GrabDirection.INTAKE))))
-                    .whileTrue(new GrabberCommand(grabberSubsystem, false));
+            // operatorXbox.leftTrigger()
+            //         .onTrue(
+            //                 new ParallelCommandGroup(
+            //                         Commands.runOnce(() -> grabberSubsystem.setTargetType(GrabType.CORAL)),
+            //                         Commands.runOnce(() -> grabberSubsystem.setTargetDirection(GrabDirection.INTAKE))))
+            //         .whileTrue(new GrabberCommand(grabberSubsystem, false));
 
-            operatorXbox.leftBumper()
-                    .onTrue(
-                            new ParallelCommandGroup(
-                                    Commands.runOnce(() -> grabberSubsystem.setTargetType(GrabType.ALGAE)),
-                                    Commands.runOnce(() -> grabberSubsystem.setTargetDirection(GrabDirection.INTAKE))))
-                    .whileTrue(new GrabberCommand(grabberSubsystem, false));
+            // operatorXbox.leftBumper()
+            //         .onTrue(
+            //                 new ParallelCommandGroup(
+            //                         Commands.runOnce(() -> grabberSubsystem.setTargetType(GrabType.ALGAE)),
+            //                         Commands.runOnce(() -> grabberSubsystem.setTargetDirection(GrabDirection.INTAKE))))
+            //         .whileTrue(new GrabberCommand(grabberSubsystem, false));
 
         }
 
     }
 
     private void configureDefaultCommands() {
-        elevatorSubsystem.setDefaultCommand(new MoveElevatorManual(elevatorSubsystem, () -> operatorXbox.getLeftY()));
-        grabberSubsystem.setDefaultCommand(new GrabberCommand(grabberSubsystem, true));
+        // elevatorSubsystem.setDefaultCommand(new MoveElevatorManual(elevatorSubsystem, () -> operatorXbox.getLeftY()));
+        // grabberSubsystem.setDefaultCommand(new GrabberCommand(grabberSubsystem, true));
     }
 
     /**
