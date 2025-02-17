@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.601,
-        "y": 6.0
+        "x": 0.6712498947260614,
+        "y": 1.3727242845614602
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.351,
-        "y": 6.0
+        "x": 0.9372614375231387,
+        "y": 1.5401172498875675
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 4.0,
-        "y": 6.0
+        "x": 4.9932313482625,
+        "y": 2.8159381458391954
       },
       "prevControl": {
-        "x": 4.25,
-        "y": 6.0
+        "x": 4.4575446511575345,
+        "y": 2.090169072342146
       },
       "nextControl": null,
       "isLocked": false,
@@ -31,9 +31,22 @@
   "rotationTargets": [],
   "constraintZones": [],
   "pointTowardsZones": [],
-  "eventMarkers": [],
+  "eventMarkers": [
+    {
+      "name": "PrepScoreCoral",
+      "waypointRelativePos": 0.6,
+      "endWaypointRelativePos": null,
+      "command": null
+    },
+    {
+      "name": "ScoreCoral",
+      "waypointRelativePos": 1.0,
+      "endWaypointRelativePos": null,
+      "command": null
+    }
+  ],
   "globalConstraints": {
-    "maxVelocity": 1.0,
+    "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
@@ -42,13 +55,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 119.99999999999999
   },
   "reversed": false,
-  "folder": "Tuning",
+  "folder": "From HP3",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 55.0
   },
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }

@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.601,
-        "y": 6.0
+        "x": 3.1762210330245484,
+        "y": 3.8744366110389628
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.351,
-        "y": 6.0
+        "x": 2.663343083661293,
+        "y": 3.0769274067130192
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 4.0,
-        "y": 6.0
+        "x": 1.616395309039974,
+        "y": 0.6958518805993776
       },
       "prevControl": {
-        "x": 4.25,
-        "y": 6.0
+        "x": 1.7915090589387945,
+        "y": 0.8742760230139437
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,7 +33,7 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 1.0,
+    "maxVelocity": 3.0,
     "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
@@ -42,13 +42,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 55.0
   },
   "reversed": false,
-  "folder": "Tuning",
+  "folder": "To HP4",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0
   },
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }
