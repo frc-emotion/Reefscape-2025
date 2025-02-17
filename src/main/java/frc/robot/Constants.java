@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 // import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Units;
@@ -117,7 +118,7 @@ public final class Constants {
         public static final Distance ALGAE_GROUND_INTAKE = Units.Inches.of(0);
         public static final Distance PREP_0 = Units.Inches.of(0);
         public static final Distance DEADZONE_DISTANCE = Units.Inches.of(1);
-        public static final Distance CORAL_INTAKE_HIGHT = Units.Inches.of(0);
+        public static final Distance CORAL_INTAKE_HEIGHT = Units.Inches.of(0);
 
         public static final int NORMAL_OPERATION_CURRENT = 0;
         public static final int CURRENT_SPIKE_THRESHOLD = 0;
@@ -149,7 +150,14 @@ public final class Constants {
         public static final double kSecondaryCurrentLimit = 40;
 
         public static final double kMaxOutput = 1;
-        
+
+            // Physical Constraints
+        public static final double kMinRotation = 0; // Note: Aligns with hopper
+        public static final double kMaxRotation = 0;
+        public static final double kMaxHeightConstrained = 0; // The height in meters at which the arm is able to rotate fully. Should be roughly the length of the arm.
+        public static final double kMaxRotationConstrained = 0; // The max rotation while the arm is below the minimum full rotation height. Could be formulaic, but probably not necessary.
+        public static final double kMinRotationConstrained = 0;
+
             // Feedforward Constants
         public static final double kS = 0;
         public static final double kG = 0.50;
@@ -165,10 +173,6 @@ public final class Constants {
         public static final double kMaxVelocity = 0;
         public static final double kMaxAcceleration = 0;
         public static final double kMaxError = 0;
-
-            // Soft Limits
-        public static final double kMaxAngle = 0;
-        public static final double kMinAngle = 0;
         
             // Encoder Constants
         public static final boolean kIsInverted = false;
@@ -176,8 +180,7 @@ public final class Constants {
         public static final double kConversionFactor = 360;
 
             // Input Constants
-        public static final double kMaxInputAccel = 10;
-
+        public static final double kInputSensitivity = 10; // degrees per second
     }
 
     public static class Ports {

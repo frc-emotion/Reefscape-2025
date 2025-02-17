@@ -82,11 +82,11 @@ public class Configs {
                 .zeroOffset(ArmConstants.kZeroOffset)
                 .zeroCentered(true);
 
-            ARM_CONFIG.softLimit
+            ARM_CONFIG.softLimit // may not be necessary, check later
                 .forwardSoftLimitEnabled(true)
                 .reverseSoftLimitEnabled(true)
-                .forwardSoftLimit(ArmConstants.kMaxAngle)
-                .reverseSoftLimit(ArmConstants.kMinAngle);
+                .forwardSoftLimit(ArmConstants.kMaxRotation)
+                .reverseSoftLimit(ArmConstants.kMinRotation);
             
             ARM_CONFIG.closedLoop
                 .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
