@@ -1,11 +1,13 @@
 package frc.robot.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
@@ -14,6 +16,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.MathUtil;
+import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
@@ -40,6 +43,8 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     private final PIDHelper pidHelper;
 
+    private ElevatorFeedforward elevatorFeedforward;
+
     public ElevatorSubsystem() {
         driveMotor = new SparkMax(Ports.CANID.ELEVATOR_DRIVE_1.getId(), MotorType.kBrushless);
         driveMotor2 = new SparkMax(Ports.CANID.ELEVATOR_DRIVE_2.getId(), MotorType.kBrushless);
@@ -51,6 +56,8 @@ public class ElevatorSubsystem extends SubsystemBase {
             ElevatorConfigs.ELEVATOR_FOLLOWER_CONFIG,
                 ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
+
+        elevatorFeedforward = new ElevatorFeedforward(ElevatorConstants.kS, ElevatorConstants.kG, ElevatorConstants.kV, ElevatorConstants.kA);
 
         controller = driveMotor.getClosedLoopController();
 
@@ -167,7 +174,8 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public void setTargetPosition(double position) {
         currentGoal = position;
-        controller.setReference(position, ControlType.kMAXMotionPositionControl);
+        double arbFF = elevatorFeedforward.calculate(getVelocity().in(MetersPerSecond));
+        controller.setReference(position, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot0, arbFF);
     }
 
     public void setTargetHeight(Distance height) {

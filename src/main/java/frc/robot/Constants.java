@@ -98,9 +98,10 @@ public final class Constants {
         public static final double MAX_MOTOR_ACCELERATION = 3000.0;
 
         // Feedforward Constants
-        public static final double kS = 0; // static gain in volts
-        public static final double kG = 0; // gravity gain in volts
-        public static final double kV = 0; // velocity gain in mps
+        public static final double kS = 0.4; // static gain in volts
+        public static final double kG = 0.18; // gravity gain in volts
+        public static final double kV = 10.52; // velocity gain in mps
+        public static final double kA = 0.03;
 
         // PID Constants
         public static final double kP = 0;
@@ -242,22 +243,22 @@ public final class Constants {
         public enum CANID {
             PDH(1, "Power Distribution Hub"),
 
-            // FRONT_LEFT_CANCODER(11, "Front Left Cancoder"),
-            // FRONT_RIGHT_CANCODER(12, "Front Right Cancoder"),
-            // BACK_LEFT_CANCODER(13, "Back Left Cancoder"),
-            // BACK_RIGHT_CANCODER(14, "Back Right Cancoder"),
+            FRONT_LEFT_CANCODER(11, "Front Left Cancoder"),
+            FRONT_RIGHT_CANCODER(12, "Front Right Cancoder"),
+            BACK_LEFT_CANCODER(13, "Back Left Cancoder"),
+            BACK_RIGHT_CANCODER(14, "Back Right Cancoder"),
 
-            // FRONT_LEFT_DRIVE(3, "Front Left Drive"),
-            // FRONT_LEFT_TURN(4, "Front Left Turn"),
+            FRONT_LEFT_DRIVE(3, "Front Left Drive"),
+            FRONT_LEFT_TURN(4, "Front Left Turn"),
 
-            // FRONT_RIGHT_DRIVE(5, "Front Right Drive"),
-            // FRONT_RIGHT_TURN(6, "Front Right Turn"),
+            FRONT_RIGHT_DRIVE(5, "Front Right Drive"),
+            FRONT_RIGHT_TURN(6, "Front Right Turn"),
 
-            // BACK_LEFT_DRIVE(7, "Back Left Drive"),
-            // BACK_LEFT_TURN(8, "Back Left Turn"),
+            BACK_LEFT_DRIVE(7, "Back Left Drive"),
+            BACK_LEFT_TURN(8, "Back Left Turn"),
 
-            // BACK_RIGHT_DRIVE(9, "Back Right Drive"),
-            // BACK_RIGHT_TURN(10, "Back Right Turn");
+            BACK_RIGHT_DRIVE(9, "Back Right Drive"),
+            BACK_RIGHT_TURN(10, "Back Right Turn"),
 
             ELEVATOR_DRIVE_1(69, "Elevator Drive 1"),
             ELEVATOR_DRIVE_2(70, "Elevator Drive 1"),
@@ -280,12 +281,12 @@ public final class Constants {
              */
 
             // Drive ID, Turn ID
-            // public static final int[][] SWERVE_IDS = {
-            // { FRONT_LEFT_DRIVE.id, FRONT_LEFT_TURN.id },
-            // { FRONT_RIGHT_DRIVE.id, FRONT_RIGHT_TURN.id },
-            // { BACK_LEFT_DRIVE.id, BACK_LEFT_TURN.id },
-            // { BACK_RIGHT_DRIVE.id, BACK_RIGHT_TURN.id }
-            // };
+            public static final int[][] SWERVE_IDS = {
+            { FRONT_LEFT_DRIVE.id, FRONT_LEFT_TURN.id },
+            { FRONT_RIGHT_DRIVE.id, FRONT_RIGHT_TURN.id },
+            { BACK_LEFT_DRIVE.id, BACK_LEFT_TURN.id },
+            { BACK_RIGHT_DRIVE.id, BACK_RIGHT_TURN.id }
+            };
 
             // public static final int[] CANCODER_IDS = {
             // FRONT_LEFT_CANCODER.id,
