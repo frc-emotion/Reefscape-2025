@@ -1,4 +1,4 @@
-package frc.robot.util.autos.tasks.positions;
+package frc.robot.util.autos.positions;
 
 public enum CoralPosition implements Position {
     A,
@@ -13,4 +13,9 @@ public enum CoralPosition implements Position {
     J,
     K,
     L;
+
+    @Override
+    public String getName() {
+        return name();
+    }
 }

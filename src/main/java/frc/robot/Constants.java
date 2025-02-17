@@ -111,6 +111,8 @@ public final class Constants {
         public static final Distance CORAL_L2_HEIGHT = Units.Inches.of(19);
         public static final Distance CORAL_L3_HEIGHT = Units.Inches.of(34.75);
         public static final Distance CORAL_L4_HEIGHT = Units.Inches.of(61);
+
+
         public static final Distance ALGAE_PREP_NET = Units.Inches.of(61);
         public static final Distance ALGAE_PREP_PROCESSOR_HEIGHT = Units.Inches.of(1);
         public static final Distance ALGAE_L3_CLEANING = Units.Inches.of(25);
@@ -181,6 +183,26 @@ public final class Constants {
 
             // Input Constants
         public static final double kInputSensitivity = 10; // degrees per second
+        
+        // Presets
+        public static final Rotation2d CORAL_L1_ANGLE = new Rotation2d(0);
+        public static final Rotation2d CORAL_L2_ANGLE = new Rotation2d(0);
+        public static final Rotation2d CORAL_L3_ANGLE = new Rotation2d(0);
+        public static final Rotation2d CORAL_L4_ANGLE = new Rotation2d(0);
+
+        // public static final Rotation2d CORAL_L1_ANGLE_FLIPPED = new Rotation2d(0);
+        // public static final Rotation2d CORAL_L2_ANGLE_FLIPPED = new Rotation2d(0);
+        // public static final Rotation2d CORAL_L3_ANGLE_FLIPPED = new Rotation2d(0);
+        // public static final Rotation2d CORAL_L4_ANGLE_FLIPPED = new Rotation2d(0);
+
+        public static final Rotation2d CORAL_INTAKE_ANGLE = new Rotation2d(kMinRotationConstrained);
+        
+        public static final Rotation2d ALGAE_L2_ANGLE = new Rotation2d(0);
+        public static final Rotation2d ALGAE_L3_ANGLE = new Rotation2d(0);
+        public static final Rotation2d ALGAE_GROUND_ANGLE = new Rotation2d(0);
+        public static final Rotation2d ALGAE_ON_CORAL_ANGLE = new Rotation2d(0);
+        public static final Rotation2d ALGAE_NET_ANGLE = new Rotation2d(0);
+        public static final Rotation2d ALGAE_PRO_ANGLE = new Rotation2d(0);
     }
 
     public static class Ports {

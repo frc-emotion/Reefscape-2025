@@ -1,7 +1,9 @@
-package frc.robot.util.autos.tasks;
+package frc.robot.util.tasks.auto;
 
-import frc.robot.util.autos.positions.AlgaePosition;
-import frc.robot.util.autos.positions.AlgaeScorePosition;
+import frc.robot.util.positions.AlgaePosition;
+import frc.robot.util.positions.AlgaeScorePosition;
+import frc.robot.util.tasks.AlgaeLevel;
+import frc.robot.util.tasks.Task;
 
 public class ScoreAlgae extends Task {
     public final AlgaePosition position;
