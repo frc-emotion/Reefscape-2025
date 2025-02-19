@@ -261,6 +261,12 @@ public class RobotContainer {
                     ArmConstants.CORAL_INTAKE_ANGLE
                 )
             );
+          
+         operatorXbox.leftStick().and(() -> Math.abs(operatorXbox.getLeftY()) > 0.1)
+                                         .onTrue(elevatorSubsystem.runOnce(elevatorSubsystem::stop))
+                                         .whileTrue(elevatorSubsystem.run(() -> elevatorSubsystem
+                                                         .moveSpeed(operatorXbox.getLeftY() * 0.75)))
+                                        .onFalse(elevatorSubsystem.runOnce(elevatorSubsystem::stop));
 
             operatorXbox.x().onTrue(new ZeroElevatorCurrent(elevatorSubsystem)); // Zero Elevator
 
@@ -281,7 +287,6 @@ public class RobotContainer {
     }
 
     private void configureDefaultCommands() {
-        elevatorSubsystem.setDefaultCommand(new MoveElevatorManual(elevatorSubsystem, () -> operatorXbox.getLeftY()));
         grabberSubsystem.setDefaultCommand(new GrabberHoldCommand(grabberSubsystem));
     }
 

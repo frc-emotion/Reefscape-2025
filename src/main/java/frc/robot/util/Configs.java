@@ -13,7 +13,6 @@ import frc.robot.Constants.Ports;
 
 import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
-
 public class Configs {
     public static class ElevatorConfigs {
         public static final SparkMaxConfig ELEVATOR_CONFIG = new SparkMaxConfig();
@@ -21,47 +20,55 @@ public class Configs {
 
         static {
             ELEVATOR_CONFIG
-                .idleMode(IdleMode.kBrake)
-                .smartCurrentLimit(ElevatorConstants.kSmartCurrentLimit)
-                .secondaryCurrentLimit(ElevatorConstants.kSecondaryCurrentLimit);
+                    .idleMode(IdleMode.kBrake)
+                    .smartCurrentLimit(ElevatorConstants.kSmartCurrentLimit)
+                    .secondaryCurrentLimit(ElevatorConstants.kSecondaryCurrentLimit)
+                    .voltageCompensation(12.0);
 
             ELEVATOR_CONFIG.softLimit
-                .forwardSoftLimitEnabled(true)
-                .reverseSoftLimitEnabled(true)
-                .forwardSoftLimit(Units.Inches.of(60).in(Units.Inches))
-                .reverseSoftLimit(Units.Inches.of(0).in(Units.Inches));
+                    .forwardSoftLimitEnabled(true)
+                    .reverseSoftLimitEnabled(true)
+                    .forwardSoftLimit(Units.Inches.of(60).in(Units.Inches))
+                    .reverseSoftLimit(Units.Inches.of(0).in(Units.Inches));
+
+            ELEVATOR_CONFIG.closedLoop
+                    .pid(ElevatorConstants.kP, ElevatorConstants.kI, ElevatorConstants.kD)
+                    .feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder);
 
             ELEVATOR_CONFIG.alternateEncoder
-                .countsPerRevolution(ElevatorConstants.kEncoderCPR)
-                .positionConversionFactor(ElevatorConstants.inchesPerCount);
+                    .countsPerRevolution(ElevatorConstants.kEncoderCPR)
+                    .positionConversionFactor(ElevatorConstants.inchesPerCount);
 
             ELEVATOR_CONFIG.closedLoop.maxMotion
-                .maxVelocity(ElevatorConstants.MAX_MOTOR_RPM)
-                .maxAcceleration(ElevatorConstants.MAX_MOTOR_ACCELERATION)
-                .allowedClosedLoopError(2);
-            
+                    .maxVelocity(ElevatorConstants.MAX_MOTOR_RPM)
+                    .maxAcceleration(ElevatorConstants.MAX_MOTOR_ACCELERATION)
+                    .positionMode(MAXMotionPositionMode.kMAXMotionTrapezoidal)
+                    .allowedClosedLoopError(0.01);
+
             ELEVATOR_CONFIG.closedLoop.pid(ElevatorConstants.kP, ElevatorConstants.kI, ElevatorConstants.kD);
-            
+
             ELEVATOR_FOLLOWER_CONFIG
-            .follow(Ports.CANID.ELEVATOR_DRIVE_1.getId())
-            .signals
-            .absoluteEncoderPositionAlwaysOn(false)
-            .analogPositionAlwaysOn(false)
-            .absoluteEncoderVelocityAlwaysOn(false)
-            .analogVelocityAlwaysOn(false)
-            .externalOrAltEncoderPositionAlwaysOn(false)
-            .externalOrAltEncoderVelocityAlwaysOn(false);
+                    .smartCurrentLimit(ElevatorConstants.kSmartCurrentLimit)
+                    .secondaryCurrentLimit(ElevatorConstants.kSecondaryCurrentLimit)
+                    .voltageCompensation(12.0)
+                    .follow(Ports.CANID.ELEVATOR_DRIVE_1.getId(), true).signals
+                    .absoluteEncoderPositionAlwaysOn(false)
+                    .analogPositionAlwaysOn(false)
+                    .absoluteEncoderVelocityAlwaysOn(false)
+                    .analogVelocityAlwaysOn(false)
+                    .externalOrAltEncoderPositionAlwaysOn(false)
+                    .externalOrAltEncoderVelocityAlwaysOn(false);
         }
     }
 
-    public static class GrabberConfigs { 
+    public static class GrabberConfigs {
         public static final SparkMaxConfig GRABBER_CONFIG = new SparkMaxConfig();
 
         static {
             GRABBER_CONFIG
-            .idleMode(IdleMode.kBrake)
-            .smartCurrentLimit(GrabberConstants.kSmartCurrentLimit)
-            .secondaryCurrentLimit(GrabberConstants.kSecondaryCurrentLimit);
+                    .idleMode(IdleMode.kBrake)
+                    .smartCurrentLimit(GrabberConstants.kSmartCurrentLimit)
+                    .secondaryCurrentLimit(GrabberConstants.kSecondaryCurrentLimit);
 
         }
     }
@@ -71,40 +78,36 @@ public class Configs {
 
         static {
             ARM_CONFIG
-                .idleMode(IdleMode.kBrake)
-                .smartCurrentLimit(ArmConstants.kSmartCurrentLimit)
-                .secondaryCurrentLimit(ArmConstants.kSecondaryCurrentLimit);
+                    .idleMode(IdleMode.kBrake)
+                    .smartCurrentLimit(ArmConstants.kSmartCurrentLimit)
+                    .secondaryCurrentLimit(ArmConstants.kSecondaryCurrentLimit);
 
-            ARM_CONFIG.absoluteEncoder
-                .inverted(ArmConstants.kIsInverted)
-                .positionConversionFactor(ArmConstants.kConversionFactor)
-                .velocityConversionFactor(ArmConstants.kConversionFactor / 60.0)
-                .zeroOffset(ArmConstants.kZeroOffset)
-                .zeroCentered(true);
+            ARM_CONFIG.alternateEncoder
+                    .inverted(ArmConstants.kIsInverted)
+                    .positionConversionFactor(ArmConstants.kConversionFactor)
+                    .velocityConversionFactor(ArmConstants.kConversionFactor / 60.0);
 
-            ARM_CONFIG.softLimit // may not be necessary, check later
-                .forwardSoftLimitEnabled(true)
-                .reverseSoftLimitEnabled(true)
-                .forwardSoftLimit(ArmConstants.kMaxRotation)
-                .reverseSoftLimit(ArmConstants.kMinRotation);
-            
+            ARM_CONFIG.softLimit
+                    .forwardSoftLimitEnabled(true)
+                    .reverseSoftLimitEnabled(true)
+                    .forwardSoftLimit(ArmConstants.kMaxAngle)
+                    .reverseSoftLimit(ArmConstants.kMinAngle);
+
             ARM_CONFIG.closedLoop
-                .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
-                .pid(
-                    ArmConstants.kP,
-                    ArmConstants.kI,
-                    ArmConstants.kD
-                )
-                .outputRange(-ArmConstants.kMaxOutput, ArmConstants.kMaxOutput);
+                    .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+                    .pid(
+                            ArmConstants.kP,
+                            ArmConstants.kI,
+                            ArmConstants.kD)
+                    .outputRange(-ArmConstants.kMaxOutput, ArmConstants.kMaxOutput);
 
             ARM_CONFIG.closedLoop.maxMotion
-                .positionMode(MAXMotionPositionMode.kMAXMotionTrapezoidal)
-                .maxVelocity(ArmConstants.kMaxVelocity)
-                .maxAcceleration(ArmConstants.kMaxAcceleration)
-                .allowedClosedLoopError(ArmConstants.kMaxError);
-                
-                
+                    .positionMode(MAXMotionPositionMode.kMAXMotionTrapezoidal)
+                    .maxVelocity(ArmConstants.kMaxVelocity)
+                    .maxAcceleration(ArmConstants.kMaxAcceleration)
+                    .allowedClosedLoopError(ArmConstants.kMaxError);
+
         }
     }
-    
+
 }

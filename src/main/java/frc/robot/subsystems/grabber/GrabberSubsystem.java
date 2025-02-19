@@ -13,7 +13,6 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.GrabberConstants;
 import frc.robot.Constants.Ports;
-import frc.robot.util.Configs.ElevatorConfigs;
 import frc.robot.util.Configs.GrabberConfigs;
 import frc.robot.util.Faults.FaultManager;
 import frc.robot.util.Faults.FaultTypes.FaultType;

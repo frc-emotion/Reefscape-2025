@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -17,11 +18,15 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
+import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.Constants.Ports;
 import frc.robot.util.Configs.ElevatorConfigs;
 import frc.robot.util.PIDHelper;
@@ -33,7 +38,7 @@ import frc.robot.Constants.ElevatorConstants;;
 public class ElevatorSubsystem extends SubsystemBase {
     private SparkMax driveMotor, driveMotor2;
 
-    private SparkClosedLoopController controller;
+    private Object controller;
 
     private RelativeEncoder boreEncoder;
 
@@ -43,9 +48,9 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     private final PIDHelper pidHelper;
 
-    private ElevatorFeedforward elevatorFeedforward;
+    private final ElevatorFeedforward feedforward;
 
-    public ElevatorSubsystem() {
+    public ElevatorSubsystem(boolean useTrapezoidal) {
         driveMotor = new SparkMax(Ports.CANID.ELEVATOR_DRIVE_1.getId(), MotorType.kBrushless);
         driveMotor2 = new SparkMax(Ports.CANID.ELEVATOR_DRIVE_2.getId(), MotorType.kBrushless);
 
@@ -53,13 +58,23 @@ public class ElevatorSubsystem extends SubsystemBase {
                 PersistMode.kPersistParameters);
 
         driveMotor2.configure(
-            ElevatorConfigs.ELEVATOR_FOLLOWER_CONFIG,
+                ElevatorConfigs.ELEVATOR_FOLLOWER_CONFIG,
                 ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
 
-        elevatorFeedforward = new ElevatorFeedforward(ElevatorConstants.kS, ElevatorConstants.kG, ElevatorConstants.kV, ElevatorConstants.kA);
+        feedforward = new ElevatorFeedforward(
+                ElevatorConstants.kS,
+                ElevatorConstants.kG,
+                ElevatorConstants.kV,
+                ElevatorConstants.kA);
 
-        controller = driveMotor.getClosedLoopController();
+        if (useTrapezoidal) {
+            controller = new ProfiledPIDController(ElevatorConstants.kP, ElevatorConstants.kI, ElevatorConstants.kD,
+                    new TrapezoidProfile.Constraints(ElevatorConstants.MAX_MOTOR_RPM,
+                            ElevatorConstants.MAX_MOTOR_ACCELERATION));
+        } else {
+            controller = driveMotor.getClosedLoopController();
+        }
 
         boreEncoder = driveMotor.getAlternateEncoder();
 
@@ -86,28 +101,32 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     private void safetyChecks() {
         FaultManager.register(
-                () -> driveMotor.getOutputCurrent() > ElevatorConstants.NORMAL_OPERATION_CURRENT + ElevatorConstants.CURRENT_SPIKE_THRESHOLD,
+                () -> driveMotor.getOutputCurrent() > ElevatorConstants.NORMAL_OPERATION_CURRENT
+                        + ElevatorConstants.CURRENT_SPIKE_THRESHOLD,
                 "Elevator Drive 1",
                 "Possible unsafe current spike",
                 FaultType.WARNING);
 
         FaultManager.register(
-            () -> driveMotor2.getOutputCurrent() > ElevatorConstants.NORMAL_OPERATION_CURRENT + ElevatorConstants.CURRENT_SPIKE_THRESHOLD,
-            "Elevator Drive 2",
-            "Possible unsafe current spike",
-            FaultType.WARNING);
+                () -> driveMotor2.getOutputCurrent() > ElevatorConstants.NORMAL_OPERATION_CURRENT
+                        + ElevatorConstants.CURRENT_SPIKE_THRESHOLD,
+                "Elevator Drive 2",
+                "Possible unsafe current spike",
+                FaultType.WARNING);
 
         FaultManager.register(
-            () -> driveMotor.getMotorTemperature() > ElevatorConstants.NORMAL_OPERATION_TEMP + ElevatorConstants.TEMP_SPIKE_THRESHOLD,
-            "Elevator Drive 1",
-            "Possible unsafe motor temperature",
-            FaultType.WARNING);
+                () -> driveMotor.getMotorTemperature() > ElevatorConstants.NORMAL_OPERATION_TEMP
+                        + ElevatorConstants.TEMP_SPIKE_THRESHOLD,
+                "Elevator Drive 1",
+                "Possible unsafe motor temperature",
+                FaultType.WARNING);
 
         FaultManager.register(
-            () -> driveMotor2.getMotorTemperature() > ElevatorConstants.NORMAL_OPERATION_TEMP + ElevatorConstants.TEMP_SPIKE_THRESHOLD,
-            "Elevator Drive 2",
-            "Possible unsafe motor temperature",
-            FaultType.WARNING);
+                () -> driveMotor2.getMotorTemperature() > ElevatorConstants.NORMAL_OPERATION_TEMP
+                        + ElevatorConstants.TEMP_SPIKE_THRESHOLD,
+                "Elevator Drive 2",
+                "Possible unsafe motor temperature",
+                FaultType.WARNING);
     }
 
     @Override
@@ -172,10 +191,25 @@ public class ElevatorSubsystem extends SubsystemBase {
         driveMotor.stopMotor();
     }
 
+    public void reachGoal(double goal) {
+        double voltsOut = MathUtil.clamp(
+                ((ProfiledPIDController) controller).calculate(getHeight().in(Inches), goal) +
+                        feedforward.calculateWithVelocities(getVelocity().in(MetersPerSecond),
+                                ((ProfiledPIDController) controller).getSetpoint().velocity),
+                -7,
+                7); // 7 is the max voltage to send out.
+        driveMotor.setVoltage(voltsOut);
+    }
+
     public void setTargetPosition(double position) {
         currentGoal = position;
-        double arbFF = elevatorFeedforward.calculate(getVelocity().in(MetersPerSecond));
-        controller.setReference(position, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot0, arbFF);
+        if (controller instanceof ProfiledPIDController) {
+            // ((ProfiledPIDController) controller).setGoal(new
+            // TrapezoidProfile.State(position, 0));
+            run(() -> reachGoal(position));
+        } else {
+            ((SparkClosedLoopController) controller).setReference(position, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot0, feedforward.calculate(getVelocity().in(MetersPerSecond)));
+        }
     }
 
     public void setTargetHeight(Distance height) {
@@ -188,6 +222,12 @@ public class ElevatorSubsystem extends SubsystemBase {
                         getTargetHeight().minus(Units.Inches.of(ElevatorConstants.TOLERABLE_ERROR))) > 0)
                 &&
                 getHeight().compareTo(getTargetHeight().plus(Units.Inches.of(ElevatorConstants.TOLERABLE_ERROR))) < 0;
+    }
+
+    public Trigger atHeight(double height, double tolerance) {
+        return new Trigger(() -> MathUtil.isNear(height,
+                getHeight().in(Inches),
+                tolerance));
     }
 
     public double getPosition() {
