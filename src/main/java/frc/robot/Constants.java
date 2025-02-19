@@ -93,13 +93,14 @@ public final class Constants {
         public static final double kMaxHeightMeters = 0;
         public static final double kStartingHeightMeters = 0;
 
-        public static final double MAX_MOTOR_RPM = 5000.0;
-        public static final double MAX_MOTOR_ACCELERATION = 3000.0;
+        public static final double MAX_MOTOR_RPM = 5000.0; // RPM
+        public static final double MAX_MOTOR_ACCELERATION = 3000.0; // RPM
 
         // Feedforward Constants
         public static final double kS = 0; // static gain in volts
         public static final double kG = 0; // gravity gain in volts
         public static final double kV = 0; // velocity gain in mps
+        public static final double kA = 0; // acceleration gain in mps^2
 
         // PID Constants
         public static final double kP = 0;
@@ -177,6 +178,12 @@ public final class Constants {
 
             // Input Constants
         public static final double kMaxInputAccel = 10;
+
+
+        public static final int NORMAL_OPERATION_CURRENT = 0;
+        public static final int NORMAL_OPERATION_TEMP = 0;
+        public static final int CURRENT_SPIKE_THRESHOLD = 0;
+        public static final int TEMP_SPIKE_THRESHOLD = 0;
 
     }
 
