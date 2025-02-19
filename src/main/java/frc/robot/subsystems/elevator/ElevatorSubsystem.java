@@ -4,6 +4,7 @@ import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import com.revrobotics.RelativeEncoder;
+import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -206,7 +207,7 @@ public class ElevatorSubsystem extends SubsystemBase {
             // TrapezoidProfile.State(position, 0));
             run(() -> reachGoal(position));
         } else {
-            ((SparkClosedLoopController) controller).setReference(position, ControlType.kMAXMotionPositionControl);
+            ((SparkClosedLoopController) controller).setReference(position, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot0, feedforward.calculate(getVelocity().in(MetersPerSecond)));
         }
     }
 

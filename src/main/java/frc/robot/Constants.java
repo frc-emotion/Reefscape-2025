@@ -97,10 +97,10 @@ public final class Constants {
         public static final double MAX_MOTOR_ACCELERATION = 3000.0; // RPM
 
         // Feedforward Constants
-        public static final double kS = 0; // static gain in volts
-        public static final double kG = 0; // gravity gain in volts
-        public static final double kV = 0; // velocity gain in mps
-        public static final double kA = 0; // acceleration gain in mps^2
+        public static final double kS = 0.4; // static gain in volts
+        public static final double kG = 0.18; // gravity gain in volts
+        public static final double kV = 10.52; // velocity gain in mps
+        public static final double kA = 0.03; // acceleration gain in mps^2
 
         // PID Constants
         public static final double kP = 0;
