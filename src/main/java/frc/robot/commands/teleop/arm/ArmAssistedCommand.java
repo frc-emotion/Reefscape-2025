@@ -4,6 +4,7 @@ import java.util.function.Supplier;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.subsystems.arm.ArmSubsystem;
@@ -12,26 +13,23 @@ public class ArmAssistedCommand extends Command {
     private final ArmSubsystem m_ArmSubsystem;
     private final Supplier<Double> armSupplier;
 
-    private final SlewRateLimiter rateLimiter;
+    private final Supplier<Distance> elevatorHeightSupplier;
 
-    public ArmAssistedCommand(ArmSubsystem armSubsystem, Supplier<Double> armSupplier) {
+    public ArmAssistedCommand(ArmSubsystem armSubsystem, Supplier<Double> armSupplier, Supplier<Distance> elevatorHeight) {
         this.m_ArmSubsystem = armSubsystem;
         this.armSupplier = armSupplier;
-
-        rateLimiter = new SlewRateLimiter(ArmConstants.kMaxInputAccel);
+        this.elevatorHeightSupplier = elevatorHeight;
 
         addRequirements(armSubsystem);
     }
 
     @Override
     public void execute() {
-        m_ArmSubsystem.setTargetAngle(
-            m_ArmSubsystem.getPosition().plus(
-                Rotation2d.fromDegrees(
-                    rateLimiter.calculate(armSupplier.get() * 360)
-                )
-            )
+        Rotation2d targetRotation = Rotation2d.fromDegrees(
+            m_ArmSubsystem.getRotation().getDegrees() + (armSupplier.get() * 360)
         );
+
+        m_ArmSubsystem.setTargetAngle(targetRotation, elevatorHeightSupplier.get());
     }
 
     @Override

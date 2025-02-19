@@ -23,18 +23,12 @@ public class GrabberSubsystem extends SubsystemBase {
         private DigitalInput coralSensor;
         private TimeOfFlight algaeSensor;
         private GrabType targetType;
-        private GrabDirection targetDirection;
 
         public static enum GrabType { 
             CORAL,
             ALGAE,
             NONE;
         };
-
-        public static enum GrabDirection {
-            INTAKE,
-            OUTTAKE
-        }
                             
         public GrabberSubsystem() {
             grabberMotor = new SparkMax(Ports.CANID.GRABBER_DRIVE.getId(), MotorType.kBrushless);
@@ -81,14 +75,6 @@ public class GrabberSubsystem extends SubsystemBase {
             }
         }
 
-        public GrabDirection getTargetGrabDirection() {
-            return targetDirection;
-        }
-
-        public void setTargetDirection(GrabDirection direction) {
-            targetDirection = direction;
-        }
-
         public void setTargetType(GrabType type) {
             targetType = type;
         }
@@ -120,6 +106,5 @@ public class GrabberSubsystem extends SubsystemBase {
             SmartDashboard.putNumber("Grabber/1/Current", grabberMotor.getOutputCurrent());
             SmartDashboard.putNumber("Grabber/1/Temp", grabberMotor.getMotorTemperature());
             SmartDashboard.putString("Grabber/1/Type", getCurrentGrabType().name());
-            SmartDashboard.putString("Grabber/1/Direction", getTargetGrabDirection().name());
         }
 }

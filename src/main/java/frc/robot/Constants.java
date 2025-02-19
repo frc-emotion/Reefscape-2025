@@ -10,6 +10,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
 // import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Units;
@@ -111,6 +112,8 @@ public final class Constants {
         public static final Distance CORAL_L2_HEIGHT = Units.Inches.of(19);
         public static final Distance CORAL_L3_HEIGHT = Units.Inches.of(34.75);
         public static final Distance CORAL_L4_HEIGHT = Units.Inches.of(61);
+
+
         public static final Distance ALGAE_PREP_NET = Units.Inches.of(61);
         public static final Distance ALGAE_PREP_PROCESSOR_HEIGHT = Units.Inches.of(1);
         public static final Distance ALGAE_L3_CLEANING = Units.Inches.of(25);
@@ -118,7 +121,7 @@ public final class Constants {
         public static final Distance ALGAE_GROUND_INTAKE = Units.Inches.of(0);
         public static final Distance PREP_0 = Units.Inches.of(0);
         public static final Distance DEADZONE_DISTANCE = Units.Inches.of(1);
-        public static final Distance CORAL_INTAKE_HIGHT = Units.Inches.of(0);
+        public static final Distance CORAL_INTAKE_HEIGHT = Units.Inches.of(0);
 
         public static final int NORMAL_OPERATION_CURRENT = 0;
         public static final int CURRENT_SPIKE_THRESHOLD = 0;
@@ -150,7 +153,14 @@ public final class Constants {
         public static final double kSecondaryCurrentLimit = 40;
 
         public static final double kMaxOutput = 1;
-        
+
+            // Physical Constraints
+        public static final double kMinRotation = 0; // Note: Aligns with hopper
+        public static final double kMaxRotation = 0;
+        public static final double kMaxHeightConstrained = 0; // The height in meters at which the arm is able to rotate fully. Should be roughly the length of the arm.
+        public static final double kMaxRotationConstrained = 0; // The max rotation while the arm is below the minimum full rotation height. Could be formulaic, but probably not necessary.
+        public static final double kMinRotationConstrained = 0;
+
             // Feedforward Constants
         public static final double kS = 0;
         public static final double kG = 0.50;
@@ -166,10 +176,6 @@ public final class Constants {
         public static final double kMaxVelocity = 0;
         public static final double kMaxAcceleration = 0;
         public static final double kMaxError = 0;
-
-            // Soft Limits
-        public static final double kMaxAngle = 0;
-        public static final double kMinAngle = 0;
         
             // Encoder Constants
         public static final boolean kIsInverted = false;
@@ -177,6 +183,27 @@ public final class Constants {
         public static final double kConversionFactor = 360;
 
             // Input Constants
+        public static final double kInputSensitivity = 10; // degrees per second
+        
+        // Presets
+        public static final Rotation2d CORAL_L1_ANGLE = new Rotation2d(0);
+        public static final Rotation2d CORAL_L2_ANGLE = new Rotation2d(0);
+        public static final Rotation2d CORAL_L3_ANGLE = new Rotation2d(0);
+        public static final Rotation2d CORAL_L4_ANGLE = new Rotation2d(0);
+
+        // public static final Rotation2d CORAL_L1_ANGLE_FLIPPED = new Rotation2d(0);
+        // public static final Rotation2d CORAL_L2_ANGLE_FLIPPED = new Rotation2d(0);
+        // public static final Rotation2d CORAL_L3_ANGLE_FLIPPED = new Rotation2d(0);
+        // public static final Rotation2d CORAL_L4_ANGLE_FLIPPED = new Rotation2d(0);
+
+        public static final Rotation2d CORAL_INTAKE_ANGLE = new Rotation2d(kMinRotationConstrained);
+        
+        public static final Rotation2d ALGAE_L2_ANGLE = new Rotation2d(0);
+        public static final Rotation2d ALGAE_L3_ANGLE = new Rotation2d(0);
+        public static final Rotation2d ALGAE_GROUND_ANGLE = new Rotation2d(0);
+        public static final Rotation2d ALGAE_ON_CORAL_ANGLE = new Rotation2d(0);
+        public static final Rotation2d ALGAE_NET_ANGLE = new Rotation2d(0);
+        public static final Rotation2d ALGAE_PRO_ANGLE = new Rotation2d(0);
         public static final double kMaxInputAccel = 10;
 
 
@@ -224,22 +251,22 @@ public final class Constants {
         public enum CANID {
             PDH(1, "Power Distribution Hub"),
 
-            // FRONT_LEFT_CANCODER(11, "Front Left Cancoder"),
-            // FRONT_RIGHT_CANCODER(12, "Front Right Cancoder"),
-            // BACK_LEFT_CANCODER(13, "Back Left Cancoder"),
-            // BACK_RIGHT_CANCODER(14, "Back Right Cancoder"),
+            FRONT_LEFT_CANCODER(11, "Front Left Cancoder"),
+            FRONT_RIGHT_CANCODER(12, "Front Right Cancoder"),
+            BACK_LEFT_CANCODER(13, "Back Left Cancoder"),
+            BACK_RIGHT_CANCODER(14, "Back Right Cancoder"),
 
-            // FRONT_LEFT_DRIVE(3, "Front Left Drive"),
-            // FRONT_LEFT_TURN(4, "Front Left Turn"),
+            FRONT_LEFT_DRIVE(3, "Front Left Drive"),
+            FRONT_LEFT_TURN(4, "Front Left Turn"),
 
-            // FRONT_RIGHT_DRIVE(5, "Front Right Drive"),
-            // FRONT_RIGHT_TURN(6, "Front Right Turn"),
+            FRONT_RIGHT_DRIVE(5, "Front Right Drive"),
+            FRONT_RIGHT_TURN(6, "Front Right Turn"),
 
-            // BACK_LEFT_DRIVE(7, "Back Left Drive"),
-            // BACK_LEFT_TURN(8, "Back Left Turn"),
+            BACK_LEFT_DRIVE(7, "Back Left Drive"),
+            BACK_LEFT_TURN(8, "Back Left Turn"),
 
-            // BACK_RIGHT_DRIVE(9, "Back Right Drive"),
-            // BACK_RIGHT_TURN(10, "Back Right Turn");
+            BACK_RIGHT_DRIVE(9, "Back Right Drive"),
+            BACK_RIGHT_TURN(10, "Back Right Turn"),
 
             ELEVATOR_DRIVE_1(69, "Elevator Drive 1"),
             ELEVATOR_DRIVE_2(70, "Elevator Drive 1"),
@@ -262,12 +289,12 @@ public final class Constants {
              */
 
             // Drive ID, Turn ID
-            // public static final int[][] SWERVE_IDS = {
-            // { FRONT_LEFT_DRIVE.id, FRONT_LEFT_TURN.id },
-            // { FRONT_RIGHT_DRIVE.id, FRONT_RIGHT_TURN.id },
-            // { BACK_LEFT_DRIVE.id, BACK_LEFT_TURN.id },
-            // { BACK_RIGHT_DRIVE.id, BACK_RIGHT_TURN.id }
-            // };
+            public static final int[][] SWERVE_IDS = {
+            { FRONT_LEFT_DRIVE.id, FRONT_LEFT_TURN.id },
+            { FRONT_RIGHT_DRIVE.id, FRONT_RIGHT_TURN.id },
+            { BACK_LEFT_DRIVE.id, BACK_LEFT_TURN.id },
+            { BACK_RIGHT_DRIVE.id, BACK_RIGHT_TURN.id }
+            };
 
             // public static final int[] CANCODER_IDS = {
             // FRONT_LEFT_CANCODER.id,
