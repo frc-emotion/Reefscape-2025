@@ -1,7 +1,7 @@
 package frc.robot.util.tasks.general;
 
-import frc.robot.util.positions.CoralPosition;
 import frc.robot.util.tasks.Task;
+import frc.robot.util.tasks.positions.CoralPosition;
 
 public class ScoreCoral extends Task {
     public final CoralPosition position;

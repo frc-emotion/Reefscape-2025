@@ -10,6 +10,7 @@ import com.revrobotics.spark.ClosedLoopSlot;
 import com.revrobotics.spark.SparkAbsoluteEncoder;
 import com.revrobotics.spark.SparkClosedLoopController;
 import com.revrobotics.spark.SparkMax;
+import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.SparkBase.ControlType;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
@@ -18,6 +19,8 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ElevatorConstants;
@@ -37,6 +40,7 @@ public class ArmSubsystem extends SubsystemBase {
     private final ArmFeedforward feedforward;
 
     private Rotation2d targetAngle;
+
     private final PIDHelper pidHelper;
 
     private final SparkMaxConfig config = new SparkMaxConfig();
@@ -48,30 +52,14 @@ public class ArmSubsystem extends SubsystemBase {
         
         armMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-        armEncoder = armMotor.getAbsoluteEncoder();
+        armEncoder = armMotor.getAlternateEncoder();
         
         pidController = armMotor.getClosedLoopController();
 
         feedforward = new ArmFeedforward(ArmConstants.kS, ArmConstants.kG, ArmConstants.kV, ArmConstants.kA);
 
         targetAngle = getRotation();
-    }
 
-    /**
-     * Sets the target angle for the arm. Constrained by the limits defined in currentConstraints.
-     * 
-     * @param angle The target angle to rotate to
-     */
-    public void setTargetAngle(Rotation2d angle, Distance elevatorHeight) {
-        targetAngle = constrain(angle, elevatorHeight);
-
-        pidController.setReference(
-            targetAngle.getDegrees(),
-            ControlType.kMAXMotionPositionControl,
-            ClosedLoopSlot.kSlot0,
-            feedforward.calculate(getRotation().getRadians(), getVelocity().getRadians())
-        );
-    
         FaultManager.register(armMotor);
 
         pidHelper = new PIDHelper(
@@ -90,6 +78,22 @@ public class ArmSubsystem extends SubsystemBase {
                 (newAllowedError) -> config.closedLoop.maxMotion.allowedClosedLoopError(newAllowedError));
 
         safetyChecks();
+    }
+
+    /**
+     * Sets the target angle for the arm. Constrained by the limits defined in currentConstraints.
+     * 
+     * @param angle The target angle to rotate to
+     */
+    public void setTargetAngle(Rotation2d angle, Distance elevatorHeight) {
+        targetAngle = constrain(angle, elevatorHeight);
+
+        pidController.setReference(
+            targetAngle.getDegrees(),
+            ControlType.kMAXMotionPositionControl,
+            ClosedLoopSlot.kSlot0,
+            feedforward.calculate(getRotation().getRadians(), getVelocity().getRadians())
+        );
 
     }
 

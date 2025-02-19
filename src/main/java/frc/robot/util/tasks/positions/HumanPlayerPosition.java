@@ -1,4 +1,4 @@
-package frc.robot.util.autos.positions;
+package frc.robot.util.tasks.positions;
 
 public enum HumanPlayerPosition implements Position {
     HP1,

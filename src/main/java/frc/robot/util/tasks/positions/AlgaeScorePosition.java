@@ -1,4 +1,4 @@
-package frc.robot.util.autos.positions;
+package frc.robot.util.tasks.positions;
 
 /**
  * The position to score the algae. Note: Barge position does not matter in teleop.

@@ -1,4 +1,4 @@
-package frc.robot.subsystems.swerve;
+package frc.robot.subsystems.vision;
 
 import static edu.wpi.first.units.Units.Microseconds;
 import static edu.wpi.first.units.Units.Milliseconds;
@@ -24,6 +24,7 @@ import edu.wpi.first.wpilibj.Alert.AlertType;
 import edu.wpi.first.wpilibj.smartdashboard.Field2d;
 import frc.robot.Robot;
 import java.awt.Desktop;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -51,8 +52,17 @@ public class Vision {
   /**
    * April Tag Field Layout of the year.
    */
-  public static final AprilTagFieldLayout fieldLayout = AprilTagFieldLayout.loadFromResource(
-      "toFillIn");
+  public static final AprilTagFieldLayout fieldLayout;
+
+  static {
+    AprilTagFieldLayout layout = null;
+    try {
+      layout = AprilTagFieldLayout.loadFromResource("toFillIn");
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    fieldLayout = layout;
+  }
   /**
    * Ambiguity defined as a value between (0,1). Used in
    * {@link Vision#filterPose}.
@@ -382,12 +392,12 @@ public class Vision {
     /**
      * Simulated camera instance which only exists during simulations.
      */
-    // public PhotonCameraSim cameraSim;
+    public PhotonCameraSim cameraSim;
     /**
      * Results list to be updated periodically and cached to avoid unnecessary
      * queries.
      */
-    // public List<PhotonPipelineResult> resultsList = new ArrayList<>();
+    public List<PhotonPipelineResult> resultsList = new ArrayList<>();
     /**
      * Last read from the camera timestamp to prevent lag due to slow data fetches.
      */

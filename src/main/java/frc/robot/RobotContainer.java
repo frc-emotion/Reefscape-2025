@@ -25,7 +25,6 @@ import frc.robot.commands.teleop.Elevator.ZeroElevatorCurrent;
 import frc.robot.commands.teleop.Grabber.GrabberGrabCommand;
 import frc.robot.commands.teleop.Grabber.GrabberHoldCommand;
 import frc.robot.commands.functional.MainCommandFactory;
-import frc.robot.commands.teleop.Elevator.MoveElevatorManual;
 
 import frc.robot.Constants;
 import frc.robot.Constants.ArmConstants;
@@ -35,6 +34,7 @@ import frc.robot.util.Configs.ElevatorConfigs;
 import frc.robot.util.Faults.FaultManager;
 import frc.robot.util.tasks.general.CoralLevel;
 import frc.robot.util.tasks.general.ScoreCoral;
+import frc.robot.util.tasks.positions.CoralPosition;
 
 import java.io.File;
 import swervelib.SwerveInputStream;
@@ -56,7 +56,7 @@ public class RobotContainer {
     private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
             "swerve/neo"));
 
-    private final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem();
+    private final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem(false);
     private final GrabberSubsystem grabberSubsystem = new GrabberSubsystem();
     private final ArmSubsystem armSubsystem = new ArmSubsystem();
 
@@ -220,7 +220,7 @@ public class RobotContainer {
                     MainCommandFactory.getPlacePrepCommand(
                         armSubsystem,
                         elevatorSubsystem,
-                        new ScoreCoral(null, CoralLevel.L1)
+                        new ScoreCoral(CoralPosition.A, CoralLevel.L1)
                     )
                 );
             

@@ -1,4 +1,4 @@
-package frc.robot.util.autos.positions;
+package frc.robot.util.tasks.positions;
 
 public enum AlgaePosition implements Position {
     AB,

@@ -90,8 +90,8 @@ public class Configs {
             ARM_CONFIG.softLimit
                     .forwardSoftLimitEnabled(true)
                     .reverseSoftLimitEnabled(true)
-                    .forwardSoftLimit(ArmConstants.kMaxAngle)
-                    .reverseSoftLimit(ArmConstants.kMinAngle);
+                    .forwardSoftLimit(ArmConstants.kMinRotation)
+                    .reverseSoftLimit(ArmConstants.kMaxRotation);
 
             ARM_CONFIG.closedLoop
                     .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
