@@ -12,7 +12,6 @@ import java.util.Map;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
-// import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Distance;
 import frc.robot.util.Faults.FaultTypes.PDFaults;
@@ -69,6 +68,22 @@ public final class Constants {
         public static final double TURN_CONSTANT = 6;
     }
 
+    public static class ClimbConstants {
+
+        public static final double kSpeed = 0.8;
+
+        public static final double SET_SPEED = 0.8;
+
+        public static final double POSITION_ERROR = 1;
+
+        public static final double EXTENSION_LIMIT = 1;
+
+        public static final int kSmartCurrentLimit = 45;
+
+        public static final double kSecondaryCurrentLimit = 45;
+
+
+    }
     public static class ElevatorConstants {
         public static final double TOLERABLE_ERROR = 1;
 
@@ -326,6 +341,8 @@ public final class Constants {
                 return CAN_ID_MAP.getOrDefault(id, "Unknown CAN ID");
             }
         }
+
+        public static final int CLIMB_PORT = 1;
     }
 
 }

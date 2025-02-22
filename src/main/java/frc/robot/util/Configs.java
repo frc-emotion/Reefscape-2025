@@ -1,17 +1,16 @@
 package frc.robot.util;
 
-import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.config.SparkMaxConfig;
 import com.revrobotics.spark.config.ClosedLoopConfig.FeedbackSensor;
 import com.revrobotics.spark.config.MAXMotionConfig.MAXMotionPositionMode;
+import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
+import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.units.Units;
 import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.ClimbConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.GrabberConstants;
 import frc.robot.Constants.Ports;
-
-import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 
 public class Configs {
     public static class ElevatorConfigs {
@@ -72,7 +71,17 @@ public class Configs {
 
         }
     }
+    public static class ClimbConfigs {
+        public static final SparkMaxConfig CLIMB_CONFIG = new SparkMaxConfig();
 
+        static {
+            CLIMB_CONFIG
+                .idleMode(IdleMode.kBrake)
+                .smartCurrentLimit(ClimbConstants.kSmartCurrentLimit)
+                .secondaryCurrentLimit(ClimbConstants.kSecondaryCurrentLimit);
+
+        }
+    }
     public static class ArmConfigs {
         public static final SparkMaxConfig ARM_CONFIG = new SparkMaxConfig();
 
