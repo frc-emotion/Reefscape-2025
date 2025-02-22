@@ -1,6 +1,8 @@
 package frc.robot.subsystems.elevator;
 
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Kilograms;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
 
 import com.revrobotics.RelativeEncoder;
@@ -19,11 +21,13 @@ import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.wpilibj.simulation.ElevatorSim;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -36,11 +40,11 @@ import frc.robot.Constants.ElevatorConstants;;
 
 @Logged
 public class ElevatorSubsystem extends SubsystemBase {
-    private SparkMax driveMotor, driveMotor2;
+    protected SparkMax driveMotor, driveMotor2;
 
     private Object controller;
 
-    private RelativeEncoder boreEncoder;
+    protected RelativeEncoder boreEncoder;
 
     private double currentGoal;
 
@@ -80,6 +84,8 @@ public class ElevatorSubsystem extends SubsystemBase {
 
         FaultManager.register(driveMotor);
         FaultManager.register(driveMotor2);
+
+        
 
         pidHelper = new PIDHelper(
                 "Elevator",

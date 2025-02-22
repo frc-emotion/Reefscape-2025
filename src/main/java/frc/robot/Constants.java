@@ -4,6 +4,9 @@
 
 package frc.robot;
 
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Pounds;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -12,9 +15,11 @@ import java.util.Map;
 
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation3d;
+import edu.wpi.first.units.MassUnit;
 // import edu.wpi.first.math.util.Units;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.Mass;
 import frc.robot.util.Faults.FaultTypes.PDFaults;
 import swervelib.math.Matter;
 
@@ -43,6 +48,8 @@ public final class Constants {
             ROBOT_MASS);
     public static final double LOOP_TIME = 0.13; // s, 20ms + 110ms sprk max velocity lag
     public static final double MAX_SPEED = Units.Feet.convertFrom(14.5, Units.Meters);
+
+    public static final boolean SIM_ENABLED = true;
 
     // Maximum speed of the robot in meters per second, used to limit acceleration.
 
@@ -82,17 +89,17 @@ public final class Constants {
 
         public static final double kPulleyCircumInches = Math.PI * kpulleyDiameterInches;
 
-        public static final double kGearRatio = 0;
+        public static final double kGearRatio = 3.818;
 
         public static final double effectiveCountsPerRevolution = kEncoderCPR * kGearRatio;
 
         public static final double inchesPerCount = kPulleyCircumInches / effectiveCountsPerRevolution;
 
-        public static final double kCarriageMassKg = 0;
-        public static final double kDrumRadiusMeters = 0;
-        public static final double kMinHeightMeters = 0;
-        public static final double kMaxHeightMeters = 0;
-        public static final double kStartingHeightMeters = 0;
+        public static final Mass kCarriageMass = Pounds.of(28.34);
+        public static final Distance kDrumRadius = Inches.of(0.878);
+        public static final Distance kMinHeight = Inches.of(0);
+        public static final Distance kMaxHeight = Inches.of(29);
+        public static final Distance kStartingHeight = Inches.of(0);
 
         public static final double MAX_MOTOR_RPM = 5000.0; // RPM
         public static final double MAX_MOTOR_ACCELERATION = 3000.0; // RPM
