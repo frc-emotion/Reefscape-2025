@@ -23,11 +23,22 @@ public class ClimbManualCommand extends Command {
 
     @Override
     public void execute() {
-        if (input.get() < -Constants.OperatorConstants.DEADBAND) {
-            climbSubsystem.setRawSpeed(-Constants.ClimbConstants.kSpeed);
-        } else if (input.get() > Constants.OperatorConstants.DEADBAND
-                && climbSubsystem.getPosition() < Constants.ClimbConstants.EXTENSION_LIMIT) {
-            climbSubsystem.setRawSpeed(Constants.ClimbConstants.kSpeed);
+        // if (input.get() < -Constants.OperatorConstants.DEADBAND) {
+        //     climbSubsystem.setRawSpeed(-Constants.ClimbConstants.kSpeed);
+        // } else if (input.get() > Constants.OperatorConstants.DEADBAND
+        //         && climbSubsystem.getPosition() < Constants.ClimbConstants.EXTENSION_LIMIT) {
+        //     climbSubsystem.setRawSpeed(Constants.ClimbConstants.kSpeed);
+        // } else {
+        //     climbSubsystem.stop();
+        // }
+        if (climbSubsystem.getPosition() > Constants.ClimbConstants.EXTENSION_LIMIT) {
+            climbSubsystem.stop();
+            return;
+        }
+
+        if (Math.abs(input.get()) > Constants.OperatorConstants.DEADBAND) {
+            int direction = (input.get() > 0) ? 1 : -1;
+            climbSubsystem.setRawSpeed(direction * Constants.ClimbConstants.kSpeed);
         } else {
             climbSubsystem.stop();
         }

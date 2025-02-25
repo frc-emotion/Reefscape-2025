@@ -56,7 +56,7 @@ public class RobotContainer {
     private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
             "swerve/neo"));
 
-    private final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem(false);
+    private final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem(true);
     private final GrabberSubsystem grabberSubsystem = new GrabberSubsystem();
     private final ArmSubsystem armSubsystem = new ArmSubsystem();
 
@@ -215,52 +215,52 @@ public class RobotContainer {
 
             driverXbox.leftBumper().whileTrue(driveFieldOrientedAnglularVelocitySlow);
 
-            operatorXbox.povDown()
-                .onTrue(
-                    MainCommandFactory.getPlacePrepCommand(
-                        armSubsystem,
-                        elevatorSubsystem,
-                        new ScoreCoral(CoralPosition.A, CoralLevel.L1)
-                    )
-                );
+            // operatorXbox.povDown()
+            //     .onTrue(
+            //         MainCommandFactory.getPlacePrepCommand(
+            //             armSubsystem,
+            //             elevatorSubsystem,
+            //             new ScoreCoral(CoralPosition.A, CoralLevel.L1)
+            //         )
+            //     );
             
-            operatorXbox.povRight()
-                .onTrue(
-                    new SequentialCommandGroup(
-                        MainCommandFactory.getPlacePrepCommand(
-                            armSubsystem,
-                            elevatorSubsystem,
-                            new ScoreCoral(null, CoralLevel.L2)
-                        )
-                    )
-                );
+            // operatorXbox.povRight()
+            //     .onTrue(
+            //         new SequentialCommandGroup(
+            //             MainCommandFactory.getPlacePrepCommand(
+            //                 armSubsystem,
+            //                 elevatorSubsystem,
+            //                 new ScoreCoral(null, CoralLevel.L2)
+            //             )
+            //         )
+            //     );
 
-            operatorXbox.povLeft()
-                .onTrue(
-                    MainCommandFactory.getPlacePrepCommand(
-                        armSubsystem,
-                        elevatorSubsystem,
-                        new ScoreCoral(null, CoralLevel.L3)
-                    )
-                );
+            // operatorXbox.povLeft()
+            //     .onTrue(
+            //         MainCommandFactory.getPlacePrepCommand(
+            //             armSubsystem,
+            //             elevatorSubsystem,
+            //             new ScoreCoral(null, CoralLevel.L3)
+            //         )
+            //     );
 
-            operatorXbox.povUp()
-                .onTrue(
-                    MainCommandFactory.getPlacePrepCommand(
-                        armSubsystem,
-                        elevatorSubsystem,
-                        new ScoreCoral(null, CoralLevel.L4)
-                    )
-                );
+            // operatorXbox.povUp()
+            //     .onTrue(
+            //         MainCommandFactory.getPlacePrepCommand(
+            //             armSubsystem,
+            //             elevatorSubsystem,
+            //             new ScoreCoral(null, CoralLevel.L4)
+            //         )
+            //     );
             
-            operatorXbox.y().onTrue(
-                MainCommandFactory.getArmElevatorPositionCommand(
-                    armSubsystem, 
-                    elevatorSubsystem,
-                    ElevatorConstants.CORAL_INTAKE_HEIGHT,
-                    ArmConstants.CORAL_INTAKE_ANGLE
-                )
-            );
+            // operatorXbox.y().onTrue(
+            //     MainCommandFactory.getArmElevatorPositionCommand(
+            //         armSubsystem, 
+            //         elevatorSubsystem,
+            //         ElevatorConstants.CORAL_INTAKE_HEIGHT,
+            //         ArmConstants.CORAL_INTAKE_ANGLE
+            //     )
+            // );
           
          operatorXbox.leftStick().and(() -> Math.abs(operatorXbox.getLeftY()) > 0.1)
                                          .onTrue(elevatorSubsystem.runOnce(elevatorSubsystem::stop))

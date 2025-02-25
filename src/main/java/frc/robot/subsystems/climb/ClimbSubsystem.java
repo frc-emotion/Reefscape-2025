@@ -9,6 +9,7 @@ import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants;
+import frc.robot.Constants.Ports.CANID;
 import frc.robot.util.Configs;
 
 public class ClimbSubsystem extends SubsystemBase {
@@ -17,7 +18,7 @@ public class ClimbSubsystem extends SubsystemBase {
     private final SparkMaxConfig climbConfig = new SparkMaxConfig().apply(Configs.ClimbConfigs.CLIMB_CONFIG);
 
     public ClimbSubsystem() {
-        climbMotor = new SparkMax(Constants.Ports.CLIMB_PORT, MotorType.kBrushless);
+        climbMotor = new SparkMax(CANID.CLIMB_PORT.getId(), MotorType.kBrushless);
         climbMotor.configure(climbConfig, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
     }
 
@@ -27,7 +28,6 @@ public class ClimbSubsystem extends SubsystemBase {
 
     public void stop() {
         setRawSpeed(0);
-        Configs.ClimbConfigs.CLIMB_CONFIG.idleMode(IdleMode.kBrake);
     }
 
     public double getPosition() {

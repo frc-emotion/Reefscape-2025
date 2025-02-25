@@ -16,6 +16,9 @@ import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Distance;
 import frc.robot.util.Faults.FaultTypes.PDFaults;
 import swervelib.math.Matter;
+import edu.wpi.first.units.measure.Mass;
+import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Pounds;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -97,17 +100,17 @@ public final class Constants {
 
         public static final double kPulleyCircumInches = Math.PI * kpulleyDiameterInches;
 
-        public static final double kGearRatio = 0;
+        public static final double kGearRatio = 12;
 
         public static final double effectiveCountsPerRevolution = kEncoderCPR * kGearRatio;
 
         public static final double inchesPerCount = kPulleyCircumInches / effectiveCountsPerRevolution;
 
-        public static final double kCarriageMassKg = 0;
-        public static final double kDrumRadiusMeters = 0;
-        public static final double kMinHeightMeters = 0;
-        public static final double kMaxHeightMeters = 0;
-        public static final double kStartingHeightMeters = 0;
+        public static final Mass kCarriageMass = Pounds.of(28.34);
+        public static final Distance kDrumRadius = Inches.of(0.878);
+        public static final Distance kMinHeight = Inches.of(0);
+        public static final Distance kMaxHeight = Inches.of(29);
+        public static final Distance kStartingHeight = Inches.of(0);
 
         public static final double MAX_MOTOR_RPM = 5000.0; // RPM
         public static final double MAX_MOTOR_ACCELERATION = 3000.0; // RPM
@@ -283,12 +286,14 @@ public final class Constants {
             BACK_RIGHT_DRIVE(9, "Back Right Drive"),
             BACK_RIGHT_TURN(10, "Back Right Turn"),
 
-            ELEVATOR_DRIVE_1(69, "Elevator Drive 1"),
-            ELEVATOR_DRIVE_2(70, "Elevator Drive 1"),
+            ELEVATOR_DRIVE_1(17, "Elevator Drive 1"),
+            ELEVATOR_DRIVE_2(18, "Elevator Drive 1"),
 
-            GRABBER_DRIVE(71, "Grabber Drive"),
+            GRABBER_DRIVE(15, "Grabber Drive"),
             ALGAE_TOF(72, "Algae Time of Flight"),
-            ARM_ANGLE(73, "Arm Angle");
+            ARM_ANGLE(19, "Arm Angle"),
+
+            CLIMB_PORT(16, "Climb Motor");
 
             private final int id;
             private final String name;
@@ -341,8 +346,6 @@ public final class Constants {
                 return CAN_ID_MAP.getOrDefault(id, "Unknown CAN ID");
             }
         }
-
-        public static final int CLIMB_PORT = 1;
     }
 
 }
