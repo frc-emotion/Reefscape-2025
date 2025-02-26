@@ -18,12 +18,15 @@ import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.arm.ArmSubsystem;
+import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.grabber.GrabberSubsystem;
 import frc.robot.subsystems.grabber.GrabberSubsystem.GrabType;
+import frc.robot.commands.teleop.Climb.ClimbManualCommand;
 import frc.robot.commands.teleop.Elevator.ZeroElevatorCurrent;
 import frc.robot.commands.teleop.Grabber.GrabberGrabCommand;
 import frc.robot.commands.teleop.Grabber.GrabberHoldCommand;
+import frc.robot.commands.teleop.arm.ArmManualCommand;
 import frc.robot.commands.functional.MainCommandFactory;
 
 import frc.robot.Constants;
@@ -56,9 +59,10 @@ public class RobotContainer {
     private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
             "swerve/neo"));
 
-    private final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem(true);
-    private final GrabberSubsystem grabberSubsystem = new GrabberSubsystem();
-    private final ArmSubsystem armSubsystem = new ArmSubsystem();
+    // private final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem(true);
+    // private final GrabberSubsystem grabberSubsystem = new GrabberSubsystem();
+    // private final ArmSubsystem armSubsystem = new ArmSubsystem();
+    private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
 
     // private final PowerDistribution m_PDH = new
     // PowerDistribution(Constants.Ports.CANID.PDH.getId(), ModuleType.kRev);
@@ -262,13 +266,14 @@ public class RobotContainer {
             //     )
             // );
           
-         operatorXbox.leftStick().and(() -> Math.abs(operatorXbox.getLeftY()) > 0.1)
-                                         .onTrue(elevatorSubsystem.runOnce(elevatorSubsystem::stop))
-                                         .whileTrue(elevatorSubsystem.run(() -> elevatorSubsystem
-                                                         .moveSpeed(operatorXbox.getLeftY() * 0.75)))
-                                        .onFalse(elevatorSubsystem.runOnce(elevatorSubsystem::stop));
+        //  armSubsystem.setDefaultCommand(
+        //     new ArmManualCommand(
+        //         armSubsystem,
+        //         () -> -operatorXbox.getRightY()
+        //     )
+        //  );
 
-            operatorXbox.x().onTrue(new ZeroElevatorCurrent(elevatorSubsystem)); // Zero Elevator
+            // operatorXbox.x().onTrue(new ZeroElevatorCurrent(elevatorSubsystem)); // Zero Elevator
 
             // right trigger coral outtake
             // right bumper algae outtake
@@ -276,18 +281,23 @@ public class RobotContainer {
             // left trigger coral intake
             // left bumper algae intake
 
-            operatorXbox.rightBumper()
-                    .whileTrue(Commands.runOnce(() -> grabberSubsystem.setTargetType(GrabType.CORAL)));
+            // operatorXbox.rightBumper()
+            //         .whileTrue(Commands.runOnce(() -> grabberSubsystem.setTargetType(GrabType.CORAL)));
 
-            operatorXbox.leftBumper()
-                .whileTrue(Commands.runOnce(() -> grabberSubsystem.setTargetType(GrabType.ALGAE)));
+            // operatorXbox.leftBumper()
+            //     .whileTrue(Commands.runOnce(() -> grabberSubsystem.setTargetType(GrabType.ALGAE)));
 
         }
 
     }
 
     private void configureDefaultCommands() {
-        grabberSubsystem.setDefaultCommand(new GrabberHoldCommand(grabberSubsystem));
+        climbSubsystem.setDefaultCommand(
+            new ClimbManualCommand(
+                climbSubsystem,
+                () -> -operatorXbox.getLeftY()
+            )
+        );
     }
 
     /**

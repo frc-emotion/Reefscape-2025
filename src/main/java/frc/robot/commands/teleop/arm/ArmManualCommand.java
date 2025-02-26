@@ -3,8 +3,8 @@ package frc.robot.commands.teleop.arm;
 import java.util.function.Supplier;
 
 import edu.wpi.first.math.MathUtil;
-import edu.wpi.first.wpilibj.SerialPort.StopBits;
 import edu.wpi.first.wpilibj2.command.Command;
+import frc.robot.Constants.ArmConstants;
 import frc.robot.subsystems.arm.ArmSubsystem;
 
 public class ArmManualCommand extends Command {
@@ -20,7 +20,7 @@ public class ArmManualCommand extends Command {
 
     @Override
     public void execute() {
-        m_ArmSubsystem.set(MathUtil.applyDeadband(armSupplier.get(), 0.1));
+        m_ArmSubsystem.set(MathUtil.applyDeadband(armSupplier.get(), 0.1) * ArmConstants.kMaxOutput);
     }
 
     @Override

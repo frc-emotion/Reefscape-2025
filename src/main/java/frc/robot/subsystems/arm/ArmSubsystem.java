@@ -17,6 +17,7 @@ import com.revrobotics.spark.SparkBase.ResetMode;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
 
 import edu.wpi.first.epilogue.Logged;
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.units.measure.Distance;
@@ -52,7 +53,7 @@ public class ArmSubsystem extends SubsystemBase {
         
         armMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
-        armEncoder = armMotor.getAlternateEncoder();
+        armEncoder = armMotor.getEncoder();
         
         pidController = armMotor.getClosedLoopController();
 
@@ -140,6 +141,12 @@ public class ArmSubsystem extends SubsystemBase {
         armMotor.set(power);
     }
 
+    public void setWithFeedforward(double percentage) {
+        armMotor.set(
+            MathUtil.clamp(percentage * ArmConstants.kMaxOutput + feedforward.calculate(getRotation().getRadians(), getVelocity().getRadians()), -1, 1)
+        );
+    }
+
     /**
      * Constrains the rotation of the arm depending on the height of the elevator.
      * 
@@ -198,6 +205,7 @@ public class ArmSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Arm/1/Voltage", armMotor.getBusVoltage());
         SmartDashboard.putNumber("Arm/1/Current", armMotor.getOutputCurrent());
         SmartDashboard.putNumber("Arm/1/Temp", armMotor.getMotorTemperature());
+        SmartDashboard.putNumber("Arm/1/Position", getRotation().getDegrees());
         SmartDashboard.putNumber("Arm/1/Target", currentGoal);
     }
 

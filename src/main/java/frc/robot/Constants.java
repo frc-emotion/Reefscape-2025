@@ -141,11 +141,11 @@ public final class Constants {
         public static final Distance DEADZONE_DISTANCE = Units.Inches.of(1);
         public static final Distance CORAL_INTAKE_HEIGHT = Units.Inches.of(0);
 
-        public static final int NORMAL_OPERATION_CURRENT = 0;
-        public static final int CURRENT_SPIKE_THRESHOLD = 0;
+        public static final int NORMAL_OPERATION_CURRENT = 40;
+        public static final int CURRENT_SPIKE_THRESHOLD = 20;
 
-        public static final int NORMAL_OPERATION_TEMP = 0;
-        public static final int TEMP_SPIKE_THRESHOLD = 0;
+        public static final int NORMAL_OPERATION_TEMP = 40;
+        public static final int TEMP_SPIKE_THRESHOLD = 20;
 
     }
 
@@ -160,17 +160,17 @@ public final class Constants {
         public static final double ZERO_SPEED = 0;
         public static final double DETECT_RANGE = 0;
         
-        public static final int NORMAL_OPERATION_CURRENT = 0;
-        public static final int CURRENT_SPIKE_THRESHOLD = 0;
-        public static final int NORMAL_OPERATION_TEMP = 0;
-        public static final int TEMP_SPIKE_THRESHOLD = 0;
+        public static final int NORMAL_OPERATION_CURRENT = 30;
+        public static final int CURRENT_SPIKE_THRESHOLD = 20;
+        public static final int NORMAL_OPERATION_TEMP = 40;
+        public static final int TEMP_SPIKE_THRESHOLD = 20;
     }
 
     public static class ArmConstants {
         public static final int kSmartCurrentLimit = 30;
         public static final double kSecondaryCurrentLimit = 40;
 
-        public static final double kMaxOutput = 1;
+        public static final double kMaxOutput = 0.3;
 
             // Physical Constraints
         public static final double kMinRotation = 0; // Note: Aligns with hopper
@@ -225,10 +225,10 @@ public final class Constants {
         public static final double kMaxInputAccel = 10;
 
 
-        public static final int NORMAL_OPERATION_CURRENT = 0;
-        public static final int NORMAL_OPERATION_TEMP = 0;
-        public static final int CURRENT_SPIKE_THRESHOLD = 0;
-        public static final int TEMP_SPIKE_THRESHOLD = 0;
+        public static final int NORMAL_OPERATION_CURRENT = 30;
+        public static final int NORMAL_OPERATION_TEMP = 40;
+        public static final int CURRENT_SPIKE_THRESHOLD = 20;
+        public static final int TEMP_SPIKE_THRESHOLD = 20;
 
     }
 

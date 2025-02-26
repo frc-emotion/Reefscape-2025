@@ -76,7 +76,7 @@ public class ElevatorSubsystem extends SubsystemBase {
             controller = driveMotor.getClosedLoopController();
         }
 
-        boreEncoder = driveMotor.getAlternateEncoder();
+        boreEncoder = driveMotor.getEncoder();
 
         FaultManager.register(driveMotor);
         FaultManager.register(driveMotor2);
