@@ -19,7 +19,7 @@ public class Configs {
 
         static {
             ELEVATOR_CONFIG
-                    .idleMode(IdleMode.kBrake)
+                    .idleMode(IdleMode.kCoast)
                     .smartCurrentLimit(ElevatorConstants.kSmartCurrentLimit)
                     .secondaryCurrentLimit(ElevatorConstants.kSecondaryCurrentLimit)
                     .voltageCompensation(12.0);
@@ -32,7 +32,7 @@ public class Configs {
 
             ELEVATOR_CONFIG.closedLoop
                     .pid(ElevatorConstants.kP, ElevatorConstants.kI, ElevatorConstants.kD)
-                    .feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder);
+                    .feedbackSensor(FeedbackSensor.kPrimaryEncoder);
 
             ELEVATOR_CONFIG.alternateEncoder
                     .countsPerRevolution(ElevatorConstants.kEncoderCPR)
