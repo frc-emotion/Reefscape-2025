@@ -44,7 +44,7 @@ public final class Constants {
     public static final Matter CHASSIS = new Matter(new Translation3d(0, 0, Units.Meters.convertFrom(8, Units.Inches)),
             ROBOT_MASS);
     public static final double LOOP_TIME = 0.13; // s, 20ms + 110ms sprk max velocity lag
-    public static final double MAX_SPEED = Units.Feet.convertFrom(14.5, Units.Meters);
+    public static final double MAX_SPEED = Units.Feet.convertFrom(20.0, Units.Meters);
 
     // Maximum speed of the robot in meters per second, used to limit acceleration.
 
@@ -80,6 +80,10 @@ public final class Constants {
         public static final double POSITION_ERROR = 1;
 
         public static final double EXTENSION_LIMIT = 1;
+
+        public static final double EXTENDED_POSITION = 0;
+
+        public static final double CLIMBED_POSITION = 0;
 
         public static final int kSmartCurrentLimit = 45;
 
@@ -150,55 +154,57 @@ public final class Constants {
     }
 
     public static class GrabberConstants {
-        public static final int kSmartCurrentLimit = 20;
-        public static final double kSecondaryCurrentLimit = 30;
+        public static final int kSmartCurrentLimit = 35;
+        public static final double kSecondaryCurrentLimit = 35;
 
-        public static final double GRABBER_CORAL_SPEED = 0.7; // TBD
-        public static final double GRABBER_ALGAE_SPEED = 1; // TBD
+        public static final double GRABBER_CORAL_SPEED = 0.65; // TBD
+        public static final double GRABBER_ALGAE_SPEED = 0.65; // TBD
         public static final double GRABBER_ALGAE_HOLD_SPEED = 0.1; // TBD
         public static final double GRABBER_CORAL_HOLD_SPEED = 0.3; // TBD
         public static final double ZERO_SPEED = 0;
-        public static final double DETECT_RANGE = 0;
+        public static final double CORAL_DETECT_RANGE = 0;
         
-        public static final int NORMAL_OPERATION_CURRENT = 30;
+        public static final int NORMAL_OPERATION_CURRENT = 40;
         public static final int CURRENT_SPIKE_THRESHOLD = 20;
         public static final int NORMAL_OPERATION_TEMP = 40;
         public static final int TEMP_SPIKE_THRESHOLD = 20;
-    }
-
+    }                                                                                                               
     public static class ArmConstants {
-        public static final int kSmartCurrentLimit = 30;
-        public static final double kSecondaryCurrentLimit = 40;
+        public static final int kSmartCurrentLimit = 45;
+        public static final double kSecondaryCurrentLimit = 45
+;
 
-        public static final double kMaxOutput = 0.3;
+        public static final double kMaxOutput = 1;
 
             // Physical Constraints
-        public static final double kMinRotation = 0; // Note: Aligns with hopper
-        public static final double kMaxRotation = 0;
+        public static final double kMinRotation = -45; // Note: Aligns with hopper
+        public static final double kMaxRotation = 115;
         public static final double kMaxHeightConstrained = 0; // The height in meters at which the arm is able to rotate fully. Should be roughly the length of the arm.
         public static final double kMaxRotationConstrained = 0; // The max rotation while the arm is below the minimum full rotation height. Could be formulaic, but probably not necessary.
         public static final double kMinRotationConstrained = 0;
 
             // Feedforward Constants
         public static final double kS = 0;
-        public static final double kG = 0.50;
-        public static final double kV = 0.53;
-        public static final double kA = 0.01;
+        public static final double kG = 0.102858; //0.098858;    
+        public static final double kV = 0.00001;
+        public static final double kA = 0.0;
 
             // PID Constants
-        public static final double kP = 0;
+        public static final double kP = 0.002058;
         public static final double kI = 0;
         public static final double kD = 0;
 
             // Smart Motion Constants
-        public static final double kMaxVelocity = 0;
-        public static final double kMaxAcceleration = 0;
-        public static final double kMaxError = 0;
+        public static final double kMaxVelocity = 30;
+        public static final double kMaxAcceleration = 30;
+        public static final double kMaxError = 2;
         
             // Encoder Constants
         public static final boolean kIsInverted = false;
-        public static final double kZeroOffset = 0;
-        public static final double kConversionFactor = 360;
+        public static final double kZeroOffset = 99.473 - 129.315 + 155.841 + 26.106 - 21.8443;
+        // public static final double kConversionFactor = 360 * (22.0/84.0);
+        // public static final double kConversionFactor = 180.0 / 7.15;
+        public static final double kConversionFactor = ((180.0 / 7.15) / 1.21915) * (90.0 / 93.415);
 
             // Input Constants
         public static final double kInputSensitivity = 10; // degrees per second
@@ -222,6 +228,9 @@ public final class Constants {
         public static final Rotation2d ALGAE_ON_CORAL_ANGLE = new Rotation2d(0);
         public static final Rotation2d ALGAE_NET_ANGLE = new Rotation2d(0);
         public static final Rotation2d ALGAE_PRO_ANGLE = new Rotation2d(0);
+
+        public static final Rotation2d CLIMB_ANGLE = new Rotation2d(0);
+
         public static final double kMaxInputAccel = 10;
 
 
@@ -235,7 +244,7 @@ public final class Constants {
     public static class Ports {
 
         public enum DIO {
-            CORAL_BEAM_BREAK(1, "Coral Beam Break");
+            ALGAE_BEAM_BREAK(1, "Algae Beam Break");
 
             private final int id;
             private final String name;
@@ -286,11 +295,12 @@ public final class Constants {
             BACK_RIGHT_DRIVE(9, "Back Right Drive"),
             BACK_RIGHT_TURN(10, "Back Right Turn"),
 
-            ELEVATOR_DRIVE_1(17, "Elevator Drive 1"),
-            ELEVATOR_DRIVE_2(18, "Elevator Drive 1"),
+            ELEVATOR_DRIVE_LEADER(17, "Elevator Drive Leader"),
+            ELEVATOR_DRIVE_FOLLOWER(18, "Elevator Drive Follower"),
 
             GRABBER_DRIVE(15, "Grabber Drive"),
-            ALGAE_TOF(72, "Algae Time of Flight"),
+            CORAL_TOF_BACK(72, "Coral Back Time of Flight"),
+            CORAL_TOF_FRONT(73, "Coral Front Time of Flight"),
             ARM_ANGLE(19, "Arm Angle"),
 
             CLIMB_PORT(16, "Climb Motor");

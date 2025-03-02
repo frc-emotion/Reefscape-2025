@@ -1,8 +1,11 @@
 package frc.robot.commands.teleop.Grabber;
 
+import static edu.wpi.first.units.Units.Micro;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.Constants.GrabberConstants;
 import frc.robot.subsystems.grabber.GrabberSubsystem;
+import frc.robot.subsystems.grabber.GrabberSubsystem.GrabType;
 
 public class GrabberPlaceCommand extends Command {
     private final GrabberSubsystem m_GrabberSubsystem;
@@ -30,7 +33,12 @@ public class GrabberPlaceCommand extends Command {
 
     @Override
     public boolean isFinished() {
-        return !m_GrabberSubsystem.hasGamePiece();
+        return false;
+        // if(m_GrabberSubsystem.getCurrentGrabType() == GrabType.CORAL) {
+        //     return !m_GrabberSubsystem.getBackCoralState();
+        // } else {
+        //     return m_GrabberSubsystem.hasGamePiece();
+        // }
     }
 
     @Override

@@ -51,8 +51,8 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final ElevatorFeedforward feedforward;
 
     public ElevatorSubsystem(boolean useTrapezoidal) {
-        driveMotor = new SparkMax(Ports.CANID.ELEVATOR_DRIVE_1.getId(), MotorType.kBrushless);
-        driveMotor2 = new SparkMax(Ports.CANID.ELEVATOR_DRIVE_2.getId(), MotorType.kBrushless);
+        driveMotor = new SparkMax(Ports.CANID.ELEVATOR_DRIVE_LEADER.getId(), MotorType.kBrushless);
+        driveMotor2 = new SparkMax(Ports.CANID.ELEVATOR_DRIVE_FOLLOWER.getId(), MotorType.kBrushless);
 
         driveMotor.configure(ElevatorConfigs.ELEVATOR_CONFIG, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
@@ -132,17 +132,18 @@ public class ElevatorSubsystem extends SubsystemBase {
     @Override
     public void periodic() {
         pidHelper.update();
+        // Elevator 1 = 17 - Leader
+        SmartDashboard.putNumber("Elevator/Leader/Output", driveMotor.get());
+        SmartDashboard.putNumber("Elevator/Leader/Voltage", driveMotor.getBusVoltage());
+        SmartDashboard.putNumber("Elevator/Leader/Current", driveMotor.getOutputCurrent());
+        SmartDashboard.putNumber("Elevator/Leader/Temp", driveMotor.getMotorTemperature());
+        SmartDashboard.putNumber("Elevator/Leader/Target", currentGoal);
 
-        SmartDashboard.putNumber("Elevator/1/Output", driveMotor.get());
-        SmartDashboard.putNumber("Elevator/1/Voltage", driveMotor.getBusVoltage());
-        SmartDashboard.putNumber("Elevator/1/Current", driveMotor.getOutputCurrent());
-        SmartDashboard.putNumber("Elevator/1/Temp", driveMotor.getMotorTemperature());
-        SmartDashboard.putNumber("Elevator/1/Target", currentGoal);
-
-        SmartDashboard.putNumber("Elevator/2/Output", driveMotor2.get());
-        SmartDashboard.putNumber("Elevator/2/Voltage", driveMotor2.getBusVoltage());
-        SmartDashboard.putNumber("Elevator/2/Current", driveMotor2.getOutputCurrent());
-        SmartDashboard.putNumber("Elevator/2/Temp", driveMotor2.getMotorTemperature());
+        // Elevator 2 = 18 - Follower
+        SmartDashboard.putNumber("Elevator/Follower/Output", driveMotor2.get());
+        SmartDashboard.putNumber("Elevator/Follower/Voltage", driveMotor2.getBusVoltage());
+        SmartDashboard.putNumber("Elevator/Follower/Current", driveMotor2.getOutputCurrent());
+        SmartDashboard.putNumber("Elevator/Follower/Temp", driveMotor2.getMotorTemperature());
     }
 
     public void changeMaxMotion(double mv, double ma, double ae) {
@@ -183,7 +184,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         return driveMotor2.getBusVoltage();
     }
 
-    public void moveSpeed(double speed) {
+    public void set(double speed) {
         driveMotor.set(MathUtil.clamp(speed, -1, 1));
     }
 

@@ -35,6 +35,7 @@ import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
 
@@ -117,8 +118,7 @@ public class SwerveSubsystem extends SubsystemBase
     // }
     //();
 
-    swerveDrive.setGyroOffset(new Rotation3d(Rotation2d.fromDegrees(180)));
-
+    
     setupPathPlanner();
   }
 
@@ -573,6 +573,10 @@ public class SwerveSubsystem extends SubsystemBase
   public void zeroGyro()
   {
     swerveDrive.zeroGyro();
+
+    swerveDrive.setGyroOffset(new Rotation3d(Rotation2d.fromDegrees(180)));
+
+    
   }
 
   /**

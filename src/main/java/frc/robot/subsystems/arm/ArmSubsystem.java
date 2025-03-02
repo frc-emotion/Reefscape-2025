@@ -19,14 +19,18 @@ import com.revrobotics.spark.SparkLowLevel.MotorType;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ArmFeedforward;
+import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.trajectory.TrapezoidProfile;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ElevatorConstants;
+import frc.robot.Constants.GrabberConstants;
 import frc.robot.Constants.Ports;
 import frc.robot.util.PIDHelper;
+import frc.robot.util.Configs.ArmConfigs;
 import frc.robot.util.Faults.FaultManager;
 import frc.robot.util.Faults.FaultTypes.FaultType;
 
@@ -36,7 +40,7 @@ public class ArmSubsystem extends SubsystemBase {
 
     private final RelativeEncoder armEncoder;
 
-    private final SparkClosedLoopController pidController;
+    private final ProfiledPIDController pidController;
 
     private final ArmFeedforward feedforward;
 
@@ -46,16 +50,18 @@ public class ArmSubsystem extends SubsystemBase {
 
     private final SparkMaxConfig config = new SparkMaxConfig();
 
-    private double currentGoal;
+    private double currentGoal, persianGoal;
 
     public ArmSubsystem() {
         armMotor = new SparkMax(Ports.CANID.ARM_ANGLE.getId(), MotorType.kBrushless);
-        
-        armMotor.configure(config, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+
+        armMotor.configure(ArmConfigs.ARM_CONFIG, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         armEncoder = armMotor.getEncoder();
-        
-        pidController = armMotor.getClosedLoopController();
+
+        pidController = new ProfiledPIDController(ArmConstants.kP, ArmConstants.kI, ArmConstants.kD,
+                new TrapezoidProfile.Constraints(ArmConstants.kMaxVelocity,
+                        ArmConstants.kMaxAcceleration));
 
         feedforward = new ArmFeedforward(ArmConstants.kS, ArmConstants.kG, ArmConstants.kV, ArmConstants.kA);
 
@@ -82,19 +88,18 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     /**
-     * Sets the target angle for the arm. Constrained by the limits defined in currentConstraints.
+     * Sets the target angle for the arm. Constrained by the limits defined in
+     * currentConstraints.
      * 
      * @param angle The target angle to rotate to
      */
     public void setTargetAngle(Rotation2d angle, Distance elevatorHeight) {
         targetAngle = constrain(angle, elevatorHeight);
 
-        pidController.setReference(
-            targetAngle.getDegrees(),
-            ControlType.kMAXMotionPositionControl,
-            ClosedLoopSlot.kSlot0,
-            feedforward.calculate(getRotation().getRadians(), getVelocity().getRadians())
-        );
+        double pidValue = pidController.calculate(getRotation().getDegrees(), targetAngle.getDegrees());
+        double ffValue = feedforward.calculate(getRotation().getRadians(), getVelocity().getRadians());
+
+        armMotor.set(MathUtil.clamp(ffValue + pidValue, -12, 12));
 
     }
 
@@ -115,21 +120,27 @@ public class ArmSubsystem extends SubsystemBase {
 
     }
 
-     /**
-     * Sets the target angle for the arm. Constrained by the limits defined in currentConstraints.
+    /**
+     * Sets the target angle for the arm. Constrained by the limits defined in
+     * currentConstraints.
      * 
      * @param angle The target angle to rotate to
      */
     public void setTargetAngle(Rotation2d angle) {
         targetAngle = constrain(angle, ElevatorConstants.CORAL_INTAKE_HEIGHT);
         currentGoal = targetAngle.getDegrees();
-      
-        pidController.setReference(
-            targetAngle.getDegrees(),
-            ControlType.kMAXMotionPositionControl,
-            ClosedLoopSlot.kSlot0,
-            feedforward.calculate(getRotation().getRadians(), getVelocity().getRadians())
-        );
+
+        // pidController.setReference(
+        // targetAngle.getDegrees(),
+        // ControlType.kMAXMotionPositionControl,
+        // ClosedLoopSlot.kSlot0,
+        // feedforward.calculate(getRotation().getRadians(),
+        // getVelocity().getRadians()));
+
+        double pidValue = pidController.calculate(getRotation().getDegrees(), currentGoal);
+        double ffValue = feedforward.calculate(getRotation().getRadians(), getVelocity().getRadians());
+
+        armMotor.set(MathUtil.clamp(ffValue + pidValue, -12, 12));
     }
 
     /**
@@ -143,42 +154,49 @@ public class ArmSubsystem extends SubsystemBase {
 
     public void setWithFeedforward(double percentage) {
         armMotor.set(
-            MathUtil.clamp(percentage * ArmConstants.kMaxOutput + feedforward.calculate(getRotation().getRadians(), getVelocity().getRadians()), -1, 1)
-        );
+                MathUtil.clamp(
+                        percentage * ArmConstants.kMaxOutput
+                                + feedforward.calculate(getRotation().getRadians(), getVelocity().getRadians()),
+                        -1, 1));
     }
 
     /**
      * Constrains the rotation of the arm depending on the height of the elevator.
      * 
-     * @param targetRotation    The desired rotation for the arm.
-     * @param elevatorHeight    The current height of the elevator.
-     * @return                  The new target rotation, taking into account limits.
+     * @param targetRotation The desired rotation for the arm.
+     * @param elevatorHeight The current height of the elevator.
+     * @return The new target rotation, taking into account limits.
      */
     public Rotation2d constrain(Rotation2d targetRotation, Distance elevatorHeight) {
-        if(
-            elevatorHeight.isNear(
+        System.out.println(targetRotation);
+
+        if (elevatorHeight.isNear(
                 Meter.of(0),
-                Meter.of(ArmConstants.kMaxHeightConstrained)
-            )
-        ) {
-            if(targetRotation.getDegrees() > ArmConstants.kMaxRotationConstrained) {
-                return Rotation2d.fromDegrees(ArmConstants.kMaxRotationConstrained);
-            } else if(targetRotation.getDegrees() < ArmConstants.kMinRotationConstrained) {
-                return Rotation2d.fromDegrees(ArmConstants.kMinRotationConstrained);
-            }
+                Meter.of(ArmConstants.kMaxHeightConstrained))) {
+                    System.out.println("SALAMALKAUMWALAKAUM SALAAMMMMMMMMM WAIT WAIT WAI0WT WAIT AWIT WOAAAAAAO");
+            return Rotation2d.fromDegrees(MathUtil.clamp(targetRotation.getDegrees(), ArmConstants.kMinRotationConstrained, ArmConstants.kMaxRotationConstrained ));
         } else {
-            if(targetRotation.getDegrees() > ArmConstants.kMaxRotation) {
+            if (targetRotation.getDegrees() > ArmConstants.kMaxRotation) {
+                System.out.println("YURRRRRRR");
                 return Rotation2d.fromDegrees(ArmConstants.kMaxRotation);
-            } else if(targetRotation.getDegrees() < ArmConstants.kMinRotation) {
+            } else if (targetRotation.getDegrees() < ArmConstants.kMinRotation) {
+                System.out.println("blud");
                 return Rotation2d.fromDegrees(ArmConstants.kMinRotation);
             }
         }
-        
+
+        persianGoal = targetRotation.getDegrees();
+
         return targetRotation;
     }
 
     public Rotation2d getRotation() {
-        return Rotation2d.fromDegrees(armEncoder.getPosition());
+        return Rotation2d
+                .fromDegrees((armEncoder.getPosition() * ArmConstants.kConversionFactor) + ArmConstants.kZeroOffset);
+    }
+
+    public double persianTest() {
+        return armEncoder.getPosition();
     }
 
     public Rotation2d getTargetRotation() {
@@ -186,7 +204,7 @@ public class ArmSubsystem extends SubsystemBase {
     }
 
     public Rotation2d getVelocity() {
-        return Rotation2d.fromDegrees(armEncoder.getVelocity());
+        return Rotation2d.fromDegrees(armEncoder.getVelocity() * ArmConstants.kConversionFactor);
     }
 
     public void stop() {
@@ -207,7 +225,9 @@ public class ArmSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Arm/1/Temp", armMotor.getMotorTemperature());
         SmartDashboard.putNumber("Arm/1/Position", getRotation().getDegrees());
         SmartDashboard.putNumber("Arm/1/Target", currentGoal);
+        SmartDashboard.putNumber("Arm/1/Velocity", getVelocity().getDegrees());
+        SmartDashboard.putNumber("Arm/1/Persian", persianTest());
+        SmartDashboard.putNumber("Arm/1/SALAMALAKUM", persianGoal);
     }
-
 
 }

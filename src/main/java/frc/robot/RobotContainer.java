@@ -15,18 +15,23 @@ import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.climb.ClimbSubsystem;
+import frc.robot.subsystems.climb.ClimbSubsystem.ClimbState;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.grabber.GrabberSubsystem;
 import frc.robot.subsystems.grabber.GrabberSubsystem.GrabType;
 import frc.robot.commands.teleop.Climb.ClimbManualCommand;
+import frc.robot.commands.teleop.Elevator.MoveElevatorManual;
 import frc.robot.commands.teleop.Elevator.ZeroElevatorCurrent;
 import frc.robot.commands.teleop.Grabber.GrabberGrabCommand;
 import frc.robot.commands.teleop.Grabber.GrabberHoldCommand;
+import frc.robot.commands.teleop.Grabber.GrabberPlaceCommand;
 import frc.robot.commands.teleop.arm.ArmManualCommand;
+import frc.robot.commands.teleop.arm.MoveArmPosition;
 import frc.robot.commands.functional.MainCommandFactory;
 
 import frc.robot.Constants;
@@ -35,9 +40,14 @@ import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.util.Configs.ElevatorConfigs;
 import frc.robot.util.Faults.FaultManager;
+import frc.robot.util.tasks.auto.ScoreAlgae;
+import frc.robot.util.tasks.general.AlgaeLevel;
 import frc.robot.util.tasks.general.CoralLevel;
 import frc.robot.util.tasks.general.ScoreCoral;
+import frc.robot.util.tasks.positions.AlgaeScorePosition;
 import frc.robot.util.tasks.positions.CoralPosition;
+import frc.robot.util.tasks.teleop.PickupAlgae;
+import frc.robot.util.tasks.teleop.PickupTask;
 
 import java.io.File;
 import swervelib.SwerveInputStream;
@@ -59,9 +69,9 @@ public class RobotContainer {
     private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
             "swerve/neo"));
 
-    // private final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem(true);
-    // private final GrabberSubsystem grabberSubsystem = new GrabberSubsystem();
-    // private final ArmSubsystem armSubsystem = new ArmSubsystem();
+    private final ElevatorSubsystem elevatorSubsystem = new ElevatorSubsystem(true);
+    private final GrabberSubsystem grabberSubsystem = new GrabberSubsystem();
+    private final ArmSubsystem armSubsystem = new ArmSubsystem();
     private final ClimbSubsystem climbSubsystem = new ClimbSubsystem();
 
     // private final PowerDistribution m_PDH = new
@@ -74,7 +84,7 @@ public class RobotContainer {
     SwerveInputStream driveAngularVelocitySlow = SwerveInputStream.of(drivebase.getSwerveDrive(),
             () -> driverXbox.getLeftY() * -1,
             () -> driverXbox.getLeftX() * -1)
-            .withControllerRotationAxis(driverXbox::getRightX)
+            .withControllerRotationAxis(() -> -driverXbox.getRightX())
             .deadband(OperatorConstants.DEADBAND)
             .scaleTranslation(0.35)
             .allianceRelativeControl(true);
@@ -82,7 +92,7 @@ public class RobotContainer {
     SwerveInputStream driveAngularVelocityMeduim = SwerveInputStream.of(drivebase.getSwerveDrive(),
             () -> driverXbox.getLeftY() * -1,
             () -> driverXbox.getLeftX() * -1)
-            .withControllerRotationAxis(driverXbox::getRightX)
+            .withControllerRotationAxis(() -> -driverXbox.getRightX())
             .deadband(OperatorConstants.DEADBAND)
             .scaleTranslation(0.5)
             .allianceRelativeControl(true);
@@ -90,7 +100,7 @@ public class RobotContainer {
     SwerveInputStream driveAngularVelocityTurbo = SwerveInputStream.of(drivebase.getSwerveDrive(),
             () -> driverXbox.getLeftY() * -1,
             () -> driverXbox.getLeftX() * -1)
-            .withControllerRotationAxis(driverXbox::getRightX)
+            .withControllerRotationAxis(() -> -driverXbox.getRightX())
             .deadband(OperatorConstants.DEADBAND)
             .scaleTranslation(0.8)
             .allianceRelativeControl(true);
@@ -206,9 +216,9 @@ public class RobotContainer {
             // driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
             driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
 
-            driverXbox.b().whileTrue(
-                    drivebase.driveToPose(
-                            new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0))));
+            // driverXbox.b().whileTrue(
+            //         drivebase.driveToPose(
+            //                 new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0))));
             driverXbox.start().whileTrue(Commands.none());
             driverXbox.back().whileTrue(Commands.none());
             // driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock,
@@ -221,10 +231,23 @@ public class RobotContainer {
 
             // operatorXbox.povDown()
             //     .onTrue(
-            //         MainCommandFactory.getPlacePrepCommand(
-            //             armSubsystem,
-            //             elevatorSubsystem,
-            //             new ScoreCoral(CoralPosition.A, CoralLevel.L1)
+            //         new SequentialCommandGroup(
+            //             MainCommandFactory.getPlacePrepCommand(
+            //                 armSubsystem,
+            //                 elevatorSubsystem,
+            //                 new ScoreCoral(CoralLevel.L1)
+            //             ).onlyIf(() -> grabberSubsystem.getCurrentGrabType() == GrabType.CORAL),
+            //             MainCommandFactory.getPlacePrepCommand(
+            //                 armSubsystem, 
+            //                 elevatorSubsystem,
+            //                 new ScoreAlgae(AlgaeScorePosition.P)
+            //             ).onlyIf(() -> grabberSubsystem.getCurrentGrabType() == GrabType.ALGAE),
+            //             MainCommandFactory.getIntakeCommand(
+            //                 armSubsystem, 
+            //                 elevatorSubsystem, 
+            //                 grabberSubsystem,
+            //                 new PickupAlgae(AlgaeLevel.TOP_OF_CORAL)
+            //             ).onlyIf(() -> grabberSubsystem.getTargetGrabType() == GrabType.ALGAE && !grabberSubsystem.hasGamePiece())
             //         )
             //     );
             
@@ -234,26 +257,47 @@ public class RobotContainer {
             //             MainCommandFactory.getPlacePrepCommand(
             //                 armSubsystem,
             //                 elevatorSubsystem,
-            //                 new ScoreCoral(null, CoralLevel.L2)
-            //             )
+            //                 new ScoreCoral(CoralLevel.L2)
+            //             ).onlyIf(() -> grabberSubsystem.getCurrentGrabType() == GrabType.CORAL),
+            //             MainCommandFactory.getIntakeCommand(
+            //                 armSubsystem, 
+            //                 elevatorSubsystem, 
+            //                 grabberSubsystem, 
+            //                 new PickupAlgae(AlgaeLevel.L2)
+            //             ).onlyIf(() -> grabberSubsystem.getTargetGrabType() == GrabType.ALGAE && !grabberSubsystem.hasGamePiece())
             //         )
             //     );
 
             // operatorXbox.povLeft()
             //     .onTrue(
-            //         MainCommandFactory.getPlacePrepCommand(
-            //             armSubsystem,
-            //             elevatorSubsystem,
-            //             new ScoreCoral(null, CoralLevel.L3)
+            //         new SequentialCommandGroup(
+            //             MainCommandFactory.getPlacePrepCommand(
+            //                 armSubsystem,
+            //                 elevatorSubsystem,
+            //                 new ScoreCoral(CoralLevel.L2)
+            //             ).onlyIf(() -> grabberSubsystem.getCurrentGrabType() == GrabType.CORAL),
+            //             MainCommandFactory.getIntakeCommand(
+            //                 armSubsystem, 
+            //                 elevatorSubsystem,
+            //                 grabberSubsystem,
+            //                 new PickupAlgae(AlgaeLevel.L3)
+            //             ).onlyIf(() -> grabberSubsystem.getTargetGrabType() == GrabType.ALGAE && !grabberSubsystem.hasGamePiece())
             //         )
             //     );
 
             // operatorXbox.povUp()
             //     .onTrue(
-            //         MainCommandFactory.getPlacePrepCommand(
-            //             armSubsystem,
-            //             elevatorSubsystem,
-            //             new ScoreCoral(null, CoralLevel.L4)
+            //         new SequentialCommandGroup(
+            //             MainCommandFactory.getPlacePrepCommand(
+            //                 armSubsystem,
+            //                 elevatorSubsystem,
+            //                 new ScoreCoral(CoralLevel.L4)
+            //             ).onlyIf(() -> grabberSubsystem.getCurrentGrabType() == GrabType.CORAL),
+            //             MainCommandFactory.getPlacePrepCommand(
+            //                 armSubsystem, 
+            //                 elevatorSubsystem,
+            //                 new ScoreAlgae(AlgaeScorePosition.R1)
+            //             ).onlyIf(() -> grabberSubsystem.getCurrentGrabType() == GrabType.ALGAE)
             //         )
             //     );
             
@@ -265,21 +309,38 @@ public class RobotContainer {
             //         ArmConstants.CORAL_INTAKE_ANGLE
             //     )
             // );
-          
-        //  armSubsystem.setDefaultCommand(
-        //     new ArmManualCommand(
-        //         armSubsystem,
-        //         () -> -operatorXbox.getRightY()
-        //     )
-        //  );
 
-            // operatorXbox.x().onTrue(new ZeroElevatorCurrent(elevatorSubsystem)); // Zero Elevator
+            operatorXbox.rightTrigger(OperatorConstants.DEADBAND).whileTrue(
+                new GrabberPlaceCommand(grabberSubsystem)
+            );
 
-            // right trigger coral outtake
-            // right bumper algae outtake
+            operatorXbox.leftTrigger(OperatorConstants.DEADBAND).whileTrue(
+                new GrabberGrabCommand(
+                    grabberSubsystem
+                )
+            );
 
-            // left trigger coral intake
-            // left bumper algae intake
+            // operatorXbox.start().onTrue(  // Zero Elevator
+            //     new ZeroElevatorCurrent(elevatorSubsystem)
+            // );
+
+            // operatorXbox.b().onTrue(
+            //     MainCommandFactory.getPrepClimbCommand(
+            //         elevatorSubsystem, 
+            //         armSubsystem, 
+            //         climbSubsystem
+            //     )
+            // );
+
+            // operatorXbox.a().and(() -> climbSubsystem.getClimbState() == ClimbState.READY).onTrue(
+            //     MainCommandFactory.getClimbCommand(
+            //         elevatorSubsystem, 
+            //         armSubsystem, 
+            //         climbSubsystem
+            //     )
+            // );
+
+            // // right bumper sets type to co]\[ral, left bumper sets type to algae 
 
             // operatorXbox.rightBumper()
             //         .whileTrue(Commands.runOnce(() -> grabberSubsystem.setTargetType(GrabType.CORAL)));
@@ -292,11 +353,38 @@ public class RobotContainer {
     }
 
     private void configureDefaultCommands() {
-        climbSubsystem.setDefaultCommand(
-            new ClimbManualCommand(
-                climbSubsystem,
-                () -> -operatorXbox.getLeftY()
+        RobotModeTriggers.autonomous().onTrue(Commands.runOnce(drivebase::zeroGyroWithAlliance));
+
+        armSubsystem.setDefaultCommand(
+            new MoveArmPosition(
+                armSubsystem, 
+                Rotation2d.fromDegrees(90),
+                () -> { return ElevatorConstants.CORAL_L4_HEIGHT; }
             )
+        );
+        // armSubsystem.setDefaultCommand(
+        //     new ArmManualCommand(
+        //         armSubsystem, 
+        //         () -> {
+        //             double raw = -operatorXbox.getLeftY()*0.75;
+        //             double sign = Math.signum(raw);
+        //             double in = Math.pow(raw, 2);
+
+        //             return sign * in;
+        //         }
+        //     )
+        // );
+
+        operatorXbox.a().whileTrue(
+            new ClimbManualCommand(climbSubsystem, () -> {return 1.0;})
+        );
+
+        operatorXbox.b().whileTrue(
+            new ClimbManualCommand(climbSubsystem, () -> {return -1.0;})
+        );
+
+        elevatorSubsystem.setDefaultCommand(
+            new MoveElevatorManual(elevatorSubsystem, () -> -operatorXbox.getRightY())
         );
     }
 

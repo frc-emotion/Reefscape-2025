@@ -11,12 +11,17 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.ClimbConstants;
 import frc.robot.Constants.ElevatorConstants;
+import frc.robot.commands.teleop.Climb.ClimbMoveToPosCommand;
 import frc.robot.commands.teleop.Elevator.MoveElevatorPosition;
 import frc.robot.commands.teleop.Grabber.GrabberGrabCommand;
 import frc.robot.commands.teleop.Grabber.GrabberPlaceCommand;
+import frc.robot.commands.teleop.arm.ArmAssistedCommand;
 import frc.robot.commands.teleop.arm.MoveArmPosition;
 import frc.robot.subsystems.arm.ArmSubsystem;
+import frc.robot.subsystems.climb.ClimbSubsystem;
+import frc.robot.subsystems.climb.ClimbSubsystem.ClimbState;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.grabber.GrabberSubsystem;
 import frc.robot.subsystems.grabber.GrabberSubsystem.GrabType;
@@ -151,7 +156,42 @@ public class MainCommandFactory {
 
         return new SequentialCommandGroup(
             getArmElevatorPositionCommand(armSubsystem, elevatorSubsystem, targetElevatorHeight, targetArmRotation),
-            new GrabberGrabCommand(grabberSubsystem, targetGrabType)
+            new GrabberGrabCommand(grabberSubsystem)
+        );
+    }
+
+    public static Command getPrepClimbCommand(ElevatorSubsystem elevatorSubsystem, ArmSubsystem armSubsystem, ClimbSubsystem climbSubsystem) {
+        return new SequentialCommandGroup(
+            new MoveArmPosition(
+                armSubsystem,
+                ArmConstants.CLIMB_ANGLE,
+                () -> elevatorSubsystem.getHeight()
+            ),
+            new ClimbMoveToPosCommand(
+                climbSubsystem,
+                ClimbConstants.EXTENSION_LIMIT
+            ),
+            new MoveArmPosition(
+                armSubsystem,
+                ArmConstants.CORAL_INTAKE_ANGLE,
+                () -> elevatorSubsystem.getHeight()
+            ),
+            Commands.runOnce(() -> climbSubsystem.setClimbState(ClimbState.READY))
+        );
+    }
+
+    public static Command getClimbCommand(ElevatorSubsystem elevatorSubsystem, ArmSubsystem armSubsystem, ClimbSubsystem climbSubsystem) {
+        return new SequentialCommandGroup(
+            new MoveArmPosition(
+                armSubsystem,
+                ArmConstants.CLIMB_ANGLE,
+                () -> elevatorSubsystem.getHeight()
+            ),
+            new ClimbMoveToPosCommand(
+                climbSubsystem,
+                ClimbConstants.CLIMBED_POSITION
+            ),
+            Commands.runOnce(() -> climbSubsystem.setClimbState(ClimbState.CLIMBED))
         );
     }
 }

@@ -15,4 +15,8 @@ public class ScoreAlgae extends Task {
         this.scorePosition = scorePosition;
         this.level = level;
     }
+
+    public ScoreAlgae(AlgaeScorePosition scorePosition) {
+        this(null, null, scorePosition);
+    }
 }

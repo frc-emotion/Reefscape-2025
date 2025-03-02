@@ -11,4 +11,8 @@ public class ScoreCoral extends Task {
         this.position = position;
         this.level = level;
     }
+
+    public ScoreCoral(CoralLevel coralLevel) {
+        this(null, coralLevel);
+    }
 }

@@ -8,18 +8,10 @@ import frc.robot.subsystems.grabber.GrabberSubsystem.GrabType;
 public class GrabberGrabCommand extends Command {
     private final GrabberSubsystem m_GrabberSubsystem;
 
-    private final GrabType targetGrabType;
-
-    public GrabberGrabCommand(GrabberSubsystem grabberSubsystem, GrabType targetGrabType) {
+    public GrabberGrabCommand(GrabberSubsystem grabberSubsystem) {
         this.m_GrabberSubsystem = grabberSubsystem;
-        this.targetGrabType = targetGrabType;
 
         addRequirements(grabberSubsystem);
-    }
-
-    @Override
-    public void initialize() {
-        m_GrabberSubsystem.setTargetType(targetGrabType);
     }
 
     @Override
@@ -39,11 +31,16 @@ public class GrabberGrabCommand extends Command {
 
     @Override
     public boolean isFinished() {
-        return m_GrabberSubsystem.hasGamePiece();
+        return false;
+        // if(m_GrabberSubsystem.getTargetGrabType() == GrabType.CORAL) {
+        //     return m_GrabberSubsystem.getBackCoralState();
+        // } else {
+        //     return m_GrabberSubsystem.hasGamePiece();
+        // }
     }
 
     @Override
     public void end(boolean interrupted) {
-        
+        m_GrabberSubsystem.stop();
     }
 }

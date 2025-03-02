@@ -28,7 +28,7 @@ public class ZeroElevatorCurrent extends Command {
 
     @Override
     public void execute() {
-        elevatorSubsystem.moveSpeed(slowSpeed);
+        elevatorSubsystem.set(slowSpeed);
     }
 
     @Override

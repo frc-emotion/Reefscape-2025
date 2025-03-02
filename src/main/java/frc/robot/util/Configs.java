@@ -25,8 +25,8 @@ public class Configs {
                     .voltageCompensation(12.0);
 
             ELEVATOR_CONFIG.softLimit
-                    .forwardSoftLimitEnabled(true)
-                    .reverseSoftLimitEnabled(true)
+                    .forwardSoftLimitEnabled(false)
+                    .reverseSoftLimitEnabled(false)
                     .forwardSoftLimit(Units.Inches.of(60).in(Units.Inches))
                     .reverseSoftLimit(Units.Inches.of(0).in(Units.Inches));
 
@@ -47,16 +47,18 @@ public class Configs {
             ELEVATOR_CONFIG.closedLoop.pid(ElevatorConstants.kP, ElevatorConstants.kI, ElevatorConstants.kD);
 
             ELEVATOR_FOLLOWER_CONFIG
+                    .idleMode(IdleMode.kBrake)
                     .smartCurrentLimit(ElevatorConstants.kSmartCurrentLimit)
                     .secondaryCurrentLimit(ElevatorConstants.kSecondaryCurrentLimit)
                     .voltageCompensation(12.0)
-                    .follow(Ports.CANID.ELEVATOR_DRIVE_1.getId(), true).signals
-                    .absoluteEncoderPositionAlwaysOn(false)
-                    .analogPositionAlwaysOn(false)
-                    .absoluteEncoderVelocityAlwaysOn(false)
-                    .analogVelocityAlwaysOn(false)
-                    .externalOrAltEncoderPositionAlwaysOn(false)
-                    .externalOrAltEncoderVelocityAlwaysOn(false);
+                    .disableFollowerMode()
+                    .follow(Ports.CANID.ELEVATOR_DRIVE_LEADER.getId(), true);
+                    // .absoluteEncoderPositionAlwaysOn(false)
+                    // .analogPositionAlwaysOn(false)
+                    // .absoluteEncoderVelocityAlwaysOn(false)
+                    // .analogVelocityAlwaysOn(false)
+                    // .externalOrAltEncoderPositionAlwaysOn(false)
+                    // .externalOrAltEncoderVelocityAlwaysOn(false);
         }
     }
 
@@ -93,17 +95,17 @@ public class Configs {
 
             ARM_CONFIG.alternateEncoder
                     .inverted(ArmConstants.kIsInverted)
-                    .positionConversionFactor(ArmConstants.kConversionFactor)
+                    // .positionConversionFactor(ArmConstants.kConversionFactor)
                     .velocityConversionFactor(ArmConstants.kConversionFactor / 60.0);
 
             ARM_CONFIG.softLimit
-                    .forwardSoftLimitEnabled(true)
-                    .reverseSoftLimitEnabled(true)
+                    .forwardSoftLimitEnabled(false)
+                    .reverseSoftLimitEnabled(false)
                     .forwardSoftLimit(ArmConstants.kMinRotation)
                     .reverseSoftLimit(ArmConstants.kMaxRotation);
 
             ARM_CONFIG.closedLoop
-                    .feedbackSensor(FeedbackSensor.kAbsoluteEncoder)
+                    .feedbackSensor(FeedbackSensor.kAlternateOrExternalEncoder)
                     .pid(
                             ArmConstants.kP,
                             ArmConstants.kI,
