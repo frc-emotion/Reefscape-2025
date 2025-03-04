@@ -210,6 +210,10 @@ public class ElevatorSubsystem extends SubsystemBase {
                 PersistMode.kPersistParameters);
     }
 
+    public void moveSpeed(double input) {
+        driveMotor.set(input);
+    }
+
     public void changePID(double p, double i, double d) {
         config.closedLoop.pid(p, i, d);
         driveMotor.configure(config, ResetMode.kResetSafeParameters,

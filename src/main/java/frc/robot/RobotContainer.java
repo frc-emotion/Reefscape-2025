@@ -157,10 +157,162 @@ public class RobotContainer {
         configureDefaultCommands();
         DriverStation.silenceJoystickConnectionWarning(true);
         // NamedCommands.registerCommand("test", Commands.print("I EXIST"));
-    }
 
-    private void configureSimulationBindings() {
+        // operatorXbox.povDown()
+        // .onTrue(
+        // new SequentialCommandGroup(
+        // MainCommandFactory.getPlacePrepCommand(
+        // armSubsystem,
+        // elevatorSubsystem,
+        // new ScoreCoral(CoralLevel.L1)
+        // ).onlyIf(() -> grabberSubsystem.getCurrentGrabType() == GrabType.CORAL),
+        // MainCommandFactory.getPlacePrepCommand(
+        // armSubsystem,
+        // elevatorSubsystem,
+        // new ScoreAlgae(AlgaeScorePosition.P)
+        // ).onlyIf(() -> grabberSubsystem.getCurrentGrabType() == GrabType.ALGAE),
+        // MainCommandFactory.getIntakeCommand(
+        // armSubsystem,
+        // elevatorSubsystem,
+        // grabberSubsystem,
+        // new PickupAlgae(AlgaeLevel.TOP_OF_CORAL)
+        // ).onlyIf(() -> grabberSubsystem.getTargetGrabType() == GrabType.ALGAE &&
+        // !grabberSubsystem.hasGamePiece())
+        // )
+        // );
 
+        // operatorXbox.povRight()
+        // .onTrue(
+        // new SequentialCommandGroup(
+        // MainCommandFactory.getPlacePrepCommand(
+        // armSubsystem,
+        // elevatorSubsystem,
+        // new ScoreCoral(CoralLevel.L2)
+        // ).onlyIf(() -> grabberSubsystem.getCurrentGrabType() == GrabType.CORAL),
+        // MainCommandFactory.getIntakeCommand(
+        // armSubsystem,
+        // elevatorSubsystem,
+        // grabberSubsystem,
+        // new PickupAlgae(AlgaeLevel.L2)
+        // ).onlyIf(() -> grabberSubsystem.getTargetGrabType() == GrabType.ALGAE &&
+        // !grabberSubsystem.hasGamePiece())
+        // )
+        // );
+
+        // operatorXbox.povLeft()
+        // .onTrue(
+        // new SequentialCommandGroup(
+        // MainCommandFactory.getPlacePrepCommand(
+        // armSubsystem,
+        // elevatorSubsystem,
+        // new ScoreCoral(CoralLevel.L2)
+        // ).onlyIf(() -> grabberSubsystem.getCurrentGrabType() == GrabType.CORAL),
+        // MainCommandFactory.getIntakeCommand(
+        // armSubsystem,
+        // elevatorSubsystem,
+        // grabberSubsystem,
+        // new PickupAlgae(AlgaeLevel.L3)
+        // ).onlyIf(() -> grabberSubsystem.getTargetGrabType() == GrabType.ALGAE &&
+        // !grabberSubsystem.hasGamePiece())
+        // )
+        // );
+
+        // operatorXbox.povUp()
+        // .onTrue(
+        // new SequentialCommandGroup(
+        // MainCommandFactory.getPlacePrepCommand(
+        // armSubsystem,
+        // elevatorSubsystem,
+        // new ScoreCoral(CoralLevel.L4)
+        // ).onlyIf(() -> grabberSubsystem.getCurrentGrabType() == GrabType.CORAL),
+        // MainCommandFactory.getPlacePrepCommand(
+        // armSubsystem,
+        // elevatorSubsystem,
+        // new ScoreAlgae(AlgaeScorePosition.R1)
+        // ).onlyIf(() -> grabberSubsystem.getCurrentGrabType() == GrabType.ALGAE)
+        // )
+        // );
+
+        // operatorXbox.y().onTrue(
+        // MainCommandFactory.getArmElevatorPositionCommand(
+        // armSubsystem,
+        // elevatorSubsystem,
+        // ElevatorConstants.CORAL_INTAKE_HEIGHT,
+        // ArmConstants.CORAL_INTAKE_ANGLE
+        // )
+        // );
+
+        operatorXbox.rightTrigger(OperatorConstants.DEADBAND).whileTrue(
+                new GrabberPlaceCommand(grabberSubsystem));
+
+        operatorXbox.leftTrigger(OperatorConstants.DEADBAND).whileTrue(
+                new GrabberGrabCommand(
+                        grabberSubsystem));
+
+        // operatorXbox.start().onTrue( // Zero Elevator
+        // new ZeroElevatorCurrent(elevatorSubsystem)
+        // );
+
+        // operatorXbox.b().onTrue(
+        // MainCommandFactory.getPrepClimbCommand(
+        // elevatorSubsystem,
+        // armSubsystem,
+        // climbSubsystem
+        // )
+        // );
+
+        // operatorXbox.a().and(() -> climbSubsystem.getClimbState() ==
+        // ClimbState.READY).onTrue(
+        // MainCommandFactory.getClimbCommand(
+        // elevatorSubsystem,
+        // armSubsystem,
+        // climbSubsystem
+        // )
+        // );
+
+        // // right bumper sets type to co]\[ral, left bumper sets type to algae
+
+        // operatorXbox.rightBumper()
+        // .whileTrue(Commands.runOnce(() ->
+        // grabberSubsystem.setTargetType(GrabType.CORAL)));
+
+        // operatorXbox.leftBumper()
+        // .whileTrue(Commands.runOnce(() ->
+        // grabberSubsystem.setTargetType(GrabType.ALGAE)));
+
+        /* --- SysId Controls --- */
+
+        // Quasistatic Arm
+        // operatorXbox.povUp().onTrue(
+        // armSubsystem.getSysIdQuasistatic(Direction.kForward)
+        // );
+        // operatorXbox.povDown().onTrue(
+        // armSubsystem.getSysIdQuasistatic(Direction.kReverse)
+        // );
+
+        // Dynamic Arm
+        // operatorXbox.povDown().onTrue(
+        // armSubsystem.getSysIdDynamic(Direction.kReverse)
+        // );
+        // operatorXbox.povUp().onTrue(
+        // armSubsystem.getSysIdDynamic(Direction.kForward)
+        // );
+
+        // Quasistatic Elevator
+        // operatorXbox.povUp().onTrue(
+        // elevatorSubsystem.getSysIdQuasistatic(Direction.kForward)
+        // );
+        // operatorXbox.povDown().onTrue(
+        // elevatorSubsystem.getSysIdQuasistatic(Direction.kReverse)
+        // );
+
+        // Dynamic Elevator
+        // operatorXbox.povUp().onTrue(
+        // elevatorSubsystem.getSysIdDynamic(Direction.kForward)
+        // );
+        // operatorXbox.povDown().onTrue(
+        // elevatorSubsystem.getSysIdDynamic(Direction.kReverse)
+        // );
     }
 
     /**
@@ -177,25 +329,60 @@ public class RobotContainer {
      * Flight joysticks}.
      */
     private void configureBindings() {
+    }
 
-        Command driveFieldOrientedDirectAngle = drivebase.driveFieldOriented(driveDirectAngle);
+    private void configureDefaultCommands() {
+        RobotModeTriggers.autonomous().onTrue(Commands.runOnce(drivebase::zeroGyroWithAlliance));
 
-        Command driveFieldOrientedAnglularVelocityMeduim = drivebase.driveFieldOriented(driveAngularVelocityMeduim);
+        // armSubsystem.setDefaultCommand(
+        // new MoveArmPosition(
+        // armSubsystem,
+        // Rotation2d.fromDegrees(90),
+        // () -> { return ElevatorConstants.CORAL_L4_HEIGHT; }
+        // )
+        // );
+        armSubsystem.setDefaultCommand(
+                new ArmManualCommand(
+                        armSubsystem,
+                        () -> {
+                            double raw = -operatorXbox.getLeftY() * 0.75;
+                            double sign = Math.signum(raw);
+                            double in = Math.pow(raw, 2);
+
+                            return sign * in;
+                        }));
+
+        operatorXbox.a().whileTrue(
+                new ClimbManualCommand(climbSubsystem, () -> {
+                    return 1.0;
+                }));
+
+        operatorXbox.b().whileTrue(
+                new ClimbManualCommand(climbSubsystem, () -> {
+                    return -1.0;
+                }));
+
+        elevatorSubsystem.setDefaultCommand(
+                new MoveElevatorManual(elevatorSubsystem, () -> -operatorXbox.getRightY()));
+
+        Command driveFieldOrientedAnglularVelocityMeduim = drivebase
+                .driveFieldOriented(driveAngularVelocityMeduim);
         Command driveFieldOrientedAnglularVelocitySlow = drivebase.driveFieldOriented(driveAngularVelocitySlow);
-        Command driveFieldOrientedAnglularVelocityTurbo = drivebase.driveFieldOriented(driveAngularVelocityTurbo);
+        Command driveFieldOrientedAnglularVelocityTurbo = drivebase
+                .driveFieldOriented(driveAngularVelocityTurbo);
 
         Command driveRobotOrientedAngularVelocity = drivebase.driveFieldOriented(driveRobotOriented);
         Command driveSetpointGen = drivebase.driveWithSetpointGeneratorFieldRelative(
                 driveDirectAngle);
         Command driveFieldOrientedDirectAngleKeyboard = drivebase.driveFieldOriented(driveDirectAngleKeyboard);
         Command driveFieldOrientedAnglularVelocityKeyboard = drivebase.driveFieldOriented(driveAngularVelocityKeyboard);
-        Command driveSetpointGenKeyboard = drivebase.driveWithSetpointGeneratorFieldRelative(
-                driveDirectAngleKeyboard);
+        Command driveSetpointGenKeyboard = drivebase.driveWithSetpointGeneratorFieldRelative(driveDirectAngleKeyboard);
 
         if (Robot.isSimulation()) {
             drivebase.setDefaultCommand(driveFieldOrientedDirectAngleKeyboard);
             driverXbox.start()
-                    .onTrue(Commands.runOnce(() -> drivebase.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
+                    .onTrue(Commands.runOnce(() -> drivebase
+                            .resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
             driverXbox.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
 
         } else {
@@ -203,7 +390,8 @@ public class RobotContainer {
         }
 
         if (DriverStation.isTest()) {
-            drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocityMeduim); // Overrides drive command above!
+            drivebase.setDefaultCommand(driveFieldOrientedAnglularVelocityMeduim); // Overrides drive
+                                                                                   // command above!
 
             driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
             driverXbox.y().whileTrue(drivebase.driveToDistanceCommand(1.0, 0.2));
@@ -217,9 +405,10 @@ public class RobotContainer {
             // driverXbox.x().onTrue(Commands.runOnce(drivebase::addFakeVisionReading));
             driverXbox.x().whileTrue(Commands.runOnce(drivebase::lock, drivebase).repeatedly());
 
-            // driverXbox.b().whileTrue(
-            //         drivebase.driveToPose(
-            //                 new Pose2d(new Translation2d(4, 4), Rotation2d.fromDegrees(0))));
+            driverXbox.b().whileTrue(
+                    drivebase.driveToPose(
+                            new Pose2d(new Translation2d(4, 4),
+                                    Rotation2d.fromDegrees(0))));
             driverXbox.start().whileTrue(Commands.none());
             driverXbox.back().whileTrue(Commands.none());
             // driverXbox.leftBumper().whileTrue(Commands.runOnce(drivebase::lock,
@@ -231,195 +420,83 @@ public class RobotContainer {
             driverXbox.leftBumper().whileTrue(driveFieldOrientedAnglularVelocitySlow);
 
             // operatorXbox.povDown()
-            //     .onTrue(
-            //         new SequentialCommandGroup(
-            //             MainCommandFactory.getPlacePrepCommand(
-            //                 armSubsystem,
-            //                 elevatorSubsystem,
-            //                 new ScoreCoral(CoralLevel.L1)
-            //             ).onlyIf(() -> grabberSubsystem.getCurrentGrabType() == GrabType.CORAL),
-            //             MainCommandFactory.getPlacePrepCommand(
-            //                 armSubsystem, 
-            //                 elevatorSubsystem,
-            //                 new ScoreAlgae(AlgaeScorePosition.P)
-            //             ).onlyIf(() -> grabberSubsystem.getCurrentGrabType() == GrabType.ALGAE),
-            //             MainCommandFactory.getIntakeCommand(
-            //                 armSubsystem, 
-            //                 elevatorSubsystem, 
-            //                 grabberSubsystem,
-            //                 new PickupAlgae(AlgaeLevel.TOP_OF_CORAL)
-            //             ).onlyIf(() -> grabberSubsystem.getTargetGrabType() == GrabType.ALGAE && !grabberSubsystem.hasGamePiece())
-            //         )
-            //     );
-            
+            // .onTrue(
+            // MainCommandFactory.getPlacePrepCommand(
+            // armSubsystem,
+            // elevatorSubsystem,
+            // new ScoreCoral(CoralPosition.A, CoralLevel.L1)
+            // )
+            // );
+
             // operatorXbox.povRight()
-            //     .onTrue(
-            //         new SequentialCommandGroup(
-            //             MainCommandFactory.getPlacePrepCommand(
-            //                 armSubsystem,
-            //                 elevatorSubsystem,
-            //                 new ScoreCoral(CoralLevel.L2)
-            //             ).onlyIf(() -> grabberSubsystem.getCurrentGrabType() == GrabType.CORAL),
-            //             MainCommandFactory.getIntakeCommand(
-            //                 armSubsystem, 
-            //                 elevatorSubsystem, 
-            //                 grabberSubsystem, 
-            //                 new PickupAlgae(AlgaeLevel.L2)
-            //             ).onlyIf(() -> grabberSubsystem.getTargetGrabType() == GrabType.ALGAE && !grabberSubsystem.hasGamePiece())
-            //         )
-            //     );
+            // .onTrue(
+            // new SequentialCommandGroup(
+            // MainCommandFactory.getPlacePrepCommand(
+            // armSubsystem,
+            // elevatorSubsystem,
+            // new ScoreCoral(null, CoralLevel.L2)
+            // )
+            // )
+            // );
 
             // operatorXbox.povLeft()
-            //     .onTrue(
-            //         new SequentialCommandGroup(
-            //             MainCommandFactory.getPlacePrepCommand(
-            //                 armSubsystem,
-            //                 elevatorSubsystem,
-            //                 new ScoreCoral(CoralLevel.L2)
-            //             ).onlyIf(() -> grabberSubsystem.getCurrentGrabType() == GrabType.CORAL),
-            //             MainCommandFactory.getIntakeCommand(
-            //                 armSubsystem, 
-            //                 elevatorSubsystem,
-            //                 grabberSubsystem,
-            //                 new PickupAlgae(AlgaeLevel.L3)
-            //             ).onlyIf(() -> grabberSubsystem.getTargetGrabType() == GrabType.ALGAE && !grabberSubsystem.hasGamePiece())
-            //         )
-            //     );
+            // .onTrue(
+            // MainCommandFactory.getPlacePrepCommand(
+            // armSubsystem,
+            // elevatorSubsystem,
+            // new ScoreCoral(null, CoralLevel.L3)
+            // )
+            // );
 
             // operatorXbox.povUp()
-            //     .onTrue(
-            //         new SequentialCommandGroup(
-            //             MainCommandFactory.getPlacePrepCommand(
-            //                 armSubsystem,
-            //                 elevatorSubsystem,
-            //                 new ScoreCoral(CoralLevel.L4)
-            //             ).onlyIf(() -> grabberSubsystem.getCurrentGrabType() == GrabType.CORAL),
-            //             MainCommandFactory.getPlacePrepCommand(
-            //                 armSubsystem, 
-            //                 elevatorSubsystem,
-            //                 new ScoreAlgae(AlgaeScorePosition.R1)
-            //             ).onlyIf(() -> grabberSubsystem.getCurrentGrabType() == GrabType.ALGAE)
-            //         )
-            //     );
-            
+            // .onTrue(
+            // MainCommandFactory.getPlacePrepCommand(
+            // armSubsystem,
+            // elevatorSubsystem,
+            // new ScoreCoral(null, CoralLevel.L4)
+            // )
+            // );
+
             // operatorXbox.y().onTrue(
-            //     MainCommandFactory.getArmElevatorPositionCommand(
-            //         armSubsystem, 
-            //         elevatorSubsystem,
-            //         ElevatorConstants.CORAL_INTAKE_HEIGHT,
-            //         ArmConstants.CORAL_INTAKE_ANGLE
-            //     )
+            // MainCommandFactory.getArmElevatorPositionCommand(
+            // armSubsystem,
+            // elevatorSubsystem,
+            // ElevatorConstants.CORAL_INTAKE_HEIGHT,
+            // ArmConstants.CORAL_INTAKE_ANGLE
+            // )
             // );
 
-            operatorXbox.rightTrigger(OperatorConstants.DEADBAND).whileTrue(
-                new GrabberPlaceCommand(grabberSubsystem)
-            );
-
-            operatorXbox.leftTrigger(OperatorConstants.DEADBAND).whileTrue(
-                new GrabberGrabCommand(
-                    grabberSubsystem
-                )
-            );
-
-            // operatorXbox.start().onTrue(  // Zero Elevator
-            //     new ZeroElevatorCurrent(elevatorSubsystem)
+            // armSubsystem.setDefaultCommand(
+            // new ArmManualCommand(
+            // armSubsystem,
+            // () -> -operatorXbox.getRightY()
+            // )
             // );
 
-            // operatorXbox.b().onTrue(
-            //     MainCommandFactory.getPrepClimbCommand(
-            //         elevatorSubsystem, 
-            //         armSubsystem, 
-            //         climbSubsystem
-            //     )
-            // );
+            // operatorXbox.x().onTrue(new ZeroElevatorCurrent(elevatorSubsystem)); // Zero
+            // Elevator
 
-            // operatorXbox.a().and(() -> climbSubsystem.getClimbState() == ClimbState.READY).onTrue(
-            //     MainCommandFactory.getClimbCommand(
-            //         elevatorSubsystem, 
-            //         armSubsystem, 
-            //         climbSubsystem
-            //     )
-            // );
+            // right trigger coral outtake
+            // right bumper algae outtake
 
-            // // right bumper sets type to co]\[ral, left bumper sets type to algae 
+            // left trigger coral intake
+            // left bumper algae intake
 
             // operatorXbox.rightBumper()
-            //         .whileTrue(Commands.runOnce(() -> grabberSubsystem.setTargetType(GrabType.CORAL)));
+            // .whileTrue(Commands.runOnce(() ->
+            // grabberSubsystem.setTargetType(GrabType.CORAL)));
 
             // operatorXbox.leftBumper()
-            //     .whileTrue(Commands.runOnce(() -> grabberSubsystem.setTargetType(GrabType.ALGAE)));
+            // .whileTrue(Commands.runOnce(() ->
+            // grabberSubsystem.setTargetType(GrabType.ALGAE)));
 
-            /* --- SysId Controls --- */
+            operatorXbox.rightStick().and(() -> Math.abs(operatorXbox.getRightY()) > 0.1)
+                    .onTrue(elevatorSubsystem.runOnce(elevatorSubsystem::stop))
+                    .whileTrue(elevatorSubsystem.run(() -> elevatorSubsystem
+                            .moveSpeed(operatorXbox.getRightY() * 0.25)))
+                    .onFalse(elevatorSubsystem.runOnce(elevatorSubsystem::stop));
 
-                // Quasistatic Arm
-            // operatorXbox.povUp().onTrue(
-            //     armSubsystem.getSysIdQuasistatic(Direction.kForward)   
-            // );
-            // operatorXbox.povDown().onTrue(
-            //     armSubsystem.getSysIdQuasistatic(Direction.kReverse)
-            // );
-
-                // Dynamic Arm
-            // operatorXbox.povDown().onTrue(
-            //     armSubsystem.getSysIdDynamic(Direction.kReverse)
-            // );
-            // operatorXbox.povUp().onTrue(
-            //     armSubsystem.getSysIdDynamic(Direction.kForward)
-            // );
-
-                // Quasistatic Elevator
-            // operatorXbox.povUp().onTrue(
-            //     elevatorSubsystem.getSysIdQuasistatic(Direction.kForward)
-            // );
-            // operatorXbox.povDown().onTrue(
-            //     elevatorSubsystem.getSysIdQuasistatic(Direction.kReverse)
-            // );
-
-                // Dynamic Elevator
-            // operatorXbox.povUp().onTrue(
-            //     elevatorSubsystem.getSysIdDynamic(Direction.kForward)
-            // );
-            // operatorXbox.povDown().onTrue(
-            //     elevatorSubsystem.getSysIdDynamic(Direction.kReverse)
-            // );
         }
-
-    }
-
-    private void configureDefaultCommands() {
-        RobotModeTriggers.autonomous().onTrue(Commands.runOnce(drivebase::zeroGyroWithAlliance));
-
-        // armSubsystem.setDefaultCommand(
-        //     new MoveArmPosition(
-        //         armSubsystem, 
-        //         Rotation2d.fromDegrees(90),
-        //         () -> { return ElevatorConstants.CORAL_L4_HEIGHT; }
-        //     )
-        // );
-        armSubsystem.setDefaultCommand(
-            new ArmManualCommand(
-                armSubsystem, 
-                () -> {
-                    double raw = -operatorXbox.getLeftY()*0.75;
-                    double sign = Math.signum(raw);
-                    double in = Math.pow(raw, 2);
-
-                    return sign * in;
-                }
-            )
-        );
-
-        operatorXbox.a().whileTrue(
-            new ClimbManualCommand(climbSubsystem, () -> {return 1.0;})
-        );
-
-        operatorXbox.b().whileTrue(
-            new ClimbManualCommand(climbSubsystem, () -> {return -1.0;})
-        );
-
-        elevatorSubsystem.setDefaultCommand(
-            new MoveElevatorManual(elevatorSubsystem, () -> -operatorXbox.getRightY())
-        );
     }
 
     /**
