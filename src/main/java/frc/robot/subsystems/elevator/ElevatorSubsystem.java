@@ -1,7 +1,12 @@
 package frc.robot.subsystems.elevator;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Meter;
+import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.Volts;
 
 import com.revrobotics.RelativeEncoder;
 import com.revrobotics.spark.ClosedLoopSlot;
@@ -24,9 +29,18 @@ import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
+import edu.wpi.first.units.measure.MutAngle;
+import edu.wpi.first.units.measure.MutAngularVelocity;
+import edu.wpi.first.units.measure.MutDistance;
+import edu.wpi.first.units.measure.MutVoltage;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.Constants.Ports;
 import frc.robot.util.Configs.ElevatorConfigs;
 import frc.robot.util.PIDHelper;
@@ -49,6 +63,11 @@ public class ElevatorSubsystem extends SubsystemBase {
     private final PIDHelper pidHelper;
 
     private final ElevatorFeedforward feedforward;
+
+    private final SysIdRoutine sysIDElevatorRoutine;
+    private MutVoltage appliedVoltageLead = Volts.mutable(0);
+    private MutVoltage appliedVoltageFollow = Volts.mutable(0);
+    private MutDistance position = Meters.mutable(0);
 
     public ElevatorSubsystem(boolean useTrapezoidal) {
         driveMotor = new SparkMax(Ports.CANID.ELEVATOR_DRIVE_LEADER.getId(), MotorType.kBrushless);
@@ -97,6 +116,11 @@ public class ElevatorSubsystem extends SubsystemBase {
                 (newAllowedError) -> config.closedLoop.maxMotion.allowedClosedLoopError(newAllowedError));
 
         safetyChecks();
+
+        sysIDElevatorRoutine = new SysIdRoutine(
+            new SysIdRoutine.Config(),
+            new SysIdRoutine.Mechanism(volts -> {setVoltage(volts.in(Volts));}, this::logElevator, this)
+        );
     }
 
     private void safetyChecks() {
@@ -146,6 +170,40 @@ public class ElevatorSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Elevator/Follower/Temp", driveMotor2.getMotorTemperature());
     }
 
+    public void setVoltage(double volts) {
+        driveMotor.setVoltage(volts);
+    }
+
+    public void logElevator(SysIdRoutineLog log) {
+        log.motor("elevator-lead-motor")
+            .voltage(
+                appliedVoltageLead.mut_replace(
+                    getVoltage(true), Volts
+                )
+            )
+            .linearPosition(
+                position.mut_replace(
+                    getHeight()
+                )
+            );
+
+        log.motor("elevator-follow-motor")
+            .voltage(
+                appliedVoltageFollow.mut_replace(
+                    getVoltage(false), Volts
+                )
+            );
+            
+    }
+
+    public Command getSysIdDynamic(Direction direction) {
+        return sysIDElevatorRoutine.dynamic(direction);
+    }
+
+    public Command getSysIdQuasistatic(Direction direction) {
+        return sysIDElevatorRoutine.quasistatic(direction);
+    }
+
     public void changeMaxMotion(double mv, double ma, double ae) {
         config.closedLoop.maxMotion.maxVelocity(mv).maxAcceleration(ma).allowedClosedLoopError(ae);
         driveMotor.configure(config, ResetMode.kResetSafeParameters,
@@ -179,9 +237,9 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public double getVoltage(boolean motor1) {
         if (motor1)
-            return driveMotor.getBusVoltage();
+            return driveMotor.get() * RobotController.getBatteryVoltage();
 
-        return driveMotor2.getBusVoltage();
+        return driveMotor2.get() * RobotController.getBatteryVoltage();
     }
 
     public void set(double speed) {

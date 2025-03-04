@@ -1,7 +1,10 @@
 package frc.robot.subsystems.arm;
 
+import static edu.wpi.first.units.Units.Degrees;
+import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.KilogramMetersPerSecond;
 import static edu.wpi.first.units.Units.Meter;
+import static edu.wpi.first.units.Units.Volts;
 
 import org.dyn4j.geometry.Rotation;
 
@@ -22,9 +25,19 @@ import edu.wpi.first.math.controller.ArmFeedforward;
 import edu.wpi.first.math.controller.ProfiledPIDController;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.trajectory.TrapezoidProfile;
+import edu.wpi.first.units.measure.AngularVelocity;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.MutAngle;
+import edu.wpi.first.units.measure.MutAngularVelocity;
+import edu.wpi.first.units.measure.MutVoltage;
+import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
+import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.GrabberConstants;
@@ -51,6 +64,12 @@ public class ArmSubsystem extends SubsystemBase {
     private final SparkMaxConfig config = new SparkMaxConfig();
 
     private double currentGoal, persianGoal;
+
+        // SysId
+    private final SysIdRoutine sysIDArmRoutine;
+    private MutVoltage appliedVoltage = Volts.mutable(0);
+    private MutAngle angle = Degrees.mutable(0);
+    private MutAngularVelocity angularVelocity = DegreesPerSecond.mutable(0);
 
     public ArmSubsystem() {
         armMotor = new SparkMax(Ports.CANID.ARM_ANGLE.getId(), MotorType.kBrushless);
@@ -85,6 +104,11 @@ public class ArmSubsystem extends SubsystemBase {
                 (newAllowedError) -> config.closedLoop.maxMotion.allowedClosedLoopError(newAllowedError));
 
         safetyChecks();
+
+        sysIDArmRoutine = new SysIdRoutine(
+            new SysIdRoutine.Config(),
+            new SysIdRoutine.Mechanism(volts -> {setVoltage(volts.in(Volts));}, this::logArm, this)
+        );
     }
 
     /**
@@ -213,6 +237,41 @@ public class ArmSubsystem extends SubsystemBase {
 
     public double getCurrent() {
         return armMotor.getOutputCurrent();
+    }
+
+    public double getVoltage() {
+        return armMotor.get() * RobotController.getBatteryVoltage();  
+    }
+
+    public void setVoltage(double volts) {
+        armMotor.setVoltage(volts);
+    }
+
+    private void logArm(SysIdRoutineLog log) {
+        log.motor("arm-motor")
+            .voltage(
+                appliedVoltage.mut_replace(
+                    getVoltage(), Volts
+                )
+            )
+            .angularPosition(
+                angle.mut_replace(
+                    getRotation().getDegrees(), Degrees
+                )
+            )
+            .angularVelocity(
+                angularVelocity.mut_replace(
+                    getVelocity().getDegrees(), DegreesPerSecond
+                )
+            );
+    }
+
+    public Command getSysIdQuasistatic(Direction direction) {
+        return sysIDArmRoutine.quasistatic(direction);
+    }
+
+    public Command getSysIdDynamic(Direction direction) {
+        return sysIDArmRoutine.dynamic(direction);
     }
 
     @Override

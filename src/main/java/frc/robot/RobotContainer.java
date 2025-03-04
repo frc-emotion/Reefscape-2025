@@ -17,6 +17,7 @@ import edu.wpi.first.wpilibj2.command.WaitCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
+import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
 import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.climb.ClimbSubsystem;
@@ -348,6 +349,39 @@ public class RobotContainer {
             // operatorXbox.leftBumper()
             //     .whileTrue(Commands.runOnce(() -> grabberSubsystem.setTargetType(GrabType.ALGAE)));
 
+            /* --- SysId Controls --- */
+
+                // Quasistatic Arm
+            // operatorXbox.povUp().onTrue(
+            //     armSubsystem.getSysIdQuasistatic(Direction.kForward)   
+            // );
+            // operatorXbox.povDown().onTrue(
+            //     armSubsystem.getSysIdQuasistatic(Direction.kReverse)
+            // );
+
+                // Dynamic Arm
+            // operatorXbox.povDown().onTrue(
+            //     armSubsystem.getSysIdDynamic(Direction.kReverse)
+            // );
+            // operatorXbox.povUp().onTrue(
+            //     armSubsystem.getSysIdDynamic(Direction.kForward)
+            // );
+
+                // Quasistatic Elevator
+            // operatorXbox.povUp().onTrue(
+            //     elevatorSubsystem.getSysIdQuasistatic(Direction.kForward)
+            // );
+            // operatorXbox.povDown().onTrue(
+            //     elevatorSubsystem.getSysIdQuasistatic(Direction.kReverse)
+            // );
+
+                // Dynamic Elevator
+            // operatorXbox.povUp().onTrue(
+            //     elevatorSubsystem.getSysIdDynamic(Direction.kForward)
+            // );
+            // operatorXbox.povDown().onTrue(
+            //     elevatorSubsystem.getSysIdDynamic(Direction.kReverse)
+            // );
         }
 
     }
@@ -355,25 +389,25 @@ public class RobotContainer {
     private void configureDefaultCommands() {
         RobotModeTriggers.autonomous().onTrue(Commands.runOnce(drivebase::zeroGyroWithAlliance));
 
-        armSubsystem.setDefaultCommand(
-            new MoveArmPosition(
-                armSubsystem, 
-                Rotation2d.fromDegrees(90),
-                () -> { return ElevatorConstants.CORAL_L4_HEIGHT; }
-            )
-        );
         // armSubsystem.setDefaultCommand(
-        //     new ArmManualCommand(
+        //     new MoveArmPosition(
         //         armSubsystem, 
-        //         () -> {
-        //             double raw = -operatorXbox.getLeftY()*0.75;
-        //             double sign = Math.signum(raw);
-        //             double in = Math.pow(raw, 2);
-
-        //             return sign * in;
-        //         }
+        //         Rotation2d.fromDegrees(90),
+        //         () -> { return ElevatorConstants.CORAL_L4_HEIGHT; }
         //     )
         // );
+        armSubsystem.setDefaultCommand(
+            new ArmManualCommand(
+                armSubsystem, 
+                () -> {
+                    double raw = -operatorXbox.getLeftY()*0.75;
+                    double sign = Math.signum(raw);
+                    double in = Math.pow(raw, 2);
+
+                    return sign * in;
+                }
+            )
+        );
 
         operatorXbox.a().whileTrue(
             new ClimbManualCommand(climbSubsystem, () -> {return 1.0;})

@@ -158,7 +158,7 @@ public final class Constants {
         public static final double kSecondaryCurrentLimit = 35;
 
         public static final double GRABBER_CORAL_SPEED = 0.65; // TBD
-        public static final double GRABBER_ALGAE_SPEED = 0.65; // TBD
+        public static final double GRABBER_ALGAE_SPEED = -0.65; // TBD
         public static final double GRABBER_ALGAE_HOLD_SPEED = 0.1; // TBD
         public static final double GRABBER_CORAL_HOLD_SPEED = 0.3; // TBD
         public static final double ZERO_SPEED = 0;
