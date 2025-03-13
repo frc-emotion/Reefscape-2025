@@ -4,7 +4,9 @@ import static edu.wpi.first.units.Units.Degrees;
 import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.KilogramMetersPerSecond;
 import static edu.wpi.first.units.Units.Meter;
+import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
+import static edu.wpi.first.units.Units.VoltsPerMeterPerSecond;
 
 import org.dyn4j.geometry.Rotation;
 
@@ -106,7 +108,11 @@ public class ArmSubsystem extends SubsystemBase {
         safetyChecks();
 
         sysIDArmRoutine = new SysIdRoutine(
-            new SysIdRoutine.Config(),
+            new SysIdRoutine.Config(
+                Volts.of(0.25).per(Second),
+                Volts.of(3),
+                null
+            ),
             new SysIdRoutine.Mechanism(volts -> {setVoltage(volts.in(Volts));}, this::logArm, this)
         );
     }

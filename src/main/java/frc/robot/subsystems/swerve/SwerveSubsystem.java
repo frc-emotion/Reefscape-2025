@@ -568,15 +568,19 @@ public class SwerveSubsystem extends SubsystemBase
   }
 
   /**
-   * Resets the gyro angle to zero and resets odometry to the same position, but facing toward 0.
+   * Resets the gyro angle to zero and resets odometry to the same posi\[]\tion, but facing toward 0.
    */
   public void zeroGyro()
   {
+    System.out.println("BLUD");
+
     swerveDrive.zeroGyro();
+
+    System.out.println("ERERERERER");
 
     swerveDrive.setGyroOffset(new Rotation3d(Rotation2d.fromDegrees(180)));
 
-    
+    System.out.println("Pluh");
   }
 
   /**

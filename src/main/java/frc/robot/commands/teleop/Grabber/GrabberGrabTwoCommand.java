@@ -15,7 +15,7 @@ public class GrabberGrabTwoCommand extends Command {
 
     @Override
     public void execute() {
-        grabberSubsystem.set(GrabberConstants.GRABBER_CORAL_SPEED);
+        grabberSubsystem.set(GrabberConstants.GRABBER_CORAL_INTAKE);
     }
 
     @Override

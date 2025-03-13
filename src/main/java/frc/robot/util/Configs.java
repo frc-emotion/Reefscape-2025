@@ -35,8 +35,8 @@ public class Configs {
                     .feedbackSensor(FeedbackSensor.kPrimaryEncoder);
 
             ELEVATOR_CONFIG.alternateEncoder
-                    .countsPerRevolution(ElevatorConstants.kEncoderCPR)
-                    .positionConversionFactor(ElevatorConstants.inchesPerCount);
+                    .countsPerRevolution(ElevatorConstants.kEncoderCPR);
+                    // .positionConversionFactor(ElevatorConstants.inchesPerCount);
 
             ELEVATOR_CONFIG.closedLoop.maxMotion
                     .maxVelocity(ElevatorConstants.MAX_MOTOR_RPM)

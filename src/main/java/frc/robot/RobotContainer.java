@@ -242,13 +242,6 @@ public class RobotContainer {
         // )
         // );
 
-        operatorXbox.rightTrigger(OperatorConstants.DEADBAND).whileTrue(
-                new GrabberPlaceCommand(grabberSubsystem));
-
-        operatorXbox.leftTrigger(OperatorConstants.DEADBAND).whileTrue(
-                new GrabberGrabCommand(
-                        grabberSubsystem));
-
         // operatorXbox.start().onTrue( // Zero Elevator
         // new ZeroElevatorCurrent(elevatorSubsystem)
         // );
@@ -283,12 +276,10 @@ public class RobotContainer {
         /* --- SysId Controls --- */
 
         // Quasistatic Arm
-        // operatorXbox.povUp().onTrue(
-        // armSubsystem.getSysIdQuasistatic(Direction.kForward)
-        // );
-        // operatorXbox.povDown().onTrue(
-        // armSubsystem.getSysIdQuasistatic(Direction.kReverse)
-        // );
+        // operatorXbox.povUp().whileTrue(
+        // armSubsystem.getSysIdQuasistatic(Direction.kForward));
+        // operatorXbox.povDown().whileTrue(
+        // armSubsystem.getSysIdQuasistatic(Direction.kReverse));
 
         // Dynamic Arm
         // operatorXbox.povDown().onTrue(
@@ -296,6 +287,7 @@ public class RobotContainer {
         // );
         // operatorXbox.povUp().onTrue(
         // armSubsystem.getSysIdDynamic(Direction.kForward)
+
         // );
 
         // Quasistatic Elevator
@@ -334,18 +326,43 @@ public class RobotContainer {
     private void configureDefaultCommands() {
         RobotModeTriggers.autonomous().onTrue(Commands.runOnce(drivebase::zeroGyroWithAlliance));
 
-        // armSubsystem.setDefaultCommand(
-        // new MoveArmPosition(
-        // armSubsystem,
-        // Rotation2d.fromDegrees(90),
-        // () -> { return ElevatorConstants.CORAL_L4_HEIGHT; }
-        // )
-        // );
+        operatorXbox.povUp().whileTrue(
+                new MoveArmPosition(
+                        armSubsystem,
+                        Rotation2d.fromDegrees(90),
+                        () -> {
+                            return ElevatorConstants.CORAL_L4_HEIGHT;
+                        }));
+
+        operatorXbox.povRight().whileTrue(
+                new MoveArmPosition(
+                        armSubsystem,
+                        Rotation2d.fromDegrees(0),
+                        () -> {
+                            return ElevatorConstants.CORAL_L4_HEIGHT;
+                        }));
+
+        operatorXbox.povLeft().whileTrue(
+                new MoveArmPosition(
+                        armSubsystem,
+                        Rotation2d.fromDegrees(125),
+                        () -> {
+                            return ElevatorConstants.CORAL_L4_HEIGHT;
+                        }));
+
+        operatorXbox.povDown().whileTrue(
+                new MoveArmPosition(
+                        armSubsystem,
+                        Rotation2d.fromDegrees(-45),
+                        () -> {
+                            return ElevatorConstants.CORAL_L4_HEIGHT;
+                        }));
+
         armSubsystem.setDefaultCommand(
                 new ArmManualCommand(
                         armSubsystem,
                         () -> {
-                            double raw = -operatorXbox.getLeftY() * 0.75;
+                            double raw = -operatorXbox.getLeftY() * 0.58;
                             double sign = Math.signum(raw);
                             double in = Math.pow(raw, 2);
 
@@ -353,14 +370,14 @@ public class RobotContainer {
                         }));
 
         operatorXbox.a().whileTrue(
-                new ClimbManualCommand(climbSubsystem, () -> {
-                    return 1.0;
-                }));
+            new ClimbManualCommand(climbSubsystem, () -> {
+                return 1.0;
+        }));
 
         operatorXbox.b().whileTrue(
-                new ClimbManualCommand(climbSubsystem, () -> {
-                    return -1.0;
-                }));
+            new ClimbManualCommand(climbSubsystem, () -> {
+                return -1.0;
+        }));
 
         elevatorSubsystem.setDefaultCommand(
                 new MoveElevatorManual(elevatorSubsystem, () -> -operatorXbox.getRightY()));
@@ -469,9 +486,7 @@ public class RobotContainer {
             // armSubsystem.setDefaultCommand(
             // new ArmManualCommand(
             // armSubsystem,
-            // () -> -operatorXbox.getRightY()
-            // )
-            // );
+            // () -> -operatorXbox.getRightY()));
 
             // operatorXbox.x().onTrue(new ZeroElevatorCurrent(elevatorSubsystem)); // Zero
             // Elevator
@@ -482,19 +497,23 @@ public class RobotContainer {
             // left trigger coral intake
             // left bumper algae intake
 
-            // operatorXbox.rightBumper()
-            // .whileTrue(Commands.runOnce(() ->
-            // grabberSubsystem.setTargetType(GrabType.CORAL)));
+            operatorXbox.rightBumper()
+                    .whileTrue(Commands.runOnce(() -> grabberSubsystem.setTargetType(GrabType.CORAL)));
 
-            // operatorXbox.leftBumper()
-            // .whileTrue(Commands.runOnce(() ->
-            // grabberSubsystem.setTargetType(GrabType.ALGAE)));
+            operatorXbox.leftBumper()
+                    .whileTrue(Commands.runOnce(() -> grabberSubsystem.setTargetType(GrabType.ALGAE)));
 
-            operatorXbox.rightStick().and(() -> Math.abs(operatorXbox.getRightY()) > 0.1)
-                    .onTrue(elevatorSubsystem.runOnce(elevatorSubsystem::stop))
-                    .whileTrue(elevatorSubsystem.run(() -> elevatorSubsystem
-                            .moveSpeed(operatorXbox.getRightY() * 0.25)))
-                    .onFalse(elevatorSubsystem.runOnce(elevatorSubsystem::stop));
+            operatorXbox.rightTrigger(OperatorConstants.DEADBAND).whileTrue(
+                    new GrabberPlaceCommand(grabberSubsystem));
+
+            operatorXbox.leftTrigger(OperatorConstants.DEADBAND).whileTrue(
+                    new GrabberGrabCommand(grabberSubsystem));
+
+            // operatorXbox.rightStick().and(() -> Math.abs(operatorXbox.getRightY()) > 0.1)
+            // .onTrue(elevatorSubsystem.runOnce(elevatorSubsystem::stop))
+            // .whileTrue(elevatorSubsystem.run(() -> elevatorSubsystem
+            // .moveSpeed(operatorXbox.getRightY() * 0.25)))
+            // .onFalse(elevatorSubsystem.runOnce(elevatorSubsystem::stop));
 
         }
     }

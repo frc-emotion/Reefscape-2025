@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Distance;
@@ -18,7 +19,9 @@ import frc.robot.util.Faults.FaultTypes.PDFaults;
 import swervelib.math.Matter;
 import edu.wpi.first.units.measure.Mass;
 import static edu.wpi.first.units.Units.Inches;
+import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.Pounds;
+import static edu.wpi.first.units.Units.Seconds;
 
 /**
  * The Constants class provides a convenient place for teams to hold robot-wide
@@ -108,7 +111,7 @@ public final class Constants {
 
         public static final double effectiveCountsPerRevolution = kEncoderCPR * kGearRatio;
 
-        public static final double inchesPerCount = kPulleyCircumInches / effectiveCountsPerRevolution;
+        public static final double inchesPerCount = kPulleyCircumInches / kGearRatio;
 
         public static final Mass kCarriageMass = Pounds.of(28.34);
         public static final Distance kDrumRadius = Inches.of(0.878);
@@ -120,10 +123,10 @@ public final class Constants {
         public static final double MAX_MOTOR_ACCELERATION = 3000.0; // RPM
 
         // Feedforward Constants
-        public static final double kS = 0.4; // static gain in volts
-        public static final double kG = 0.18; // gravity gain in volts
-        public static final double kV = 10.52; // velocity gain in mps
-        public static final double kA = 0.03; // acceleration gain in mps^2
+        public static final double kS = 0.0; // static gain in volts
+        public static final double kG = 0.36; // gravity gain in volts
+        public static final double kV = 0; //10.52; // velocity gain in mps
+        public static final double kA = 0; //0.03; // acceleration gain in mps^2
 
         // PID Constants
         public static final double kP = 0;
@@ -157,7 +160,10 @@ public final class Constants {
         public static final int kSmartCurrentLimit = 35;
         public static final double kSecondaryCurrentLimit = 35;
 
-        public static final double GRABBER_CORAL_SPEED = 0.65; // TBD
+        public static final double GRABBER_CORAL_OUTTAKE = -0.65; // TBD
+
+        public static final double GRABBER_CORAL_INTAKE = GRABBER_CORAL_OUTTAKE / 2.0;
+
         public static final double GRABBER_ALGAE_SPEED = -0.65; // TBD
         public static final double GRABBER_ALGAE_HOLD_SPEED = 0.1; // TBD
         public static final double GRABBER_CORAL_HOLD_SPEED = 0.3; // TBD
@@ -171,32 +177,31 @@ public final class Constants {
     }                                                                                                               
     public static class ArmConstants {
         public static final int kSmartCurrentLimit = 45;
-        public static final double kSecondaryCurrentLimit = 45
-;
+        public static final double kSecondaryCurrentLimit = 45;
 
         public static final double kMaxOutput = 1;
 
             // Physical Constraints
         public static final double kMinRotation = -45; // Note: Aligns with hopper
-        public static final double kMaxRotation = 115;
+        public static final double kMaxRotation = 125;
         public static final double kMaxHeightConstrained = 0; // The height in meters at which the arm is able to rotate fully. Should be roughly the length of the arm.
         public static final double kMaxRotationConstrained = 0; // The max rotation while the arm is below the minimum full rotation height. Could be formulaic, but probably not necessary.
         public static final double kMinRotationConstrained = 0;
 
             // Feedforward Constants
         public static final double kS = 0;
-        public static final double kG = 0.102858; //0.098858;    
-        public static final double kV = 0.00001;
-        public static final double kA = 0.0;
+        public static final double kG = 0.088858; // recalc: 0.55
+        public static final double kV = 0.00025; // recalc: 0.39
+        public static final double kA = 0.001; // recalc: 0.02
 
             // PID Constants
-        public static final double kP = 0.002058;
+        public static final double kP = 0.002058; //0.003058;
         public static final double kI = 0;
         public static final double kD = 0;
 
             // Smart Motion Constants
-        public static final double kMaxVelocity = 30;
-        public static final double kMaxAcceleration = 30;
+        public static final double kMaxVelocity = 300;
+        public static final double kMaxAcceleration = 300;
         public static final double kMaxError = 2;
         
             // Encoder Constants
@@ -275,6 +280,12 @@ public final class Constants {
             }
         }
 
+        public static class VisionConstants {
+
+            public static final double ACCURACY_LIMIT = 4;
+            public static final double DEBOUNCE_TIME_SEC = Milliseconds.of(15).in(Seconds);
+        }
+
         public enum CANID {
             PDH(1, "Power Distribution Hub"),
 
@@ -302,6 +313,8 @@ public final class Constants {
             CORAL_TOF_BACK(72, "Coral Back Time of Flight"),
             CORAL_TOF_FRONT(73, "Coral Front Time of Flight"),
             ARM_ANGLE(19, "Arm Angle"),
+
+            PIGEON_GYRO(30, "Gyro"),
 
             CLIMB_PORT(16, "Climb Motor");
 

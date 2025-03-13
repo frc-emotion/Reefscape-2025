@@ -2,6 +2,7 @@ package frc.robot.commands.teleop.Elevator;
 
 import java.util.function.Supplier;
 
+import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 
@@ -18,6 +19,6 @@ public class MoveElevatorManual extends Command {
 
     @Override
     public void execute() {
-        m_ElevatorSubsystem.set(inputSupplier.get());
+        m_ElevatorSubsystem.setWithFeedforward(MathUtil.applyDeadband(inputSupplier.get(), 0.1));
     }
 }

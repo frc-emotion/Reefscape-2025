@@ -162,6 +162,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Elevator/Leader/Current", driveMotor.getOutputCurrent());
         SmartDashboard.putNumber("Elevator/Leader/Temp", driveMotor.getMotorTemperature());
         SmartDashboard.putNumber("Elevator/Leader/Target", currentGoal);
+        SmartDashboard.putNumber("Elevator/Leader/Position", getPosition());
 
         // Elevator 2 = 18 - Follower
         SmartDashboard.putNumber("Elevator/Follower/Output", driveMotor2.get());
@@ -210,10 +211,6 @@ public class ElevatorSubsystem extends SubsystemBase {
                 PersistMode.kPersistParameters);
     }
 
-    public void moveSpeed(double input) {
-        driveMotor.set(input);
-    }
-
     public void changePID(double p, double i, double d) {
         config.closedLoop.pid(p, i, d);
         driveMotor.configure(config, ResetMode.kResetSafeParameters,
@@ -248,6 +245,15 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public void set(double speed) {
         driveMotor.set(MathUtil.clamp(speed, -1, 1));
+    }
+
+    public void setWithFeedforward(double speed) {
+        double inVoltage = speed * 12.0;
+        double ff = feedforward.calculate(getVelocity().in(MetersPerSecond));
+
+        driveMotor.setVoltage(
+            MathUtil.clamp(inVoltage + ff, -RobotController.getBatteryVoltage(), RobotController.getBatteryVoltage())
+        );
     }
 
     public void stop() {
@@ -294,7 +300,7 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public double getPosition() {
-        return boreEncoder.getPosition();
+        return boreEncoder.getPosition() * ElevatorConstants.inchesPerCount;
     }
 
     public Distance getHeight() {

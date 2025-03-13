@@ -20,7 +20,7 @@ public class GrabberPlaceCommand extends Command {
     public void execute() {
         switch(m_GrabberSubsystem.getCurrentGrabType()) {
             case CORAL:
-                m_GrabberSubsystem.set(-GrabberConstants.GRABBER_CORAL_SPEED);
+                m_GrabberSubsystem.set(GrabberConstants.GRABBER_CORAL_OUTTAKE);
                 break;
             case ALGAE:
                 m_GrabberSubsystem.set(-GrabberConstants.GRABBER_ALGAE_SPEED);
