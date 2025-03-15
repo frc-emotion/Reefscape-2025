@@ -9,6 +9,7 @@ import org.ironmaple.simulation.SimulatedArena;
 // import edu.wpi.first.epilogue.Epilogue;
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.net.WebServer;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Threads;
@@ -70,6 +71,8 @@ public class Robot extends TimedRobot {
         if (m_autonomousCommand != null) {
         m_autonomousCommand.schedule();
         }
+        
+        LEDSubsystem.setLedAlliance();
     }
 
     @Override
@@ -83,14 +86,13 @@ public class Robot extends TimedRobot {
         if (m_autonomousCommand != null) {
             m_autonomousCommand.cancel();
         }
-        
+
+        LEDSubsystem.setLedAlliance();
     }
 
     @Override
     public void teleopPeriodic() {
-        LEDSubsystem.setRainbow();
-        //LEDSubsystem.setSolidColor();
-        //LEDSubsystem.blindTheDriver();
+
     }
     @Override
     public void teleopExit() {}

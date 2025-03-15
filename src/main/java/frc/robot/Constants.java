@@ -18,6 +18,10 @@ import edu.wpi.first.units.measure.Distance;
 import frc.robot.util.Faults.FaultTypes.PDFaults;
 import swervelib.math.Matter;
 import edu.wpi.first.units.measure.Mass;
+import edu.wpi.first.wpilibj.AddressableLED;
+import edu.wpi.first.wpilibj.AddressableLEDBuffer;
+import edu.wpi.first.wpilibj.DriverStation;
+
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Milliseconds;
 import static edu.wpi.first.units.Units.Pounds;
@@ -369,6 +373,16 @@ public final class Constants {
                 return CAN_ID_MAP.getOrDefault(id, "Unknown CAN ID");
             }
         }
+    }
+    public static class LEDConstants {
+
+        public static int rainbowFirstPixelHue = 0;
+
+        public static final int LED_PORT = 0;
+
+        public static final int LED_COUNT = 69;
+
+
     }
 
 }
