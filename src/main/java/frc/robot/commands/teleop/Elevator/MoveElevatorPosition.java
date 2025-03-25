@@ -8,11 +8,18 @@ public class MoveElevatorPosition extends Command {
     private final ElevatorSubsystem m_ElevatorSubsystem;
     private Distance targetDistance;
 
-    public MoveElevatorPosition(ElevatorSubsystem elevatorSubsystem, Distance targetDistance) {
+    private boolean shouldFinish;
+
+    public MoveElevatorPosition(ElevatorSubsystem elevatorSubsystem, Distance targetDistance, boolean shouldFinish) {
         this.m_ElevatorSubsystem = elevatorSubsystem;
         this.targetDistance = targetDistance;
+        this.shouldFinish = shouldFinish;
 
         addRequirements(m_ElevatorSubsystem);
+    }
+
+    public MoveElevatorPosition(ElevatorSubsystem elevatorSubsystem, Distance targetDistance) {
+        this(elevatorSubsystem, targetDistance, false);
     }
 
     @Override
@@ -27,6 +34,6 @@ public class MoveElevatorPosition extends Command {
 
     @Override
     public boolean isFinished() {
-        return m_ElevatorSubsystem.isAtSetpoint();
+        return shouldFinish && m_ElevatorSubsystem.controllerAtSetpoint();
     }
 }

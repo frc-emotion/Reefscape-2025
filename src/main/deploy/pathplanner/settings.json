@@ -13,11 +13,13 @@
     "From S3",
     "From S4",
     "Full Autos",
-    "Tuning",
+    "Other",
+    "New New Folder",
     "To HP1",
     "To HP2",
     "To HP3",
-    "To HP4"
+    "To HP4",
+    "Tuning"
   ],
   "autoFolders": [],
   "defaultMaxVel": 3.0,

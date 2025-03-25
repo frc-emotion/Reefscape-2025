@@ -1,13 +1,28 @@
 package frc.robot;
 
+// import frc.robot.subsystems.vision.Vision;
+
+// public class RobotContainer {
+//     private final Vision visionSubsystem = new Vision();
+
+//     public RobotContainer() {
+
+//     }
+// }
+
 import com.pathplanner.lib.auto.NamedCommands;
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj.PowerDistribution;
 import edu.wpi.first.wpilibj.PowerDistribution.ModuleType;
+import edu.wpi.first.wpilibj.shuffleboard.Shuffleboard;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
@@ -27,6 +42,7 @@ import frc.robot.subsystems.grabber.GrabberSubsystem;
 import frc.robot.subsystems.grabber.GrabberSubsystem.GrabType;
 import frc.robot.commands.teleop.Climb.ClimbManualCommand;
 import frc.robot.commands.teleop.Elevator.MoveElevatorManual;
+import frc.robot.commands.teleop.Elevator.MoveElevatorPosition;
 import frc.robot.commands.teleop.Elevator.ZeroElevatorCurrent;
 import frc.robot.commands.teleop.Grabber.GrabberGrabCommand;
 import frc.robot.commands.teleop.Grabber.GrabberHoldCommand;
@@ -39,8 +55,10 @@ import frc.robot.Constants;
 import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OperatorConstants;
+import frc.robot.util.TabManager;
 import frc.robot.util.Configs.ElevatorConfigs;
 import frc.robot.util.Faults.FaultManager;
+import frc.robot.util.TabManager.SubsystemTab;
 import frc.robot.util.tasks.auto.ScoreAlgae;
 import frc.robot.util.tasks.general.AlgaeLevel;
 import frc.robot.util.tasks.general.CoralLevel;
@@ -49,6 +67,8 @@ import frc.robot.util.tasks.positions.AlgaeScorePosition;
 import frc.robot.util.tasks.positions.CoralPosition;
 import frc.robot.util.tasks.teleop.PickupAlgae;
 import frc.robot.util.tasks.teleop.PickupTask;
+
+import static edu.wpi.first.units.Units.Inches;
 
 import java.io.File;
 import swervelib.SwerveInputStream;
@@ -77,6 +97,8 @@ public class RobotContainer {
 
     // private final PowerDistribution m_PDH = new
     // PowerDistribution(Constants.Ports.CANID.PDH.getId(), ModuleType.kRev);
+
+    private final SendableChooser<Command> autoChooser;
 
     /**
      * Converts driver input into a field-relative ChassisSpeeds that is controlled
@@ -151,10 +173,12 @@ public class RobotContainer {
      * The container for the robot. Contains subsystems, OI devices, and commands.
      */
     public RobotContainer() {
+        autoChooser = new SendableChooser<Command>();
         // FaultManager.register(m_PDH);
         // Configure the trigger bindings
-        configureBindings();
         configureDefaultCommands();
+        initializeNamedCommands();
+        configureUI();
         DriverStation.silenceJoystickConnectionWarning(true);
         // NamedCommands.registerCommand("test", Commands.print("I EXIST"));
 
@@ -307,56 +331,52 @@ public class RobotContainer {
         // );
     }
 
-    /**
-     * Use this method to define your trigger->command mappings. Triggers can be
-     * created via the
-     * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with
-     * an arbitrary predicate, or via the
-     * named factories in
-     * {@link edu.wpi.first.wpilibj2.command.button.CommandGenericHID}'s subclasses
-     * for
-     * {@link CommandXboxController
-     * Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller PS4}
-     * controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick
-     * Flight joysticks}.
-     */
-    private void configureBindings() {
+    private void configureUI() {
+        autoChooser.setDefaultOption("Taxi Auto", getAutonomousCommand("Straight Test"));
+        addAutoOption("S4-B Score");  
+        addAutoOption("S2-G Score");
+
+        TabManager.getInstance().accessTab(SubsystemTab.AUTO).add(autoChooser);
     }
 
     private void configureDefaultCommands() {
         RobotModeTriggers.autonomous().onTrue(Commands.runOnce(drivebase::zeroGyroWithAlliance));
 
+        RobotModeTriggers.teleop().onTrue(Commands.runOnce(drivebase::zeroGyroWithAlliance));
+
         operatorXbox.povUp().whileTrue(
-                new MoveArmPosition(
+                MainCommandFactory.getArmElevatorPositionCommand(
                         armSubsystem,
-                        Rotation2d.fromDegrees(90),
-                        () -> {
-                            return ElevatorConstants.CORAL_L4_HEIGHT;
-                        }));
+                        elevatorSubsystem,
+                        ElevatorConstants.CORAL_L4_HEIGHT,
+                        ArmConstants.CORAL_L4_ANGLE));
+        // new MoveArmPosition(
+        // armSubsystem,
+        // Rotation2d.fromDegrees(90),
+        // () -> {
+        // return ElevatorConstants.CORAL_L4_HEIGHT;
+        // }));
 
         operatorXbox.povRight().whileTrue(
-                new MoveArmPosition(
+                MainCommandFactory.getArmElevatorPositionCommand(
                         armSubsystem,
-                        Rotation2d.fromDegrees(0),
-                        () -> {
-                            return ElevatorConstants.CORAL_L4_HEIGHT;
-                        }));
+                        elevatorSubsystem,
+                        ElevatorConstants.CORAL_L3_HEIGHT,
+                        ArmConstants.CORAL_L3_ANGLE));
 
         operatorXbox.povLeft().whileTrue(
-                new MoveArmPosition(
+                MainCommandFactory.getArmElevatorPositionCommand(
                         armSubsystem,
-                        Rotation2d.fromDegrees(125),
-                        () -> {
-                            return ElevatorConstants.CORAL_L4_HEIGHT;
-                        }));
+                        elevatorSubsystem,
+                        ElevatorConstants.CORAL_L2_HEIGHT,
+                        ArmConstants.CORAL_L2_ANGLE));
 
         operatorXbox.povDown().whileTrue(
-                new MoveArmPosition(
+                MainCommandFactory.getArmElevatorPositionCommand(
                         armSubsystem,
-                        Rotation2d.fromDegrees(-45),
-                        () -> {
-                            return ElevatorConstants.CORAL_L4_HEIGHT;
-                        }));
+                        elevatorSubsystem,
+                        ElevatorConstants.CORAL_INTAKE_HEIGHT,
+                        ArmConstants.CORAL_INTAKE_ANGLE));
 
         armSubsystem.setDefaultCommand(
                 new ArmManualCommand(
@@ -370,14 +390,32 @@ public class RobotContainer {
                         }));
 
         operatorXbox.a().whileTrue(
-            new ClimbManualCommand(climbSubsystem, () -> {
-                return 1.0;
-        }));
+                new ClimbManualCommand(climbSubsystem, () -> {
+                    return 1.0;
+                }));
 
         operatorXbox.b().whileTrue(
-            new ClimbManualCommand(climbSubsystem, () -> {
-                return -1.0;
-        }));
+                new ClimbManualCommand(climbSubsystem, () -> {
+                    return -1.0;
+                }));
+
+        operatorXbox.x().whileTrue(
+                MainCommandFactory.getArmElevatorPositionCommand(
+                        armSubsystem,
+                        elevatorSubsystem,
+                        ElevatorConstants.ALGAE_L2_CLEANING,
+                        ArmConstants.ALGAE_L2_ANGLE
+                    )
+        );
+
+        operatorXbox.y().whileTrue(
+                MainCommandFactory.getArmElevatorPositionCommand(
+                        armSubsystem,
+                        elevatorSubsystem,
+                        ElevatorConstants.ALGAE_L3_CLEANING,
+                        ArmConstants.ALGAE_L3_ANGLE
+                    )
+        );
 
         elevatorSubsystem.setDefaultCommand(
                 new MoveElevatorManual(elevatorSubsystem, () -> -operatorXbox.getRightY()));
@@ -518,13 +556,63 @@ public class RobotContainer {
         }
     }
 
+    public void initializeNamedCommands() {
+        NamedCommands.registerCommand(
+            "PrepL4",
+            MainCommandFactory.getAutoArmElevatorPositionCommand(
+                armSubsystem, 
+                elevatorSubsystem, 
+                ElevatorConstants.CORAL_L4_HEIGHT,
+                ArmConstants.CORAL_L4_ANGLE
+            )
+        );
+
+        NamedCommands.registerCommand(
+            "PrepL3",
+            MainCommandFactory.getAutoArmElevatorPositionCommand(
+                armSubsystem, 
+                elevatorSubsystem, 
+                ElevatorConstants.CORAL_L3_HEIGHT,
+                ArmConstants.CORAL_L3_ANGLE
+            )
+        );
+
+        NamedCommands.registerCommand(
+            "PrepL2",
+            MainCommandFactory.getAutoArmElevatorPositionCommand(
+                armSubsystem, 
+                elevatorSubsystem, 
+                ElevatorConstants.CORAL_L2_HEIGHT,
+                ArmConstants.CORAL_L2_ANGLE
+            )
+        );
+
+        NamedCommands.registerCommand(
+            "ResetIntake",
+            MainCommandFactory.getAutoArmElevatorPositionCommand(
+                armSubsystem, 
+                elevatorSubsystem, 
+                ElevatorConstants.CORAL_INTAKE_HEIGHT,
+                ArmConstants.CORAL_INTAKE_ANGLE
+            )
+        );
+    }
+
     /**
      * Use this to pass the autonomous command to the main {@link Robot} class.
      *
      * @return the command to run in autonomous
      */
     public Command getAutonomousCommand() {
-        return drivebase.getAutonomousCommand("Straight Test");
+        return autoChooser.getSelected();
+    }
+
+    private void addAutoOption(String name) {
+        autoChooser.addOption(name, drivebase.getAutonomousCommand(name));
+    }
+
+    private Command getAutonomousCommand(String name) {
+        return drivebase.getAutonomousCommand(name);
     }
 
     public void setMotorBrake(boolean brake) {

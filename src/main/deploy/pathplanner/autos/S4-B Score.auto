@@ -1,0 +1,37 @@
+{
+  "version": "2025.0",
+  "command": {
+    "type": "sequential",
+    "data": {
+      "commands": [
+        {
+          "type": "path",
+          "data": {
+            "pathName": "S4-B Reverse"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "DropCoral"
+          }
+        },
+        {
+          "type": "path",
+          "data": {
+            "pathName": "B Reverse"
+          }
+        },
+        {
+          "type": "named",
+          "data": {
+            "name": "ResetIntake"
+          }
+        }
+      ]
+    }
+  },
+  "resetOdom": true,
+  "folder": null,
+  "choreoAuto": false
+}

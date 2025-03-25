@@ -15,6 +15,7 @@
 // import org.photonvision.targeting.PhotonTrackedTarget;
 
 // import edu.wpi.first.apriltag.AprilTagFieldLayout;
+// import edu.wpi.first.apriltag.AprilTagFields;
 // import edu.wpi.first.math.Matrix;
 // import edu.wpi.first.math.VecBuilder;
 // import edu.wpi.first.math.geometry.Rotation3d;
@@ -27,27 +28,28 @@
 // import frc.robot.Robot;
 
 // public class Vision {
-//     private AprilTagFieldLayout aprilTagFieldLayout;
+//     private static final AprilTagFieldLayout APRIL_TAG_FIELD_LAYOUT = AprilTagFieldLayout.loadField(AprilTagFields.k2024Crescendo);
 
 //     enum Cameras {
 //         FRONT_RIGHT(
 //                 "front-right-swerve",
 //                 new Translation3d(0, 0, 0),
 //                 new Rotation3d(0, 0, 0),
+//                 APRIL_TAG_FIELD_LAYOUT,
 //                 VecBuilder.fill(4, 4, 8),
-//                 VecBuilder.fill(4, 4, 8)),
-//         FRONT_LEFT(
-//                 "front-left-swerve",
-//                 new Translation3d(0, 0, 0),
-//                 new Rotation3d(0, 0, 0),
-//                 VecBuilder.fill(4, 4, 8),
-//                 VecBuilder.fill(4, 4, 8)),
-//         BACK(
-//                 "limelight",
-//                 new Translation3d(0, 0, 0),
-//                 new Rotation3d(0, 0, 0),
-//                 VecBuilder.fill(4, 4, 8),
-//                 VecBuilder.fill(4, 4, 8));
+//                 VecBuilder.fill(4, 4, 8)); //,
+//         // FRONT_LEFT(
+//         //         "front-left-swerve",
+//         //         new Translation3d(0, 0, 0),
+//         //         new Rotation3d(0, 0, 0),
+//         //         VecBuilder.fill(4, 4, 8),
+//         //         VecBuilder.fill(4, 4, 8)),
+//         // BACK(
+//         //         "limelight",
+//         //         new Translation3d(0, 0, 0),
+//         //         new Rotation3d(0, 0, 0),
+//         //         VecBuilder.fill(4, 4, 8),
+//         //         VecBuilder.fill(4, 4, 8));
 
 //         public final PhotonCamera camera;
 
@@ -55,15 +57,15 @@
 
 //         private final Matrix<N3, N1> singleTagStdDevs, multiTagStdDevs;
 
-//         private final Translation3d robotToCameraTranslation;
-
-//         private final Rotation3d robotToCameraRotation;
+//         private final Transform3d robotToCameraTransform;
 
 //         private Matrix<N3, N1> currentStdDevs;
 
 //         public List<PhotonPipelineResult> photonResults = new ArrayList<>();
 
 //         private double lastReadTimestamp;
+
+//         private Optional<EstimatedRobotPose> estimatedRobotPose;
 
 //         Cameras(
 //                 String name,
@@ -73,8 +75,11 @@
 //                 Matrix<N3, N1> singleTagStdDevs,
 //                 Matrix<N3, N1> multiTagStdDevs) {
 //             camera = new PhotonCamera(name);
-//             poseEstimator = new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR,
-//                     new Transform3d(robotToCameraTranslation, robotToCameraRotation));
+
+//             this.robotToCameraTransform = new Transform3d(robotToCameraTranslation, robotToCameraRotation);
+
+//             poseEstimator = new PhotonPoseEstimator(fieldLayout, PoseStrategy.MULTI_TAG_PNP_ON_COPROCESSOR, robotToCameraTransform);
+            
 //             this.singleTagStdDevs = singleTagStdDevs;
 //             this.multiTagStdDevs = multiTagStdDevs;
 
@@ -104,7 +109,12 @@
 //         }
 
 //         private void updateEstimatedPose() {
-            
+//             Optional<EstimatedRobotPose> visionEstimate = Optional.empty();
+//             for(var result : photonResults) {
+//                 visionEstimate = poseEstimator.update(result);
+//                 updateStdDevs(visionEstimate, result.getTargets());
+//             }
+//             estimatedRobotPose = visionEstimate;
 //         }
 
 //         public void updateStdDevs(Optional<EstimatedRobotPose> estimatedPose, List<PhotonTrackedTarget> targets) {

@@ -14,6 +14,7 @@ import frc.robot.Constants.ArmConstants;
 import frc.robot.Constants.ClimbConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.commands.teleop.Climb.ClimbMoveToPosCommand;
+import frc.robot.commands.teleop.Elevator.MoveElevatorManual;
 import frc.robot.commands.teleop.Elevator.MoveElevatorPosition;
 import frc.robot.commands.teleop.Grabber.GrabberGrabCommand;
 import frc.robot.commands.teleop.Grabber.GrabberPlaceCommand;
@@ -52,7 +53,19 @@ public class MainCommandFactory {
     ) {
         return new ParallelCommandGroup(
             new MoveElevatorPosition(elevatorSubsystem, targetElevatorHeight),
-            new MoveArmPosition(armSubsystem, targetArmAngle, elevatorSubsystem::getHeight)
+            new MoveArmPosition(armSubsystem, targetArmAngle, () -> { return Inches.of(90); })
+        );
+    }
+
+    public static Command getAutoArmElevatorPositionCommand(
+        ArmSubsystem armSubsystem,
+        ElevatorSubsystem elevatorSubsystem,
+        Distance targetElevatorHeight,
+        Rotation2d targetArmAngle
+    ) {
+        return new ParallelCommandGroup(
+            new MoveElevatorPosition(elevatorSubsystem, targetElevatorHeight, true),
+            new MoveArmPosition(armSubsystem, targetArmAngle, () -> { return Inches.of(90); }, true)
         );
     }
 
@@ -193,5 +206,28 @@ public class MainCommandFactory {
             ),
             Commands.runOnce(() -> climbSubsystem.setClimbState(ClimbState.CLIMBED))
         );
+    }
+
+    public static class BackupCommands {
+        public static Command getElevatorL4Stupid(ElevatorSubsystem elevatorSubsystem, ArmSubsystem armSubsystem) {
+            return new SequentialCommandGroup(
+                new ParallelCommandGroup(
+                    new SequentialCommandGroup(
+                        new MoveElevatorManual(elevatorSubsystem, () -> { return 0.4; }).withTimeout(0.5),
+                        getRunElevatorToCurrentCommand(elevatorSubsystem, 0.4, 30)
+                    ),
+                    new SequentialCommandGroup(
+                        new MoveArmPosition(armSubsystem,Rotation2d.fromDegrees(115), () -> { return ElevatorConstants.CORAL_L4_HEIGHT; }).withTimeout(0.01),
+                        new MoveArmPosition(armSubsystem,Rotation2d.fromDegrees(100), () -> { return ElevatorConstants.CORAL_L4_HEIGHT; })
+                    )
+                )
+            );
+        }
+
+        public static Command getRunElevatorToCurrentCommand(ElevatorSubsystem elevatorSubsystem, double speed, int currentLimit) {
+            return new MoveElevatorManual(elevatorSubsystem, () -> { return speed; }).until(
+                () -> { return elevatorSubsystem.getCurrentDraw(true) > currentLimit; }
+            );
+        }
     }
 }

@@ -83,6 +83,7 @@ public class ArmSubsystem extends SubsystemBase {
         pidController = new ProfiledPIDController(ArmConstants.kP, ArmConstants.kI, ArmConstants.kD,
                 new TrapezoidProfile.Constraints(ArmConstants.kMaxVelocity,
                         ArmConstants.kMaxAcceleration));
+        pidController.setTolerance(3.5);
 
         feedforward = new ArmFeedforward(ArmConstants.kS, ArmConstants.kG, ArmConstants.kV, ArmConstants.kA);
 
@@ -293,6 +294,10 @@ public class ArmSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Arm/1/Velocity", getVelocity().getDegrees());
         SmartDashboard.putNumber("Arm/1/Persian", persianTest());
         SmartDashboard.putNumber("Arm/1/SALAMALAKUM", persianGoal);
+    }
+
+    public boolean isAtSetpoint() {
+        return pidController.atSetpoint();
     }
 
 }

@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.122174657534247,
-        "y": 3.85488447341726
+        "x": 3.175,
+        "y": 3.84
       },
       "prevControl": null,
       "nextControl": {
-        "x": 6.85119155105895,
-        "y": 3.903403236807375
+        "x": 2.289802631578947,
+        "y": 3.8111348684210524
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 5.7985389487136665,
-        "y": 3.85488447341726
+        "x": 2.1167763157894735,
+        "y": 3.84
       },
       "prevControl": {
-        "x": 6.04417531677052,
-        "y": 3.808378831954766
+        "x": 2.5882401315789476,
+        "y": 3.820756578947368
       },
       "nextControl": null,
       "isLocked": false,
@@ -33,8 +33,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 2.0,
-    "maxAcceleration": 2.0,
+    "maxVelocity": 3.0,
+    "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -45,10 +45,10 @@
     "rotation": 0.0
   },
   "reversed": false,
-  "folder": "From S2",
+  "folder": "Other",
   "idealStartingState": {
     "velocity": 0,
     "rotation": 0.0
   },
-  "useDefaultConstraints": false
+  "useDefaultConstraints": true
 }

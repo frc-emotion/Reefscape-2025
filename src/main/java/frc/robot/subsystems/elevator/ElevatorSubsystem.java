@@ -33,6 +33,7 @@ import edu.wpi.first.units.measure.MutAngle;
 import edu.wpi.first.units.measure.MutAngularVelocity;
 import edu.wpi.first.units.measure.MutDistance;
 import edu.wpi.first.units.measure.MutVoltage;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
@@ -91,6 +92,7 @@ public class ElevatorSubsystem extends SubsystemBase {
             controller = new ProfiledPIDController(ElevatorConstants.kP, ElevatorConstants.kI, ElevatorConstants.kD,
                     new TrapezoidProfile.Constraints(ElevatorConstants.MAX_MOTOR_RPM,
                             ElevatorConstants.MAX_MOTOR_ACCELERATION));
+            ((ProfiledPIDController) controller).setTolerance(0.1);
         } else {
             controller = driveMotor.getClosedLoopController();
         }
@@ -163,6 +165,7 @@ public class ElevatorSubsystem extends SubsystemBase {
         SmartDashboard.putNumber("Elevator/Leader/Temp", driveMotor.getMotorTemperature());
         SmartDashboard.putNumber("Elevator/Leader/Target", currentGoal);
         SmartDashboard.putNumber("Elevator/Leader/Position", getPosition());
+        SmartDashboard.putBoolean("Elevator/Leader/PersianGoal", controllerAtSetpoint());
 
         // Elevator 2 = 18 - Follower
         SmartDashboard.putNumber("Elevator/Follower/Output", driveMotor2.get());
@@ -261,24 +264,20 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public void reachGoal(double goal) {
+        
         double voltsOut = MathUtil.clamp(
-                ((ProfiledPIDController) controller).calculate(getHeight().in(Inches), goal) +
-                        feedforward.calculateWithVelocities(getVelocity().in(MetersPerSecond),
-                                ((ProfiledPIDController) controller).getSetpoint().velocity),
-                -7,
-                7); // 7 is the max voltage to send out.
+                ((ProfiledPIDController) controller).calculate(getPosition(), goal) +
+                        feedforward.calculate(getVelocity().in(MetersPerSecond)),
+                -RobotController.getBatteryVoltage(),
+                RobotController.getBatteryVoltage());
+        
+        System.out.println("MEOW " + voltsOut);
         driveMotor.setVoltage(voltsOut);
     }
 
     public void setTargetPosition(double position) {
         currentGoal = position;
-        if (controller instanceof ProfiledPIDController) {
-            // ((ProfiledPIDController) controller).setGoal(new
-            // TrapezoidProfile.State(position, 0));
-            run(() -> reachGoal(position));
-        } else {
-            ((SparkClosedLoopController) controller).setReference(position, ControlType.kMAXMotionPositionControl, ClosedLoopSlot.kSlot0, feedforward.calculate(getVelocity().in(MetersPerSecond)));
-        }
+        reachGoal(position);
     }
 
     public void setTargetHeight(Distance height) {
@@ -291,6 +290,18 @@ public class ElevatorSubsystem extends SubsystemBase {
                         getTargetHeight().minus(Units.Inches.of(ElevatorConstants.TOLERABLE_ERROR))) > 0)
                 &&
                 getHeight().compareTo(getTargetHeight().plus(Units.Inches.of(ElevatorConstants.TOLERABLE_ERROR))) < 0;
+    }
+    
+    public boolean controllerAtSetpoint() {
+        return ((ProfiledPIDController) controller).atSetpoint();
+    }
+
+    public boolean isAtSetpoint(double target) {
+        return (getHeight()
+                .compareTo(
+                        Distance.ofBaseUnits(target, Inches).minus(Units.Inches.of(ElevatorConstants.TOLERABLE_ERROR))) > 0)
+                &&
+                getHeight().compareTo(Distance.ofBaseUnits(target, Inches).plus(Units.Inches.of(ElevatorConstants.TOLERABLE_ERROR))) < 0;
     }
 
     public Trigger atHeight(double height, double tolerance) {
@@ -321,6 +332,10 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     public void resetSensorPosition(Distance setpoint) {
         boreEncoder.setPosition(setpoint.in(Inches));
+    }
+
+    public static double convertDistanceToEncoderCounts(Distance height) {
+        return height.in(Inches) / ElevatorConstants.inchesPerCount;
     }
 
 }

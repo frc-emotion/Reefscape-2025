@@ -574,11 +574,12 @@ public class SwerveSubsystem extends SubsystemBase
   {
     System.out.println("BLUD");
 
+    // swerveDrive.setGyro(new Rotation3d().minus(swerveDrive.getGyro().getRawRotation3d()));
     swerveDrive.zeroGyro();
 
     System.out.println("ERERERERER");
 
-    swerveDrive.setGyroOffset(new Rotation3d(Rotation2d.fromDegrees(180)));
+    // resetOdometry(new Pose2d(getPose().getTranslation(), Rotation2d.fromDegrees(180)));
 
     System.out.println("Pluh");
   }

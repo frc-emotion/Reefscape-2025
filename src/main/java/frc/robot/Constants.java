@@ -99,7 +99,7 @@ public final class Constants {
 
     }
     public static class ElevatorConstants {
-        public static final double TOLERABLE_ERROR = 1;
+        public static final double TOLERABLE_ERROR = 1.5;
 
         // Physical Constants
         public static final int kSmartCurrentLimit = 45;
@@ -123,8 +123,8 @@ public final class Constants {
         public static final Distance kMaxHeight = Inches.of(29);
         public static final Distance kStartingHeight = Inches.of(0);
 
-        public static final double MAX_MOTOR_RPM = 5000.0; // RPM
-        public static final double MAX_MOTOR_ACCELERATION = 3000.0; // RPM
+        public static final double MAX_MOTOR_RPM = 10000.0; // Need to change name of variable not RPM
+        public static final double MAX_MOTOR_ACCELERATION = 100; // TODO: Need to change name of variable not RPM
 
         // Feedforward Constants
         public static final double kS = 0.0; // static gain in volts
@@ -133,20 +133,20 @@ public final class Constants {
         public static final double kA = 0; //0.03; // acceleration gain in mps^2
 
         // PID Constants
-        public static final double kP = 0;
+        public static final double kP = 2.5;
         public static final double kI = 0;
         public static final double kD = 0;
 
-        public static final Distance CORAL_L1_HEIGHT = Units.Inches.of(8.25);
-        public static final Distance CORAL_L2_HEIGHT = Units.Inches.of(19);
-        public static final Distance CORAL_L3_HEIGHT = Units.Inches.of(34.75);
-        public static final Distance CORAL_L4_HEIGHT = Units.Inches.of(61);
+        public static final Distance CORAL_L1_HEIGHT = Units.Inches.of(0);
+        public static final Distance CORAL_L2_HEIGHT = Units.Inches.of(8.6);
+        public static final Distance CORAL_L3_HEIGHT = Units.Inches.of(18.1);
+        public static final Distance CORAL_L4_HEIGHT = Units.Inches.of(34.8);
 
 
         public static final Distance ALGAE_PREP_NET = Units.Inches.of(61);
         public static final Distance ALGAE_PREP_PROCESSOR_HEIGHT = Units.Inches.of(1);
-        public static final Distance ALGAE_L3_CLEANING = Units.Inches.of(25);
-        public static final Distance ALGAE_L2_CLEANING = Units.Inches.of(9);
+        public static final Distance ALGAE_L3_CLEANING = Units.Inches.of(18.1);
+        public static final Distance ALGAE_L2_CLEANING = Units.Inches.of(8.6);
         public static final Distance ALGAE_GROUND_INTAKE = Units.Inches.of(0);
         public static final Distance PREP_0 = Units.Inches.of(0);
         public static final Distance DEADZONE_DISTANCE = Units.Inches.of(1);
@@ -205,7 +205,7 @@ public final class Constants {
 
             // Smart Motion Constants
         public static final double kMaxVelocity = 300;
-        public static final double kMaxAcceleration = 300;
+        public static final double kMaxAcceleration = 3000;
         public static final double kMaxError = 2;
         
             // Encoder Constants
@@ -219,20 +219,20 @@ public final class Constants {
         public static final double kInputSensitivity = 10; // degrees per second
         
         // Presets
-        public static final Rotation2d CORAL_L1_ANGLE = new Rotation2d(0);
-        public static final Rotation2d CORAL_L2_ANGLE = new Rotation2d(0);
-        public static final Rotation2d CORAL_L3_ANGLE = new Rotation2d(0);
-        public static final Rotation2d CORAL_L4_ANGLE = new Rotation2d(0);
+        public static final Rotation2d CORAL_L1_ANGLE = Rotation2d.fromDegrees(95);
+        public static final Rotation2d CORAL_L2_ANGLE = Rotation2d.fromDegrees(95);
+        public static final Rotation2d CORAL_L3_ANGLE = Rotation2d.fromDegrees(95);
+        public static final Rotation2d CORAL_L4_ANGLE = Rotation2d.fromDegrees(95); // it was 90 before type shi
 
         // public static final Rotation2d CORAL_L1_ANGLE_FLIPPED = new Rotation2d(0);
         // public static final Rotation2d CORAL_L2_ANGLE_FLIPPED = new Rotation2d(0);
         // public static final Rotation2d CORAL_L3_ANGLE_FLIPPED = new Rotation2d(0);
         // public static final Rotation2d CORAL_L4_ANGLE_FLIPPED = new Rotation2d(0);
 
-        public static final Rotation2d CORAL_INTAKE_ANGLE = new Rotation2d(kMinRotationConstrained);
+        public static final Rotation2d CORAL_INTAKE_ANGLE = Rotation2d.fromDegrees(125);
         
-        public static final Rotation2d ALGAE_L2_ANGLE = new Rotation2d(0);
-        public static final Rotation2d ALGAE_L3_ANGLE = new Rotation2d(0);
+        public static final Rotation2d ALGAE_L2_ANGLE = Rotation2d.fromDegrees(-30); // was -45
+        public static final Rotation2d ALGAE_L3_ANGLE = Rotation2d.fromDegrees(-30); // was -45
         public static final Rotation2d ALGAE_GROUND_ANGLE = new Rotation2d(0);
         public static final Rotation2d ALGAE_ON_CORAL_ANGLE = new Rotation2d(0);
         public static final Rotation2d ALGAE_NET_ANGLE = new Rotation2d(0);

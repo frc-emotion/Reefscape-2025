@@ -38,6 +38,7 @@ public class Configs {
                     .countsPerRevolution(ElevatorConstants.kEncoderCPR);
                     // .positionConversionFactor(ElevatorConstants.inchesPerCount);
 
+
             ELEVATOR_CONFIG.closedLoop.maxMotion
                     .maxVelocity(ElevatorConstants.MAX_MOTOR_RPM)
                     .maxAcceleration(ElevatorConstants.MAX_MOTOR_ACCELERATION)

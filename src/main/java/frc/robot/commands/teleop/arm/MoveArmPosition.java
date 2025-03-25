@@ -14,12 +14,19 @@ public class MoveArmPosition extends Command {
 
     private final Supplier<Distance> elevatorHeightSupplier;
 
-    public MoveArmPosition(ArmSubsystem armSubsystem, Rotation2d targetRotation2d, Supplier<Distance> elevatorHeight) {
+    private boolean shouldFinish;
+
+    public MoveArmPosition(ArmSubsystem armSubsystem, Rotation2d targetRotation2d, Supplier<Distance> elevatorHeight, boolean shouldFinish) {
         this.m_ArmSubsystem = armSubsystem;
         this.targetRotation = targetRotation2d;
         this.elevatorHeightSupplier = elevatorHeight;
+        this.shouldFinish = shouldFinish;
         
         addRequirements(armSubsystem);
+    }
+
+    public MoveArmPosition(ArmSubsystem armSubsystem, Rotation2d targetRotation2d, Supplier<Distance> elevatorHeight) {
+        this(armSubsystem, targetRotation2d, elevatorHeight, false);
     }
 
     @Override
@@ -28,5 +35,10 @@ public class MoveArmPosition extends Command {
             targetRotation,
             elevatorHeightSupplier.get()
         );
+    }
+
+    @Override
+    public boolean isFinished() {
+        return shouldFinish && m_ArmSubsystem.isAtSetpoint();
     }
 }
