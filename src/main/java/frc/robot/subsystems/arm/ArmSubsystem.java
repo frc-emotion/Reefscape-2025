@@ -205,7 +205,7 @@ public class ArmSubsystem extends SubsystemBase {
                 Meter.of(0),
                 Meter.of(ArmConstants.kMaxHeightConstrained))) {
                     System.out.println("SALAMALKAUMWALAKAUM SALAAMMMMMMMMM WAIT WAIT WAI0WT WAIT AWIT WOAAAAAAO");
-            return Rotation2d.fromDegrees(MathUtil.clamp(targetRotation.getDegrees(), ArmConstants.kMinRotationConstrained, ArmConstants.kMaxRotationConstrained ));
+            return Rotation2d.fromDegrees(MathUtil.clamp(targetRotation.getDegrees(), ArmConstants.kMinRotationConstrained, ArmConstants.kMaxRotationConstrained )); // the problem gng frfr yurrrr
         } else {
             if (targetRotation.getDegrees() > ArmConstants.kMaxRotation) {
                 System.out.println("YURRRRRRR");

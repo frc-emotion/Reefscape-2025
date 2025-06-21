@@ -3,25 +3,25 @@
   "waypoints": [
     {
       "anchor": {
-        "x": 7.660356941869703,
-        "y": 3.8251456567796605
+        "x": 7.574926010129556,
+        "y": 4.373543190748871
       },
       "prevControl": null,
       "nextControl": {
-        "x": 7.296257605562339,
-        "y": 3.8251456567796605
+        "x": 7.324926010129556,
+        "y": 4.373543190748871
       },
       "isLocked": false,
       "linkedName": null
     },
     {
       "anchor": {
-        "x": 6.0438993809586865,
-        "y": 3.826307600635593
+        "x": 8.241,
+        "y": 4.36699623938162
       },
       "prevControl": {
-        "x": 6.320577684514431,
-        "y": 3.826307600635593
+        "x": 8.241,
+        "y": 4.11699623938162
       },
       "nextControl": null,
       "isLocked": false,
@@ -30,7 +30,7 @@
   ],
   "rotationTargets": [
     {
-      "waypointRelativePos": 0,
+      "waypointRelativePos": 1,
       "rotationDegrees": 0.0
     }
   ],
@@ -38,8 +38,8 @@
   "pointTowardsZones": [],
   "eventMarkers": [],
   "globalConstraints": {
-    "maxVelocity": 2.0,
-    "maxAcceleration": 2.0,
+    "maxVelocity": 1.0,
+    "maxAcceleration": 3.0,
     "maxAngularVelocity": 540.0,
     "maxAngularAcceleration": 720.0,
     "nominalVoltage": 12.0,
@@ -47,13 +47,13 @@
   },
   "goalEndState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 90.0
   },
   "reversed": false,
-  "folder": "From S2",
+  "folder": "Tuning",
   "idealStartingState": {
     "velocity": 0,
-    "rotation": 0.0
+    "rotation": 180.0
   },
   "useDefaultConstraints": false
 }

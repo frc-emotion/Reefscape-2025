@@ -1,0 +1,99 @@
+{
+  "version": "2025.0",
+  "waypoints": [
+    {
+      "anchor": {
+        "x": 2.854255280671295,
+        "y": 6.938524667245371
+      },
+      "prevControl": null,
+      "nextControl": {
+        "x": 3.104255280671295,
+        "y": 6.938524667245371
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 5.061075665509259,
+        "y": 6.813849826388889
+      },
+      "prevControl": {
+        "x": 5.061075665509259,
+        "y": 7.063849826388889
+      },
+      "nextControl": {
+        "x": 5.061075665509259,
+        "y": 5.414066711249912
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 4.935352647569443,
+        "y": 5.548175998263889
+      },
+      "prevControl": {
+        "x": 5.185352647569443,
+        "y": 5.548175998263889
+      },
+      "nextControl": {
+        "x": 4.629352647569443,
+        "y": 5.548175998263889
+      },
+      "isLocked": false,
+      "linkedName": null
+    },
+    {
+      "anchor": {
+        "x": 2.854255280671295,
+        "y": 5.568981312897246
+      },
+      "prevControl": {
+        "x": 3.104255280671295,
+        "y": 5.568981312897246
+      },
+      "nextControl": null,
+      "isLocked": false,
+      "linkedName": null
+    }
+  ],
+  "rotationTargets": [
+    {
+      "waypointRelativePos": 0.9295997191011243,
+      "rotationDegrees": 0.0
+    },
+    {
+      "waypointRelativePos": 1.3184628310593909,
+      "rotationDegrees": -90.0
+    },
+    {
+      "waypointRelativePos": 2.996821077447839,
+      "rotationDegrees": 180.0
+    }
+  ],
+  "constraintZones": [],
+  "pointTowardsZones": [],
+  "eventMarkers": [],
+  "globalConstraints": {
+    "maxVelocity": 1.0,
+    "maxAcceleration": 2.0,
+    "maxAngularVelocity": 540.0,
+    "maxAngularAcceleration": 720.0,
+    "nominalVoltage": 12.0,
+    "unlimited": false
+  },
+  "goalEndState": {
+    "velocity": 0,
+    "rotation": 180.0
+  },
+  "reversed": false,
+  "folder": "Tuning",
+  "idealStartingState": {
+    "velocity": 0,
+    "rotation": 0.0
+  },
+  "useDefaultConstraints": false
+}

@@ -30,7 +30,14 @@ public class MoveArmPosition extends Command {
     }
 
     @Override
+    public void end(boolean interrupted){
+        m_ArmSubsystem.stop();
+        System.out.println("Arm command ended");
+    }
+
+    @Override
     public void execute() {
+        System.out.println("Arm command ran");
         m_ArmSubsystem.setTargetAngle(
             targetRotation,
             elevatorHeightSupplier.get()

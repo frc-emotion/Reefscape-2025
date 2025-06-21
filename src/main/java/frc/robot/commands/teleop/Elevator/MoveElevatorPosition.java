@@ -24,16 +24,19 @@ public class MoveElevatorPosition extends Command {
 
     @Override
     public void execute() {
+        System.out.println("Elevator command ran");
         m_ElevatorSubsystem.setTargetHeight(targetDistance);
     }
 
     @Override
     public void end(boolean interrupted) {
+        System.out.println("elevator command ended");
         m_ElevatorSubsystem.stop();
     }
 
     @Override
     public boolean isFinished() {
-        return shouldFinish && m_ElevatorSubsystem.controllerAtSetpoint();
+        // return shouldFinish && m_ElevatorSubsystem.controllerAtSetpoint();
+        return shouldFinish && m_ElevatorSubsystem.isAtSetpoint();
     }
 }

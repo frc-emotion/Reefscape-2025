@@ -124,7 +124,7 @@ public final class Constants {
         public static final Distance kStartingHeight = Inches.of(0);
 
         public static final double MAX_MOTOR_RPM = 10000.0; // Need to change name of variable not RPM
-        public static final double MAX_MOTOR_ACCELERATION = 100; // TODO: Need to change name of variable not RPM
+        public static final double MAX_MOTOR_ACCELERATION = 80; // TODO: Need to change name of variable not RPM
 
         // Feedforward Constants
         public static final double kS = 0.0; // static gain in volts
@@ -133,14 +133,14 @@ public final class Constants {
         public static final double kA = 0; //0.03; // acceleration gain in mps^2
 
         // PID Constants
-        public static final double kP = 2.5;
+        public static final double kP = 2.0;
         public static final double kI = 0;
         public static final double kD = 0;
 
         public static final Distance CORAL_L1_HEIGHT = Units.Inches.of(0);
         public static final Distance CORAL_L2_HEIGHT = Units.Inches.of(8.6);
         public static final Distance CORAL_L3_HEIGHT = Units.Inches.of(18.1);
-        public static final Distance CORAL_L4_HEIGHT = Units.Inches.of(34.8);
+        public static final Distance CORAL_L4_HEIGHT = Units.Inches.of(29.5);
 
 
         public static final Distance ALGAE_PREP_NET = Units.Inches.of(61);
@@ -166,7 +166,7 @@ public final class Constants {
 
         public static final double GRABBER_CORAL_OUTTAKE = -0.65; // TBD
 
-        public static final double GRABBER_CORAL_INTAKE = GRABBER_CORAL_OUTTAKE / 2.0;
+        public static final double GRABBER_CORAL_INTAKE = GRABBER_CORAL_OUTTAKE / 2.5;
 
         public static final double GRABBER_ALGAE_SPEED = -0.65; // TBD
         public static final double GRABBER_ALGAE_HOLD_SPEED = 0.1; // TBD
@@ -189,7 +189,7 @@ public final class Constants {
         public static final double kMinRotation = -45; // Note: Aligns with hopper
         public static final double kMaxRotation = 125;
         public static final double kMaxHeightConstrained = 0; // The height in meters at which the arm is able to rotate fully. Should be roughly the length of the arm.
-        public static final double kMaxRotationConstrained = 0; // The max rotation while the arm is below the minimum full rotation height. Could be formulaic, but probably not necessary.
+        public static final double kMaxRotationConstrained = 95; // The max rotation while the arm is below the minimum full rotation height. Could be formulaic, but probably not necessary.
         public static final double kMinRotationConstrained = 0;
 
             // Feedforward Constants
@@ -222,12 +222,12 @@ public final class Constants {
         public static final Rotation2d CORAL_L1_ANGLE = Rotation2d.fromDegrees(95);
         public static final Rotation2d CORAL_L2_ANGLE = Rotation2d.fromDegrees(95);
         public static final Rotation2d CORAL_L3_ANGLE = Rotation2d.fromDegrees(95);
-        public static final Rotation2d CORAL_L4_ANGLE = Rotation2d.fromDegrees(95); // it was 90 before type shi
+        public static final Rotation2d CORAL_L4_ANGLE = Rotation2d.fromDegrees(100); // it was 90 before type shi
 
         // public static final Rotation2d CORAL_L1_ANGLE_FLIPPED = new Rotation2d(0);
         // public static final Rotation2d CORAL_L2_ANGLE_FLIPPED = new Rotation2d(0);
         // public static final Rotation2d CORAL_L3_ANGLE_FLIPPED = new Rotation2d(0);
-        // public static final Rotation2d CORAL_L4_ANGLE_FLIPPED = new Rotation2d(0);
+        // public s\tatic final Rotation2d CORAL_L4_ANGLE_FLIPPED = new Rotation2d(0);
 
         public static final Rotation2d CORAL_INTAKE_ANGLE = Rotation2d.fromDegrees(125);
         

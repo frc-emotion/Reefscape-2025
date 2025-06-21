@@ -26,6 +26,7 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
+import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import edu.wpi.first.wpilibj2.command.WaitCommand;
@@ -327,15 +328,20 @@ public class RobotContainer {
         // elevatorSubsystem.getSysIdDynamic(Direction.kForward)
         // );
         // operatorXbox.povDown().onTrue(
-        // elevatorSubsystem.getSysIdDynamic(Direction.kReverse)
+        // elevatorSubsystem.getSysIdDynami(cDirection.kReverse)
         // );
     }
 
     private void configureUI() {
         autoChooser.setDefaultOption("Taxi Auto", getAutonomousCommand("Straight Test"));
         addAutoOption("S4-B Score");  
-        addAutoOption("S2-G Score");
+        addAutoOption("S2-G Score"); 
 
+        addAutoOption("persian u");
+        addAutoOption("neev");
+        addAutoOption("neev-L3");
+        addAutoOption("neev-L4");
+        
         TabManager.getInstance().accessTab(SubsystemTab.AUTO).add(autoChooser);
     }
 
@@ -558,6 +564,15 @@ public class RobotContainer {
 
     public void initializeNamedCommands() {
         NamedCommands.registerCommand(
+                "DropCoral",
+                new SequentialCommandGroup(
+                        Commands.runOnce(()->grabberSubsystem.setTargetType(GrabType.CORAL)),
+                        
+                        new GrabberGrabCommand(grabberSubsystem)
+                )
+        );
+
+        NamedCommands.registerCommand(
             "PrepL4",
             MainCommandFactory.getAutoArmElevatorPositionCommand(
                 armSubsystem, 
@@ -575,6 +590,24 @@ public class RobotContainer {
                 ElevatorConstants.CORAL_L3_HEIGHT,
                 ArmConstants.CORAL_L3_ANGLE
             )
+        );
+
+        NamedCommands.registerCommand(
+                "MaintainL2",
+                MainCommandFactory.getArmElevatorPositionCommand(armSubsystem, elevatorSubsystem, ElevatorConstants.CORAL_L2_HEIGHT,
+                ArmConstants.CORAL_L2_ANGLE)
+        );
+
+        NamedCommands.registerCommand(
+                "MaintainL3",
+                MainCommandFactory.getArmElevatorPositionCommand(armSubsystem, elevatorSubsystem, ElevatorConstants.CORAL_L3_HEIGHT,
+                ArmConstants.CORAL_L3_ANGLE)
+        );
+
+        NamedCommands.registerCommand(
+                "MaintainL4",
+                MainCommandFactory.getArmElevatorPositionCommand(armSubsystem, elevatorSubsystem, ElevatorConstants.CORAL_L4_HEIGHT,
+                ArmConstants.CORAL_L4_ANGLE)
         );
 
         NamedCommands.registerCommand(
