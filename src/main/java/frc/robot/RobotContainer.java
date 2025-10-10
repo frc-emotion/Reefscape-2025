@@ -335,7 +335,8 @@ public class RobotContainer {
     private void configureUI() {
         autoChooser.setDefaultOption("Taxi Auto", getAutonomousCommand("Straight Test"));
         addAutoOption("S4-B Score");  
-        addAutoOption("S2-G Score"); 
+        addAutoOption("S2-G Score");
+        addAutoOption("meter test"); 
 
         addAutoOption("persian u");
         addAutoOption("neev");
