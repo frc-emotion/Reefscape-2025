@@ -54,6 +54,7 @@ import frc.robot.commands.functional.MainCommandFactory;
 
 import frc.robot.Constants;
 import frc.robot.Constants.ArmConstants;
+import frc.robot.Constants.AutonConstants;
 import frc.robot.Constants.ElevatorConstants;
 import frc.robot.Constants.OperatorConstants;
 import frc.robot.util.TabManager;
@@ -342,6 +343,8 @@ public class RobotContainer {
         addAutoOption("neev");
         addAutoOption("neev-L3");
         addAutoOption("neev-L4");
+
+        AutonConstants.initDashboard();
         
         TabManager.getInstance().accessTab(SubsystemTab.AUTO).add(autoChooser);
     }

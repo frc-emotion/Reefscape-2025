@@ -38,6 +38,7 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.Constants;
+import frc.robot.Constants.AutonConstants;
 
 // import frc.robot.Constants;
 // import frc.robot.subsystems.swervedrive.Vision.Cameras;
@@ -85,6 +86,7 @@ public class SwerveSubsystem extends SubsystemBase
    *
    * @param directory Directory of swerve drive config files.
    */
+  private PPHolonomicDriveController autoPathFollower;
   public SwerveSubsystem(File directory)
   {
     // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary objects being created.
@@ -175,6 +177,15 @@ public class SwerveSubsystem extends SubsystemBase
       config = RobotConfig.fromGUISettings();
 
       final boolean enableFeedforward = true;
+
+      autoPathFollower = // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
+      new PPHolonomicDriveController(
+          // PPHolonomicController is the built in path following controller for holonomic drive trains
+          AutonConstants.TRANSLATION_PID,
+          // Translation PID constants
+          AutonConstants.ANGLE_PID
+          // Rotation PID constants
+      );
       // Configure AutoBuilder last
       AutoBuilder.configure(
           this::getPose,
@@ -196,14 +207,8 @@ public class SwerveSubsystem extends SubsystemBase
               swerveDrive.setChassisSpeeds(speedsRobotRelative);
             }
           },
-          // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
-          new PPHolonomicDriveController(
-              // PPHolonomicController is the built in path following controller for holonomic drive trains
-              new PIDConstants(0.005, 0.0, 0.0),
-              // Translation PID constants
-              new PIDConstants(5.0, 0.0, 0.0)
-              // Rotation PID constants
-          ),
+          autoPathFollower
+          ,
           config,
           // The robot configuration
           () -> {

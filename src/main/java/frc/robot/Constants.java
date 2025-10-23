@@ -10,6 +10,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import com.pathplanner.lib.config.PIDConstants;
+
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation3d;
@@ -21,6 +23,7 @@ import edu.wpi.first.units.measure.Mass;
 import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Milliseconds;
@@ -55,13 +58,45 @@ public final class Constants {
 
     // Maximum speed of the robot in meters per second, used to limit acceleration.
 
-    // public static final class AutonConstants
-    // {
-    //
-    // public static final PIDConstants TRANSLATION_PID = new PIDConstants(0.7, 0,
-    // 0);
-    // public static final PIDConstants ANGLE_PID = new PIDConstants(0.4, 0, 0.01);
-    // }
+    public static final class AutonConstants
+{
+    // Default values
+    private static final double DEFAULT_TRANSLATION_P = 0.005;
+    private static final double DEFAULT_TRANSLATION_I = 0.0;
+    private static final double DEFAULT_TRANSLATION_D = 0.0;
+    
+    private static final double DEFAULT_ANGLE_P = 5.0;
+    private static final double DEFAULT_ANGLE_I = 0.0;
+    private static final double DEFAULT_ANGLE_D = 0.0;
+    
+    // Mutable PIDConstants objects
+    public static final PIDConstants TRANSLATION_PID = new PIDConstants(
+        DEFAULT_TRANSLATION_P, DEFAULT_TRANSLATION_I, DEFAULT_TRANSLATION_D
+    );
+    public static final PIDConstants ANGLE_PID = new PIDConstants(
+        DEFAULT_ANGLE_P, DEFAULT_ANGLE_I, DEFAULT_ANGLE_D
+    );
+    
+    public static void initDashboard() {
+        SmartDashboard.putNumber("Auto/Translation/P", DEFAULT_TRANSLATION_P);
+        SmartDashboard.putNumber("Auto/Translation/I", DEFAULT_TRANSLATION_I);
+        SmartDashboard.putNumber("Auto/Translation/D", DEFAULT_TRANSLATION_D);
+        
+        SmartDashboard.putNumber("Auto/Angle/P", DEFAULT_ANGLE_P);
+        SmartDashboard.putNumber("Auto/Angle/I", DEFAULT_ANGLE_I);
+        SmartDashboard.putNumber("Auto/Angle/D", DEFAULT_ANGLE_D);
+    }
+    
+    public static void updateFromDashboard() {
+        TRANSLATION_PID.kP = SmartDashboard.getNumber("Auto/Translation/P", DEFAULT_TRANSLATION_P);
+        TRANSLATION_PID.kI = SmartDashboard.getNumber("Auto/Translation/I", DEFAULT_TRANSLATION_I);
+        TRANSLATION_PID.kD = SmartDashboard.getNumber("Auto/Translation/D", DEFAULT_TRANSLATION_D);
+        
+        ANGLE_PID.kP = SmartDashboard.getNumber("Auto/Angle/P", DEFAULT_ANGLE_P);
+        ANGLE_PID.kI = SmartDashboard.getNumber("Auto/Angle/I", DEFAULT_ANGLE_I);
+        ANGLE_PID.kD = SmartDashboard.getNumber("Auto/Angle/D", DEFAULT_ANGLE_D);
+    }
+}
 
     public static final class DrivebaseConstants {
 
