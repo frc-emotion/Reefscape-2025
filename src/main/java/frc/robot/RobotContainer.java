@@ -344,7 +344,7 @@ public class RobotContainer {
         addAutoOption("neev-L3");
         addAutoOption("neev-L4");
 
-        AutonConstants.initDashboard();
+        // AutonConstants.initDashboard();
         
         TabManager.getInstance().accessTab(SubsystemTab.AUTO).add(autoChooser);
     }

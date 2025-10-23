@@ -45,7 +45,7 @@ public class Robot extends TimedRobot {
     public void robotPeriodic() {
         // Switch thread to high priority to improve loop timing
         Threads.setCurrentThreadPriority(true, 99);
-        Constants.AutonConstants.updateFromDashboard();
+        // Constants.AutonConstants.updateFromDashboard();
         CommandScheduler.getInstance().run();
 
         // Return to normal thread priority     
