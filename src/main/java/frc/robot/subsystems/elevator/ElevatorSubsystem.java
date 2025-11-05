@@ -1,128 +1,105 @@
 package frc.robot.subsystems.elevator;
 
-import static edu.wpi.first.units.Units.Degrees;
-import static edu.wpi.first.units.Units.DegreesPerSecond;
 import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Meter;
 import static edu.wpi.first.units.Units.Meters;
 import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.Volts;
+import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+import static edu.wpi.first.units.Units.Amps;
+import static edu.wpi.first.units.Units.Pounds;
+import static edu.wpi.first.units.Units.Seconds;
 
-import com.revrobotics.RelativeEncoder;
-import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.SparkBase.ControlType;
+import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkBase.PersistMode;
 import com.revrobotics.spark.SparkBase.ResetMode;
-import com.revrobotics.spark.ClosedLoopSlot;
-import com.revrobotics.spark.SparkClosedLoopController;
-import com.revrobotics.spark.SparkMax;
 import com.revrobotics.spark.SparkLowLevel.MotorType;
-import com.revrobotics.spark.config.SparkFlexConfig;
-import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.controller.ProfiledPIDController;
-import edu.wpi.first.math.trajectory.TrapezoidProfile;
-import edu.wpi.first.math.trajectory.TrapezoidProfile.Constraints;
+import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.units.measure.LinearVelocity;
-import edu.wpi.first.units.measure.MutAngle;
-import edu.wpi.first.units.measure.MutAngularVelocity;
-import edu.wpi.first.units.measure.MutDistance;
-import edu.wpi.first.units.measure.MutVoltage;
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-import edu.wpi.first.wpilibj.sysid.SysIdRoutineLog;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import frc.robot.config.subsystems.ElevatorConfig;
 import frc.robot.constants.PortMap;
 import frc.robot.constants.subsystems.ElevatorConstants;
-import frc.robot.util.helpers.PIDHelper;
 import frc.robot.util.diagnostics.Faults.FaultManager;
 import frc.robot.util.diagnostics.Faults.FaultTypes.FaultType;
+import yams.gearing.GearBox;
+import yams.gearing.MechanismGearing;
+import yams.mechanisms.positional.Elevator;
+import yams.mechanisms.config.ElevatorConfig;
+import yams.motorcontrollers.SmartMotorController;
+import yams.motorcontrollers.SmartMotorControllerConfig;
+import yams.motorcontrollers.SmartMotorControllerConfig.ControlMode;
+import yams.motorcontrollers.SmartMotorControllerConfig.MotorMode;
+import yams.motorcontrollers.SmartMotorControllerConfig.TelemetryVerbosity;
+import yams.motorcontrollers.local.SparkWrapper;
 
 @Logged
 public class ElevatorSubsystem extends SubsystemBase {
-    private SparkMax driveMotor, driveMotor2;
-
-    private Object controller;
-
-    private RelativeEncoder boreEncoder;
-
-    private double currentGoal;
-
-    private SparkMaxConfig config = new SparkMaxConfig();
-
-    private final PIDHelper pidHelper;
-
-    private final ElevatorFeedforward feedforward;
-
-    private final SysIdRoutine sysIDElevatorRoutine;
-    private MutVoltage appliedVoltageLead = Volts.mutable(0);
-    private MutVoltage appliedVoltageFollow = Volts.mutable(0);
-    private MutDistance position = Meters.mutable(0);
+    private final SparkMax driveMotor, driveMotor2;
+    private final SmartMotorController motor;
+    private final Elevator elevator;
+    
+    private Distance targetHeight = ElevatorConstants.kStartingHeight;
 
     public ElevatorSubsystem(boolean useTrapezoidal) {
+        // Create raw motors
         driveMotor = new SparkMax(PortMap.CANID.ELEVATOR_DRIVE_LEADER.getId(), MotorType.kBrushless);
         driveMotor2 = new SparkMax(PortMap.CANID.ELEVATOR_DRIVE_FOLLOWER.getId(), MotorType.kBrushless);
 
-        driveMotor.configure(ElevatorConfig.ELEVATOR_CONFIG, ResetMode.kResetSafeParameters,
-                PersistMode.kPersistParameters);
-
-        driveMotor2.configure(
-                ElevatorConfig.ELEVATOR_FOLLOWER_CONFIG,
-                ResetMode.kResetSafeParameters,
-                PersistMode.kPersistParameters);
-
-        feedforward = new ElevatorFeedforward(
-                ElevatorConstants.kS,
-                ElevatorConstants.kG,
-                ElevatorConstants.kV,
-                ElevatorConstants.kA);
-
-        if (useTrapezoidal) {
-            controller = new ProfiledPIDController(ElevatorConstants.kP, ElevatorConstants.kI, ElevatorConstants.kD,
-                    new TrapezoidProfile.Constraints(ElevatorConstants.MAX_MOTOR_RPM,
-                            ElevatorConstants.MAX_MOTOR_ACCELERATION));
-            ((ProfiledPIDController) controller).setTolerance(0.1);
-        } else {
-            controller = driveMotor.getClosedLoopController();
-        }
-
-        boreEncoder = driveMotor.getEncoder();
+        // Configure YAMS SmartMotorController
+        motor = new SparkWrapper(
+            driveMotor,
+            DCMotor.getNEO(2), // 2 NEO motors
+            new SmartMotorControllerConfig(this)
+                .withControlMode(ControlMode.CLOSED_LOOP)
+                .withClosedLoopController(
+                    ElevatorConstants.kP,
+                    ElevatorConstants.kI,
+                    ElevatorConstants.kD,
+                    ElevatorConstants.kMaxVelocity,
+                    ElevatorConstants.kMaxAcceleration
+                )
+                .withFeedforward(new ElevatorFeedforward(
+                    ElevatorConstants.kS,
+                    ElevatorConstants.kG,
+                    ElevatorConstants.kV,
+                    ElevatorConstants.kA
+                ))
+                .withGearing(ElevatorConstants.kGearing)
+                .withSoftLimit(
+                    Meters.of(ElevatorConstants.kMinHeight.in(Inches) / 12.0),
+                    Meters.of(ElevatorConstants.kMaxHeight.in(Inches) / 12.0)
+                )
+                .withIdleMode(MotorMode.BRAKE)
+                .withTelemetry("Elevator", TelemetryVerbosity.HIGH)
+                .withStatorCurrentLimit(Amps.of(ElevatorConstants.kSmartCurrentLimit))
+                .withClosedLoopRampRate(Seconds.of(0.25))
+                .withOpenLoopRampRate(Seconds.of(0.25))
+                .withFollower(driveMotor2, false) // Add follower motor
+        );
+        
+        // Create YAMS Elevator mechanism
+        elevator = new Elevator(
+            new ElevatorConfig(motor)
+                .withCarriageMass(ElevatorConstants.kCarriageMass)
+                .withDrumRadius(Meters.of(ElevatorConstants.kDrumRadius.in(Inches) / 12.0))
+                .withHardLimit(
+                    Meters.of(ElevatorConstants.kMinHeight.in(Inches) / 12.0),
+                    Meters.of(ElevatorConstants.kMaxHeight.in(Inches) / 12.0)
+                )
+                .withStartingPosition(Meters.of(ElevatorConstants.kStartingHeight.in(Inches) / 12.0))
+                .withTelemetry("ElevatorMechanism", TelemetryVerbosity.HIGH)
+        );
 
         FaultManager.register(driveMotor);
         FaultManager.register(driveMotor2);
-
-        pidHelper = new PIDHelper(
-                "Elevator",
-                ElevatorConstants.kP,
-                ElevatorConstants.kI,
-                ElevatorConstants.kD,
-                (newP) -> config.closedLoop.p(newP),
-                (newI) -> config.closedLoop.i(newI),
-                (newD) -> config.closedLoop.d(newD),
-                ElevatorConstants.MAX_MOTOR_RPM,
-                ElevatorConstants.MAX_MOTOR_ACCELERATION,
-                2,
-                (newMaxVel) -> config.closedLoop.maxMotion.maxVelocity(newMaxVel),
-                (newMaxAccel) -> config.closedLoop.maxMotion.maxAcceleration(newMaxAccel),
-                (newAllowedError) -> config.closedLoop.maxMotion.allowedClosedLoopError(newAllowedError));
-
         safetyChecks();
-
-        sysIDElevatorRoutine = new SysIdRoutine(
-            new SysIdRoutine.Config(),
-            new SysIdRoutine.Mechanism(volts -> {setVoltage(volts.in(Volts));}, this::logElevator, this)
-        );
     }
 
     private void safetyChecks() {
@@ -157,72 +134,25 @@ public class ElevatorSubsystem extends SubsystemBase {
 
     @Override
     public void periodic() {
-        pidHelper.update();
-        // Elevator 1 = 17 - Leader
-        SmartDashboard.putNumber("Elevator/Leader/Output", driveMotor.get());
-        SmartDashboard.putNumber("Elevator/Leader/Voltage", driveMotor.getBusVoltage());
-        SmartDashboard.putNumber("Elevator/Leader/Current", driveMotor.getOutputCurrent());
-        SmartDashboard.putNumber("Elevator/Leader/Temp", driveMotor.getMotorTemperature());
-        SmartDashboard.putNumber("Elevator/Leader/Target", currentGoal);
-        SmartDashboard.putNumber("Elevator/Leader/Position", getPosition());
-        SmartDashboard.putBoolean("Elevator/Leader/PersianGoal", controllerAtSetpoint());
-
-        // Elevator 2 = 18 - Follower
-        SmartDashboard.putNumber("Elevator/Follower/Output", driveMotor2.get());
-        SmartDashboard.putNumber("Elevator/Follower/Voltage", driveMotor2.getBusVoltage());
-        SmartDashboard.putNumber("Elevator/Follower/Current", driveMotor2.getOutputCurrent());
-        SmartDashboard.putNumber("Elevator/Follower/Temp", driveMotor2.getMotorTemperature());
+        // YAMS handles telemetry automatically
+        elevator.updateTelemetry();
+    }
+    
+    @Override
+    public void simulationPeriodic() {
+        // YAMS handles physics simulation
+        elevator.simIterate();
     }
 
     public void setVoltage(double volts) {
-        driveMotor.setVoltage(volts);
+        motor.setVoltage(volts);
     }
 
-    public void logElevator(SysIdRoutineLog log) {
-        log.motor("elevator-lead-motor")
-            .voltage(
-                appliedVoltageLead.mut_replace(
-                    getVoltage(true), Volts
-                )
-            )
-            .linearPosition(
-                position.mut_replace(
-                    getHeight()
-                )
-            );
-
-        log.motor("elevator-follow-motor")
-            .voltage(
-                appliedVoltageFollow.mut_replace(
-                    getVoltage(false), Volts
-                )
-            );
-            
-    }
-
-    public Command getSysIdDynamic(Direction direction) {
-        return sysIDElevatorRoutine.dynamic(direction);
-    }
-
-    public Command getSysIdQuasistatic(Direction direction) {
-        return sysIDElevatorRoutine.quasistatic(direction);
-    }
-
-    public void changeMaxMotion(double mv, double ma, double ae) {
-        config.closedLoop.maxMotion.maxVelocity(mv).maxAcceleration(ma).allowedClosedLoopError(ae);
-        driveMotor.configure(config, ResetMode.kResetSafeParameters,
-                PersistMode.kPersistParameters);
-    }
-
-    public void changePID(double p, double i, double d) {
-        config.closedLoop.pid(p, i, d);
-        driveMotor.configure(config, ResetMode.kResetSafeParameters,
-                PersistMode.kPersistParameters);
-    }
-
-    public void configure() {
-        driveMotor.configure(config, ResetMode.kResetSafeParameters,
-                PersistMode.kPersistParameters);
+    /**
+     * Gets the YAMS SysId routine for characterization
+     */
+    public Command getSysIdRoutine() {
+        return elevator.sysId();
     }
 
     public double getTemperature(boolean motor1) {
@@ -247,61 +177,28 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
 
     public void set(double speed) {
-        driveMotor.set(MathUtil.clamp(speed, -1, 1));
+        motor.set(speed);
     }
 
     public void setWithFeedforward(double speed) {
-        double inVoltage = speed * 12.0;
-        double ff = feedforward.calculate(getVelocity().in(MetersPerSecond));
-
-        driveMotor.setVoltage(
-            MathUtil.clamp(inVoltage + ff, -RobotController.getBatteryVoltage(), RobotController.getBatteryVoltage())
-        );
+        // YAMS handles feedforward automatically
+        motor.setVoltage(speed * 12.0);
     }
 
     public void stop() {
-        driveMotor.stopMotor();
-    }
-
-    public void reachGoal(double goal) {
-        
-        double voltsOut = MathUtil.clamp(
-                ((ProfiledPIDController) controller).calculate(getPosition(), goal) +
-                        feedforward.calculate(getVelocity().in(MetersPerSecond)),
-                -RobotController.getBatteryVoltage(),
-                RobotController.getBatteryVoltage());
-        
-        System.out.println("MEOW " + voltsOut);
-        driveMotor.setVoltage(voltsOut);
-    }
-
-    public void setTargetPosition(double position) {
-        currentGoal = position;
-        reachGoal(position);
+        motor.set(0);
     }
 
     public void setTargetHeight(Distance height) {
-        setTargetPosition(height.in(Inches));
+        targetHeight = height;
+        elevator.setHeight(Meters.of(height.in(Inches) / 12.0)).schedule();
     }
 
     public boolean isAtSetpoint() {
-        return (getHeight()
-                .compareTo(
-                        getTargetHeight().minus(Units.Inches.of(ElevatorConstants.TOLERABLE_ERROR))) > 0)
-                &&
-                getHeight().compareTo(getTargetHeight().plus(Units.Inches.of(ElevatorConstants.TOLERABLE_ERROR))) < 0;
-    }
-    
-    public boolean controllerAtSetpoint() {
-        return ((ProfiledPIDController) controller).atSetpoint();
-    }
-
-    public boolean isAtSetpoint(double target) {
-        return (getHeight()
-                .compareTo(
-                        Distance.ofBaseUnits(target, Inches).minus(Units.Inches.of(ElevatorConstants.TOLERABLE_ERROR))) > 0)
-                &&
-                getHeight().compareTo(Distance.ofBaseUnits(target, Inches).plus(Units.Inches.of(ElevatorConstants.TOLERABLE_ERROR))) < 0;
+        return elevator.isNear(
+            Meters.of(targetHeight.in(Inches) / 12.0), 
+            Meters.of(ElevatorConstants.TOLERABLE_ERROR / 12.0)
+        );
     }
 
     public Trigger atHeight(double height, double tolerance) {
@@ -310,32 +207,28 @@ public class ElevatorSubsystem extends SubsystemBase {
                 tolerance));
     }
 
-    public double getPosition() {
-        return boreEncoder.getPosition() * ElevatorConstants.inchesPerCount;
-    }
-
     public Distance getHeight() {
-        return Distance.ofBaseUnits(getPosition(), Units.Inches);
-    }
-
-    public double getTargetPosition() {
-        return currentGoal;
+        return Inches.of(motor.getPosition().in(Meters) * 12.0); // Convert meters back to inches
     }
 
     public Distance getTargetHeight() {
-        return Distance.ofBaseUnits(currentGoal, Units.Inches);
+        return targetHeight;
     }
 
     public LinearVelocity getVelocity() {
-        return LinearVelocity.ofBaseUnits(boreEncoder.getVelocity(), Units.InchesPerSecond);
+        return motor.getVelocity();
     }
 
     public void resetSensorPosition(Distance setpoint) {
-        boreEncoder.setPosition(setpoint.in(Inches));
+        // YAMS handles encoder position
+        motor.setPosition(Meters.of(setpoint.in(Inches) / 12.0));
     }
-
-    public static double convertDistanceToEncoderCounts(Distance height) {
-        return height.in(Inches) / ElevatorConstants.inchesPerCount;
+    
+    /**
+     * Returns a command to set the elevator to a specific height
+     */
+    public Command setHeight(Distance height) {
+        return elevator.setHeight(Meters.of(height.in(Inches) / 12.0));
     }
 
 }

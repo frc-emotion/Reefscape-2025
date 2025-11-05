@@ -6,7 +6,10 @@ package frc.robot.constants.subsystems;
 
 import edu.wpi.first.units.Units;
 import edu.wpi.first.units.measure.Distance;
+import edu.wpi.first.units.measure.LinearVelocity;
 import edu.wpi.first.units.measure.Mass;
+import yams.gearing.GearBox;
+import yams.gearing.MechanismGearing;
 
 import static edu.wpi.first.units.Units.Inches;
 import static edu.wpi.first.units.Units.Pounds;
@@ -15,6 +18,14 @@ import static edu.wpi.first.units.Units.Pounds;
  * Constants for the elevator subsystem including physical dimensions, limits, and preset positions.
  */
 public final class ElevatorConstants {
+
+    /** The compound gear ratio of the climb: (3/1) * (4/1) */
+    public static final MechanismGearing kGearing = new MechanismGearing(
+            new GearBox(
+                new double[] {
+                    3, // 3:1
+                    4 // 4:1    
+        }));
     
     // Control Constants
     public static final double TOLERABLE_ERROR = 1.5; // inches
@@ -76,6 +87,8 @@ public final class ElevatorConstants {
     public static final int CURRENT_SPIKE_THRESHOLD = 20; // amps
     public static final int NORMAL_OPERATION_TEMP = 40; // celsius
     public static final int TEMP_SPIKE_THRESHOLD = 20; // celsius
+
+    public static LinearVelocity kMaxVelocity ;
 
     private ElevatorConstants() {
         throw new UnsupportedOperationException("This is a utility class!");

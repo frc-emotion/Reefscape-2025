@@ -20,19 +20,12 @@ import frc.robot.constants.subsystems.ArmConstants;
 import frc.robot.constants.subsystems.ClimbConstants;
 import frc.robot.constants.subsystems.ElevatorConstants;
 import frc.robot.game.Task;
-import frc.robot.game.GameElement.AlgaeLevel;
-import frc.robot.game.GameElement.CoralLevel;
-import frc.robot.game.tasks.PickupAlgae;
-import frc.robot.game.tasks.PickupCoral;
 import frc.robot.game.tasks.PickupTask;
-import frc.robot.game.tasks.ScoreAlgae;
-import frc.robot.game.tasks.ScoreCoral;
 import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.climb.ClimbSubsystem.ClimbState;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.grabber.GrabberSubsystem;
-import frc.robot.subsystems.grabber.GrabberSubsystem.GrabType;
 
 public class MainCommandFactory {
     /**
@@ -79,49 +72,26 @@ public class MainCommandFactory {
         // ));
     }
 
+    /**
+     * Gets a command to prepare the arm and elevator for placing a game piece.
+     * Uses polymorphism to determine positions based on task type.
+     * 
+     * @param armSubsystem The arm subsystem
+     * @param elevatorSubsystem The elevator subsystem
+     * @param scoreTask The scoring task (determines positions)
+     * @return Command to move to scoring position, or Commands.none() if task is invalid
+     */
     public static Command getPlacePrepCommand(
             ArmSubsystem armSubsystem,
             ElevatorSubsystem elevatorSubsystem,
             Task scoreTask) {
-        Distance targetElevatorHeight = Inches.of(0);
-        Rotation2d targetArmAngle = new Rotation2d();
-
-        if (scoreTask instanceof ScoreCoral) {
-            ScoreCoral scoreCoral = (ScoreCoral) scoreTask;
-
-            switch (scoreCoral.level) {
-                case L1:
-                    targetElevatorHeight = ElevatorConstants.CORAL_L1_HEIGHT;
-                    targetArmAngle = ArmConstants.CORAL_L1_ANGLE;
-                    break;
-                case L2:
-                    targetElevatorHeight = ElevatorConstants.CORAL_L2_HEIGHT;
-                    targetArmAngle = ArmConstants.CORAL_L2_ANGLE;
-                    break;
-                case L3:
-                    targetElevatorHeight = ElevatorConstants.CORAL_L3_HEIGHT;
-                    targetArmAngle = ArmConstants.CORAL_L3_ANGLE;
-                    break;
-                case L4:
-                    targetElevatorHeight = ElevatorConstants.CORAL_L4_HEIGHT;
-                    targetArmAngle = ArmConstants.CORAL_L4_ANGLE;
-                    break;
-            }
-
-        } else if (scoreTask instanceof ScoreAlgae) {
-            ScoreAlgae scoreAlgae = (ScoreAlgae) scoreTask;
-
-            switch (scoreAlgae.scorePosition) {
-                case P:
-                    targetElevatorHeight = ElevatorConstants.ALGAE_PREP_PROCESSOR_HEIGHT;
-                    targetArmAngle = ArmConstants.ALGAE_PRO_ANGLE;
-                    break;
-                case R1, R2, R3:
-                    targetElevatorHeight = ElevatorConstants.ALGAE_PREP_NET;
-                    targetArmAngle = ArmConstants.ALGAE_NET_ANGLE;
-                    break;
-            }
-        } else {
+        
+        // Use polymorphism to get positions from the task
+        Distance targetElevatorHeight = scoreTask.getElevatorHeight();
+        Rotation2d targetArmAngle = scoreTask.getArmAngle();
+        
+        // Return none if invalid task (null positions)
+        if (targetElevatorHeight == null || targetArmAngle == null) {
             return Commands.none();
         }
 
@@ -141,34 +111,28 @@ public class MainCommandFactory {
                         new GrabberPlaceCommand(grabberSubsystem)));
     }
 
+    /**
+     * Gets a command to intake/pickup a game piece.
+     * Moves arm/elevator to pickup position, then activates grabber.
+     * 
+     * @param armSubsystem The arm subsystem
+     * @param elevatorSubsystem The elevator subsystem
+     * @param grabberSubsystem The grabber subsystem
+     * @param pickupTask The pickup task (determines positions)
+     * @return Command sequence for pickup, or Commands.none() if task is invalid
+     */
     public static Command getIntakeCommand(
             ArmSubsystem armSubsystem,
             ElevatorSubsystem elevatorSubsystem,
             GrabberSubsystem grabberSubsystem,
             PickupTask pickupTask) {
-        Distance targetElevatorHeight = null;
-        Rotation2d targetArmRotation = null;
-        GrabType targetGrabType = GrabType.NONE;
-
-        if (pickupTask instanceof PickupCoral) {
-            targetElevatorHeight = ElevatorConstants.CORAL_INTAKE_HEIGHT;
-            targetArmRotation = ArmConstants.CORAL_INTAKE_ANGLE;
-            targetGrabType = GrabType.CORAL;
-        } else if (pickupTask instanceof PickupAlgae) {
-            PickupAlgae pickupAlgae = (PickupAlgae) pickupTask;
-            targetGrabType = GrabType.ALGAE;
-
-            switch (pickupAlgae.targetAlgaeLevel) {
-                case L2:
-                    targetElevatorHeight = ElevatorConstants.ALGAE_L2_CLEANING;
-                    targetArmRotation = ArmConstants.ALGAE_L2_ANGLE;
-                    break;
-                case L3:
-                    targetElevatorHeight = ElevatorConstants.ALGAE_L3_CLEANING;
-                    targetArmRotation = ArmConstants.ALGAE_L3_ANGLE;
-                    break;
-            }
-        } else {
+        
+        // Use polymorphism to get positions from the task
+        Distance targetElevatorHeight = pickupTask.getElevatorHeight();
+        Rotation2d targetArmRotation = pickupTask.getArmAngle();
+        
+        // Return none if invalid task (null positions)
+        if (targetElevatorHeight == null || targetArmRotation == null) {
             return Commands.none();
         }
 

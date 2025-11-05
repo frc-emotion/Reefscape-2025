@@ -4,7 +4,13 @@
 
 package frc.robot.constants.subsystems;
 
+import static edu.wpi.first.units.Units.MetersPerSecond;
+import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
+
 import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.units.measure.LinearAcceleration;
+import edu.wpi.first.units.measure.LinearVelocity;
+import yams.gearing.GearBox;
 
 /**
  * Constants for the arm subsystem including physical limits, PID values, and preset positions.
@@ -15,6 +21,8 @@ public final class ArmConstants {
     public static final int kSmartCurrentLimit = 45;
     public static final double kSecondaryCurrentLimit = 45;
     public static final double kMaxOutput = 1;
+
+    public static final GearBox gearing = GearBox.fromReductionStages(null);
 
     // Physical Constraints
     /** Minimum arm rotation in degrees (aligns with hopper) */
@@ -40,8 +48,8 @@ public final class ArmConstants {
     public static final double kD = 0;
 
     // Smart Motion Constants
-    public static final double kMaxVelocity = 300; // degrees per second
-    public static final double kMaxAcceleration = 3000; // degrees per second²
+    public static final LinearVelocity kMaxVelocity = MetersPerSecond.of(2);
+    public static final LinearAcceleration kMaxAcceleration = MetersPerSecondPerSecond.of(5);
     public static final double kMaxError = 2; // degrees
 
     // Encoder Constants

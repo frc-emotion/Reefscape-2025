@@ -4,6 +4,7 @@ import frc.robot.game.Task;
 
 /**
  * Base class for pickup tasks.
+ * Subclasses must implement position methods for specific game elements.
  */
-public class PickupTask extends Task {
+public abstract class PickupTask extends Task {
 }
