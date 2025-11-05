@@ -37,10 +37,9 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
-import frc.robot.Constants;
-import frc.robot.Constants.AutonConstants;
+import frc.robot.constants.AutoConstants;
 
-// import frc.robot.Constants;
+// // import frc.robot.Constants; // Deprecated
 // import frc.robot.subsystems.swervedrive.Vision.Cameras;
 import java.io.File;
 import java.io.IOException;
@@ -181,9 +180,9 @@ public class SwerveSubsystem extends SubsystemBase
       autoPathFollower = // Method that will drive the robot given ROBOT RELATIVE ChassisSpeeds. Also optionally outputs individual module feedforwards
       new PPHolonomicDriveController(
           // PPHolonomicController is the built in path following controller for holonomic drive trains
-          AutonConstants.TRANSLATION_PID,
+          AutoConstants.TRANSLATION_PID,
           // Translation PID constants
-          AutonConstants.ANGLE_PID
+          AutoConstants.ANGLE_PID
           // Rotation PID constants
       );
       // Configure AutoBuilder last

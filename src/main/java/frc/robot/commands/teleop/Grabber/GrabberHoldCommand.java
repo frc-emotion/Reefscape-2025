@@ -6,7 +6,7 @@ import java.util.function.Supplier;
 
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.grabber.GrabberSubsystem;
-import frc.robot.Constants.GrabberConstants;
+import frc.robot.constants.subsystems.GrabberConstants;
 
 public class GrabberHoldCommand extends Command {
     private final GrabberSubsystem grabberSubsystem;

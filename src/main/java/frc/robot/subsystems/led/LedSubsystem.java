@@ -6,7 +6,8 @@ import edu.wpi.first.wpilibj.AddressableLED;
 import edu.wpi.first.wpilibj.AddressableLEDBuffer;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
+import frc.robot.constants.PortMap;
+import frc.robot.constants.subsystems.LEDConstants;
 
 
 public class LedSubsystem extends SubsystemBase{ // led test
@@ -15,8 +16,8 @@ public class LedSubsystem extends SubsystemBase{ // led test
     private final AddressableLEDBuffer ledBuffer;
 
     public LedSubsystem () {
-        led = new AddressableLED(Constants.LEDConstants.LED_PORT);
-        ledBuffer = new AddressableLEDBuffer(Constants.LEDConstants.LED_COUNT);
+        led = new AddressableLED(LEDConstants.LED_PORT);
+        ledBuffer = new AddressableLEDBuffer(LEDConstants.LED_COUNT);
         led.setLength(ledBuffer.getLength());
 
         led.setData(ledBuffer);
@@ -52,7 +53,7 @@ public class LedSubsystem extends SubsystemBase{ // led test
 
     public void setRainbow() {
         for (int i = 0; i < ledBuffer.getLength(); i++) {
-            int hue = (Constants.LEDConstants.rainbowFirstPixelHue + (i * 180 / ledBuffer.getLength())) % 180;
+            int hue = (LEDConstants.rainbowFirstPixelHue + (i * 180 / ledBuffer.getLength())) % 180;
             ledBuffer.setHSV(i, hue, 255, 128);
         }
     

@@ -1,4 +1,4 @@
-package frc.robot.util.Faults;
+package frc.robot.util.diagnostics.Faults;
 
 import com.revrobotics.spark.SparkBase.Faults;
 

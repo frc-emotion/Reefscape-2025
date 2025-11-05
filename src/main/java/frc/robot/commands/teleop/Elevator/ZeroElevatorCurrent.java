@@ -5,7 +5,7 @@ import java.util.function.Supplier;
 import edu.wpi.first.units.Units;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.ElevatorConstants;
+import frc.robot.constants.subsystems.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 
 public class ZeroElevatorCurrent extends Command {

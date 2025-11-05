@@ -40,14 +40,14 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Mechanism;
-import frc.robot.Constants.ArmConstants;
-import frc.robot.Constants.ElevatorConstants;
-import frc.robot.Constants.GrabberConstants;
-import frc.robot.Constants.Ports;
-import frc.robot.util.PIDHelper;
-import frc.robot.util.Configs.ArmConfigs;
-import frc.robot.util.Faults.FaultManager;
-import frc.robot.util.Faults.FaultTypes.FaultType;
+import frc.robot.config.subsystems.ArmConfig;
+import frc.robot.constants.PortMap;
+import frc.robot.constants.subsystems.ArmConstants;
+import frc.robot.constants.subsystems.ElevatorConstants;
+import frc.robot.constants.subsystems.GrabberConstants;
+import frc.robot.util.helpers.PIDHelper;
+import frc.robot.util.diagnostics.Faults.FaultManager;
+import frc.robot.util.diagnostics.Faults.FaultTypes.FaultType;
 
 @Logged
 public class ArmSubsystem extends SubsystemBase {
@@ -74,9 +74,9 @@ public class ArmSubsystem extends SubsystemBase {
     private MutAngularVelocity angularVelocity = DegreesPerSecond.mutable(0);
 
     public ArmSubsystem() {
-        armMotor = new SparkMax(Ports.CANID.ARM_ANGLE.getId(), MotorType.kBrushless);
+        armMotor = new SparkMax(PortMap.CANID.ARM_ANGLE.getId(), MotorType.kBrushless);
 
-        armMotor.configure(ArmConfigs.ARM_CONFIG, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        armMotor.configure(ArmConfig.ARM_CONFIG, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         armEncoder = armMotor.getEncoder();
 

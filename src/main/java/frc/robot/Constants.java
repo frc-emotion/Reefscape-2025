@@ -4,420 +4,177 @@
 
 package frc.robot;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import com.pathplanner.lib.config.PIDConstants;
-
-import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
-import edu.wpi.first.math.geometry.Translation3d;
-import edu.wpi.first.units.Units;
-import edu.wpi.first.units.measure.Distance;
-import frc.robot.util.Faults.FaultTypes.PDFaults;
-import swervelib.math.Matter;
-import edu.wpi.first.units.measure.Mass;
-import edu.wpi.first.wpilibj.AddressableLED;
-import edu.wpi.first.wpilibj.AddressableLEDBuffer;
-import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
-
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Milliseconds;
-import static edu.wpi.first.units.Units.Pounds;
-import static edu.wpi.first.units.Units.Seconds;
-
 /**
- * The Constants class provides a convenient place for teams to hold robot-wide
- * numerical or boolean constants. This
- * class should not be used for any other purpose. All constants should be
- * declared globally (i.e. public static). Do
- * not put anything functional in this class.
- *
- * <p>
- * It is advised to statically import this class (or one of its inner classes)
- * wherever the
- * constants are needed, to reduce verbosity.
+ * DEPRECATED: This class is kept for backward compatibility.
+ * Please use the modular constants in the frc.robot.constants package instead.
+ * 
+ * New structure:
+ * - frc.robot.constants.RobotConstants - Robot-wide constants
+ * - frc.robot.constants.OperatorConstants - Controller settings
+ * - frc.robot.constants.AutoConstants - Autonomous PID values
+ * - frc.robot.constants.PortMap - CAN IDs and DIO ports
+ * - frc.robot.constants.VisionConstants - Vision processing
+ * - frc.robot.constants.subsystems.* - Subsystem-specific constants
  */
+@Deprecated
 public final class Constants {
-
-    public static final List<String> KNOWN_PD_FAULTS = new ArrayList<>(Arrays.asList(
-            PDFaults.CHANNEL_20_BREAKER.name(),
-            PDFaults.CHANNEL_21_BREAKER.name(),
-            PDFaults.CHANNEL_22_BREAKER.name(),
-            PDFaults.CHANNEL_20_BREAKER.name()));
-
-    public static final double ROBOT_MASS = (148 - 20.3) * 0.453592; // 32lbs * kg per pound
-    public static final Matter CHASSIS = new Matter(new Translation3d(0, 0, Units.Meters.convertFrom(8, Units.Inches)),
-            ROBOT_MASS);
-    public static final double LOOP_TIME = 0.13; // s, 20ms + 110ms sprk max velocity lag
-    public static final double MAX_SPEED = Units.Feet.convertFrom(20.0, Units.Meters);
-
-    // Maximum speed of the robot in meters per second, used to limit acceleration.
-
-    public static final class AutonConstants
-{
-    // Default values
-    private static double DEFAULT_TRANSLATION_P = 0.005;
-    private static double DEFAULT_TRANSLATION_I = 0.0;
-    private static double DEFAULT_TRANSLATION_D = 0.0;
     
-    private static double DEFAULT_ANGLE_P = 5.0;
-    private static double DEFAULT_ANGLE_I = 0.0;
-    private static double DEFAULT_ANGLE_D = 0.0;
+    // Re-export classes for backward compatibility by aliasing
+    public static final class AutonConstants {
+        public static final com.pathplanner.lib.config.PIDConstants TRANSLATION_PID = 
+            frc.robot.constants.AutoConstants.TRANSLATION_PID;
+        public static final com.pathplanner.lib.config.PIDConstants ANGLE_PID = 
+            frc.robot.constants.AutoConstants.ANGLE_PID;
+    }
     
-    // Mutable PIDConstants objects
-    public static PIDConstants TRANSLATION_PID = new PIDConstants(
-        DEFAULT_TRANSLATION_P, DEFAULT_TRANSLATION_I, DEFAULT_TRANSLATION_D
-    );
-    public static PIDConstants ANGLE_PID = new PIDConstants(
-        DEFAULT_ANGLE_P, DEFAULT_ANGLE_I, DEFAULT_ANGLE_D
-    );
-    
-    // public static void initDashboard() {
-    //     SmartDashboard.putNumber("Auto/Translation/P", DEFAULT_TRANSLATION_P);
-    //     SmartDashboard.putNumber("Auto/Translation/I", DEFAULT_TRANSLATION_I);
-    //     SmartDashboard.putNumber("Auto/Translation/D", DEFAULT_TRANSLATION_D);
-        
-    //     SmartDashboard.putNumber("Auto/Angle/P", DEFAULT_ANGLE_P);
-    //     SmartDashboard.putNumber("Auto/Angle/I", DEFAULT_ANGLE_I);
-    //     SmartDashboard.putNumber("Auto/Angle/D", DEFAULT_ANGLE_D);
-    // }
-    
-    // public static void updateFromDashboard() {
-    //     TRANSLATION_PID. = SmartDashboard.getNumber("Auto/Translation/P", DEFAULT_TRANSLATION_P);
-    //     TRANSLATION_PID.kI = SmartDashboard.getNumber("Auto/Translation/I", DEFAULT_TRANSLATION_I);
-    //     TRANSLATION_PID.kD = SmartDashboard.getNumber("Auto/Translation/D", DEFAULT_TRANSLATION_D);
-        
-    //     ANGLE_PID.kP = SmartDashboard.getNumber("Auto/Angle/P", DEFAULT_ANGLE_P);
-    //     ANGLE_PID.kI = SmartDashboard.getNumber("Auto/Angle/I", DEFAULT_ANGLE_I);
-    //     ANGLE_PID.kD = SmartDashboard.getNumber("Auto/Angle/D", DEFAULT_ANGLE_D);
-    // }
-}
-
     public static final class DrivebaseConstants {
-
-        // Hold time on motor brakes when disabled
-        public static final double WHEEL_LOCK_TIME = 10; // seconds
+        public static final double WHEEL_LOCK_TIME = 
+            frc.robot.constants.subsystems.DriveConstants.WHEEL_LOCK_TIME;
     }
-
-    public static class OperatorConstants {
-
-        // Joystick Deadband
-        public static final double DEADBAND = 0.1;
-        public static final double LEFT_Y_DEADBAND = 0.1;
-        public static final double RIGHT_X_DEADBAND = 0.1;
-        public static final double TURN_CONSTANT = 6;
+    
+    public static final class OperatorConstants {
+        public static final double DEADBAND = frc.robot.constants.OperatorConstants.DEADBAND;
+        public static final double LEFT_Y_DEADBAND = frc.robot.constants.OperatorConstants.LEFT_Y_DEADBAND;
+        public static final double RIGHT_X_DEADBAND = frc.robot.constants.OperatorConstants.RIGHT_X_DEADBAND;
+        public static final double TURN_CONSTANT = frc.robot.constants.OperatorConstants.TURN_CONSTANT;
     }
-
-    public static class ClimbConstants {
-
-        public static final double kSpeed = 0.8;
-
-        public static final double SET_SPEED = 0.8;
-
-        public static final double POSITION_ERROR = 1;
-
-        public static final double EXTENSION_LIMIT = 1;
-
-        public static final double EXTENDED_POSITION = 0;
-
-        public static final double CLIMBED_POSITION = 0;
-
-        public static final int kSmartCurrentLimit = 45;
-
-        public static final double kSecondaryCurrentLimit = 45;
-
-
+    
+    public static final class ClimbConstants {
+        public static final double kSpeed = frc.robot.constants.subsystems.ClimbConstants.kSpeed;
+        public static final double SET_SPEED = frc.robot.constants.subsystems.ClimbConstants.SET_SPEED;
+        public static final double POSITION_ERROR = frc.robot.constants.subsystems.ClimbConstants.POSITION_ERROR;
+        public static final double EXTENSION_LIMIT = frc.robot.constants.subsystems.ClimbConstants.EXTENSION_LIMIT;
+        public static final double EXTENDED_POSITION = frc.robot.constants.subsystems.ClimbConstants.EXTENDED_POSITION;
+        public static final double CLIMBED_POSITION = frc.robot.constants.subsystems.ClimbConstants.CLIMBED_POSITION;
+        public static final int kSmartCurrentLimit = frc.robot.constants.subsystems.ClimbConstants.kSmartCurrentLimit;
+        public static final double kSecondaryCurrentLimit = frc.robot.constants.subsystems.ClimbConstants.kSecondaryCurrentLimit;
     }
-    public static class ElevatorConstants {
-        public static final double TOLERABLE_ERROR = 1.5;
-
-        // Physical Constants
-        public static final int kSmartCurrentLimit = 45;
-        public static final int kSecondaryCurrentLimit = 45;
-
-        public static final int kEncoderCPR = 8192;
-
-        public static final double kpulleyDiameterInches = 2.0;
-
-        public static final double kPulleyCircumInches = Math.PI * kpulleyDiameterInches;
-
-        public static final double kGearRatio = 12;
-
-        public static final double effectiveCountsPerRevolution = kEncoderCPR * kGearRatio;
-
-        public static final double inchesPerCount = kPulleyCircumInches / kGearRatio;
-
-        public static final Mass kCarriageMass = Pounds.of(28.34);
-        public static final Distance kDrumRadius = Inches.of(0.878);
-        public static final Distance kMinHeight = Inches.of(0);
-        public static final Distance kMaxHeight = Inches.of(29);
-        public static final Distance kStartingHeight = Inches.of(0);
-
-        public static final double MAX_MOTOR_RPM = 10000.0; // Need to change name of variable not RPM
-        public static final double MAX_MOTOR_ACCELERATION = 80; // TODO: Need to change name of variable not RPM
-
-        // Feedforward Constants
-        public static final double kS = 0.0; // static gain in volts
-        public static final double kG = 0.36; // gravity gain in volts
-        public static final double kV = 0; //10.52; // velocity gain in mps
-        public static final double kA = 0; //0.03; // acceleration gain in mps^2
-
-        // PID Constants
-        public static final double kP = 2.0;
-        public static final double kI = 0;
-        public static final double kD = 0;
-
-        public static final Distance CORAL_L1_HEIGHT = Units.Inches.of(0);
-        public static final Distance CORAL_L2_HEIGHT = Units.Inches.of(8.6);
-        public static final Distance CORAL_L3_HEIGHT = Units.Inches.of(18.1);
-        public static final Distance CORAL_L4_HEIGHT = Units.Inches.of(29.5);
-
-
-        public static final Distance ALGAE_PREP_NET = Units.Inches.of(61);
-        public static final Distance ALGAE_PREP_PROCESSOR_HEIGHT = Units.Inches.of(1);
-        public static final Distance ALGAE_L3_CLEANING = Units.Inches.of(18.1);
-        public static final Distance ALGAE_L2_CLEANING = Units.Inches.of(8.6);
-        public static final Distance ALGAE_GROUND_INTAKE = Units.Inches.of(0);
-        public static final Distance PREP_0 = Units.Inches.of(0);
-        public static final Distance DEADZONE_DISTANCE = Units.Inches.of(1);
-        public static final Distance CORAL_INTAKE_HEIGHT = Units.Inches.of(0);
-
-        public static final int NORMAL_OPERATION_CURRENT = 40;
-        public static final int CURRENT_SPIKE_THRESHOLD = 20;
-
-        public static final int NORMAL_OPERATION_TEMP = 40;
-        public static final int TEMP_SPIKE_THRESHOLD = 20;
-
+    
+    public static final class ElevatorConstants {
+        // Re-export all elevator constants
+        public static final double TOLERABLE_ERROR = frc.robot.constants.subsystems.ElevatorConstants.TOLERABLE_ERROR;
+        public static final int kSmartCurrentLimit = frc.robot.constants.subsystems.ElevatorConstants.kSmartCurrentLimit;
+        public static final int kSecondaryCurrentLimit = frc.robot.constants.subsystems.ElevatorConstants.kSecondaryCurrentLimit;
+        public static final int kEncoderCPR = frc.robot.constants.subsystems.ElevatorConstants.kEncoderCPR;
+        public static final double kpulleyDiameterInches = frc.robot.constants.subsystems.ElevatorConstants.kpulleyDiameterInches;
+        public static final double kPulleyCircumInches = frc.robot.constants.subsystems.ElevatorConstants.kPulleyCircumInches;
+        public static final double kGearRatio = frc.robot.constants.subsystems.ElevatorConstants.kGearRatio;
+        public static final double effectiveCountsPerRevolution = frc.robot.constants.subsystems.ElevatorConstants.effectiveCountsPerRevolution;
+        public static final double inchesPerCount = frc.robot.constants.subsystems.ElevatorConstants.inchesPerCount;
+        public static final edu.wpi.first.units.measure.Mass kCarriageMass = frc.robot.constants.subsystems.ElevatorConstants.kCarriageMass;
+        public static final edu.wpi.first.units.measure.Distance kDrumRadius = frc.robot.constants.subsystems.ElevatorConstants.kDrumRadius;
+        public static final edu.wpi.first.units.measure.Distance kMinHeight = frc.robot.constants.subsystems.ElevatorConstants.kMinHeight;
+        public static final edu.wpi.first.units.measure.Distance kMaxHeight = frc.robot.constants.subsystems.ElevatorConstants.kMaxHeight;
+        public static final edu.wpi.first.units.measure.Distance kStartingHeight = frc.robot.constants.subsystems.ElevatorConstants.kStartingHeight;
+        public static final double MAX_MOTOR_RPM = frc.robot.constants.subsystems.ElevatorConstants.MAX_MOTOR_RPM;
+        public static final double MAX_MOTOR_ACCELERATION = frc.robot.constants.subsystems.ElevatorConstants.MAX_MOTOR_ACCELERATION;
+        public static final double kS = frc.robot.constants.subsystems.ElevatorConstants.kS;
+        public static final double kG = frc.robot.constants.subsystems.ElevatorConstants.kG;
+        public static final double kV = frc.robot.constants.subsystems.ElevatorConstants.kV;
+        public static final double kA = frc.robot.constants.subsystems.ElevatorConstants.kA;
+        public static final double kP = frc.robot.constants.subsystems.ElevatorConstants.kP;
+        public static final double kI = frc.robot.constants.subsystems.ElevatorConstants.kI;
+        public static final double kD = frc.robot.constants.subsystems.ElevatorConstants.kD;
+        public static final edu.wpi.first.units.measure.Distance CORAL_L1_HEIGHT = frc.robot.constants.subsystems.ElevatorConstants.CORAL_L1_HEIGHT;
+        public static final edu.wpi.first.units.measure.Distance CORAL_L2_HEIGHT = frc.robot.constants.subsystems.ElevatorConstants.CORAL_L2_HEIGHT;
+        public static final edu.wpi.first.units.measure.Distance CORAL_L3_HEIGHT = frc.robot.constants.subsystems.ElevatorConstants.CORAL_L3_HEIGHT;
+        public static final edu.wpi.first.units.measure.Distance CORAL_L4_HEIGHT = frc.robot.constants.subsystems.ElevatorConstants.CORAL_L4_HEIGHT;
+        public static final edu.wpi.first.units.measure.Distance CORAL_INTAKE_HEIGHT = frc.robot.constants.subsystems.ElevatorConstants.CORAL_INTAKE_HEIGHT;
+        public static final edu.wpi.first.units.measure.Distance ALGAE_PREP_NET = frc.robot.constants.subsystems.ElevatorConstants.ALGAE_PREP_NET;
+        public static final edu.wpi.first.units.measure.Distance ALGAE_PREP_PROCESSOR_HEIGHT = frc.robot.constants.subsystems.ElevatorConstants.ALGAE_PREP_PROCESSOR_HEIGHT;
+        public static final edu.wpi.first.units.measure.Distance ALGAE_L3_CLEANING = frc.robot.constants.subsystems.ElevatorConstants.ALGAE_L3_CLEANING;
+        public static final edu.wpi.first.units.measure.Distance ALGAE_L2_CLEANING = frc.robot.constants.subsystems.ElevatorConstants.ALGAE_L2_CLEANING;
+        public static final edu.wpi.first.units.measure.Distance ALGAE_GROUND_INTAKE = frc.robot.constants.subsystems.ElevatorConstants.ALGAE_GROUND_INTAKE;
+        public static final edu.wpi.first.units.measure.Distance PREP_0 = frc.robot.constants.subsystems.ElevatorConstants.PREP_0;
+        public static final edu.wpi.first.units.measure.Distance DEADZONE_DISTANCE = frc.robot.constants.subsystems.ElevatorConstants.DEADZONE_DISTANCE;
+        public static final int NORMAL_OPERATION_CURRENT = frc.robot.constants.subsystems.ElevatorConstants.NORMAL_OPERATION_CURRENT;
+        public static final int CURRENT_SPIKE_THRESHOLD = frc.robot.constants.subsystems.ElevatorConstants.CURRENT_SPIKE_THRESHOLD;
+        public static final int NORMAL_OPERATION_TEMP = frc.robot.constants.subsystems.ElevatorConstants.NORMAL_OPERATION_TEMP;
+        public static final int TEMP_SPIKE_THRESHOLD = frc.robot.constants.subsystems.ElevatorConstants.TEMP_SPIKE_THRESHOLD;
     }
-
-    public static class GrabberConstants {
-        public static final int kSmartCurrentLimit = 35;
-        public static final double kSecondaryCurrentLimit = 35;
-
-        public static final double GRABBER_CORAL_OUTTAKE = -0.65; // TBD
-
-        public static final double GRABBER_CORAL_INTAKE = GRABBER_CORAL_OUTTAKE / 2.5;
-
-        public static final double GRABBER_ALGAE_SPEED = -0.65; // TBD
-        public static final double GRABBER_ALGAE_HOLD_SPEED = 0.1; // TBD
-        public static final double GRABBER_CORAL_HOLD_SPEED = 0.3; // TBD
-        public static final double ZERO_SPEED = 0;
-        public static final double CORAL_DETECT_RANGE = 0;
+    
+    public static final class GrabberConstants {
+        public static final int kSmartCurrentLimit = frc.robot.constants.subsystems.GrabberConstants.kSmartCurrentLimit;
+        public static final double kSecondaryCurrentLimit = frc.robot.constants.subsystems.GrabberConstants.kSecondaryCurrentLimit;
+        public static final double GRABBER_CORAL_OUTTAKE = frc.robot.constants.subsystems.GrabberConstants.GRABBER_CORAL_OUTTAKE;
+        public static final double GRABBER_CORAL_INTAKE = frc.robot.constants.subsystems.GrabberConstants.GRABBER_CORAL_INTAKE;
+        public static final double GRABBER_ALGAE_SPEED = frc.robot.constants.subsystems.GrabberConstants.GRABBER_ALGAE_SPEED;
+        public static final double GRABBER_ALGAE_HOLD_SPEED = frc.robot.constants.subsystems.GrabberConstants.GRABBER_ALGAE_HOLD_SPEED;
+        public static final double GRABBER_CORAL_HOLD_SPEED = frc.robot.constants.subsystems.GrabberConstants.GRABBER_CORAL_HOLD_SPEED;
+        public static final double ZERO_SPEED = frc.robot.constants.subsystems.GrabberConstants.ZERO_SPEED;
+        public static final double CORAL_DETECT_RANGE = frc.robot.constants.subsystems.GrabberConstants.CORAL_DETECT_RANGE;
+        public static final int NORMAL_OPERATION_CURRENT = frc.robot.constants.subsystems.GrabberConstants.NORMAL_OPERATION_CURRENT;
+        public static final int CURRENT_SPIKE_THRESHOLD = frc.robot.constants.subsystems.GrabberConstants.CURRENT_SPIKE_THRESHOLD;
+        public static final int NORMAL_OPERATION_TEMP = frc.robot.constants.subsystems.GrabberConstants.NORMAL_OPERATION_TEMP;
+        public static final int TEMP_SPIKE_THRESHOLD = frc.robot.constants.subsystems.GrabberConstants.TEMP_SPIKE_THRESHOLD;
+    }
+    
+    public static final class ArmConstants {
+        public static final int kSmartCurrentLimit = frc.robot.constants.subsystems.ArmConstants.kSmartCurrentLimit;
+        public static final double kSecondaryCurrentLimit = frc.robot.constants.subsystems.ArmConstants.kSecondaryCurrentLimit;
+        public static final double kMaxOutput = frc.robot.constants.subsystems.ArmConstants.kMaxOutput;
+        public static final double kMinRotation = frc.robot.constants.subsystems.ArmConstants.kMinRotation;
+        public static final double kMaxRotation = frc.robot.constants.subsystems.ArmConstants.kMaxRotation;
+        public static final double kMaxHeightConstrained = frc.robot.constants.subsystems.ArmConstants.kMaxHeightConstrained;
+        public static final double kMaxRotationConstrained = frc.robot.constants.subsystems.ArmConstants.kMaxRotationConstrained;
+        public static final double kMinRotationConstrained = frc.robot.constants.subsystems.ArmConstants.kMinRotationConstrained;
+        public static final double kS = frc.robot.constants.subsystems.ArmConstants.kS;
+        public static final double kG = frc.robot.constants.subsystems.ArmConstants.kG;
+        public static final double kV = frc.robot.constants.subsystems.ArmConstants.kV;
+        public static final double kA = frc.robot.constants.subsystems.ArmConstants.kA;
+        public static final double kP = frc.robot.constants.subsystems.ArmConstants.kP;
+        public static final double kI = frc.robot.constants.subsystems.ArmConstants.kI;
+        public static final double kD = frc.robot.constants.subsystems.ArmConstants.kD;
+        public static final double kMaxVelocity = frc.robot.constants.subsystems.ArmConstants.kMaxVelocity;
+        public static final double kMaxAcceleration = frc.robot.constants.subsystems.ArmConstants.kMaxAcceleration;
+        public static final double kMaxError = frc.robot.constants.subsystems.ArmConstants.kMaxError;
+        public static final boolean kIsInverted = frc.robot.constants.subsystems.ArmConstants.kIsInverted;
+        public static final double kZeroOffset = frc.robot.constants.subsystems.ArmConstants.kZeroOffset;
+        public static final double kConversionFactor = frc.robot.constants.subsystems.ArmConstants.kConversionFactor;
+        public static final double kInputSensitivity = frc.robot.constants.subsystems.ArmConstants.kInputSensitivity;
+        public static final double kMaxInputAccel = frc.robot.constants.subsystems.ArmConstants.kMaxInputAccel;
+        public static final edu.wpi.first.math.geometry.Rotation2d CORAL_L1_ANGLE = frc.robot.constants.subsystems.ArmConstants.CORAL_L1_ANGLE;
+        public static final edu.wpi.first.math.geometry.Rotation2d CORAL_L2_ANGLE = frc.robot.constants.subsystems.ArmConstants.CORAL_L2_ANGLE;
+        public static final edu.wpi.first.math.geometry.Rotation2d CORAL_L3_ANGLE = frc.robot.constants.subsystems.ArmConstants.CORAL_L3_ANGLE;
+        public static final edu.wpi.first.math.geometry.Rotation2d CORAL_L4_ANGLE = frc.robot.constants.subsystems.ArmConstants.CORAL_L4_ANGLE;
+        public static final edu.wpi.first.math.geometry.Rotation2d CORAL_INTAKE_ANGLE = frc.robot.constants.subsystems.ArmConstants.CORAL_INTAKE_ANGLE;
+        public static final edu.wpi.first.math.geometry.Rotation2d ALGAE_L2_ANGLE = frc.robot.constants.subsystems.ArmConstants.ALGAE_L2_ANGLE;
+        public static final edu.wpi.first.math.geometry.Rotation2d ALGAE_L3_ANGLE = frc.robot.constants.subsystems.ArmConstants.ALGAE_L3_ANGLE;
+        public static final edu.wpi.first.math.geometry.Rotation2d ALGAE_GROUND_ANGLE = frc.robot.constants.subsystems.ArmConstants.ALGAE_GROUND_ANGLE;
+        public static final edu.wpi.first.math.geometry.Rotation2d ALGAE_ON_CORAL_ANGLE = frc.robot.constants.subsystems.ArmConstants.ALGAE_ON_CORAL_ANGLE;
+        public static final edu.wpi.first.math.geometry.Rotation2d ALGAE_NET_ANGLE = frc.robot.constants.subsystems.ArmConstants.ALGAE_NET_ANGLE;
+        public static final edu.wpi.first.math.geometry.Rotation2d ALGAE_PRO_ANGLE = frc.robot.constants.subsystems.ArmConstants.ALGAE_PRO_ANGLE;
+        public static final edu.wpi.first.math.geometry.Rotation2d CLIMB_ANGLE = frc.robot.constants.subsystems.ArmConstants.CLIMB_ANGLE;
+        public static final int NORMAL_OPERATION_CURRENT = frc.robot.constants.subsystems.ArmConstants.NORMAL_OPERATION_CURRENT;
+        public static final int NORMAL_OPERATION_TEMP = frc.robot.constants.subsystems.ArmConstants.NORMAL_OPERATION_TEMP;
+        public static final int CURRENT_SPIKE_THRESHOLD = frc.robot.constants.subsystems.ArmConstants.CURRENT_SPIKE_THRESHOLD;
+        public static final int TEMP_SPIKE_THRESHOLD = frc.robot.constants.subsystems.ArmConstants.TEMP_SPIKE_THRESHOLD;
+    }
+    
+    public static final class Ports {
+        public static final frc.robot.constants.PortMap.DIO DIO = null;
+        public static final frc.robot.constants.PortMap.CANID CANID = null;
         
-        public static final int NORMAL_OPERATION_CURRENT = 40;
-        public static final int CURRENT_SPIKE_THRESHOLD = 20;
-        public static final int NORMAL_OPERATION_TEMP = 40;
-        public static final int TEMP_SPIKE_THRESHOLD = 20;
-    }                                                                                                               
-    public static class ArmConstants {
-        public static final int kSmartCurrentLimit = 45;
-        public static final double kSecondaryCurrentLimit = 45;
-
-        public static final double kMaxOutput = 1;
-
-            // Physical Constraints
-        public static final double kMinRotation = -45; // Note: Aligns with hopper
-        public static final double kMaxRotation = 125;
-        public static final double kMaxHeightConstrained = 0; // The height in meters at which the arm is able to rotate fully. Should be roughly the length of the arm.
-        public static final double kMaxRotationConstrained = 95; // The max rotation while the arm is below the minimum full rotation height. Could be formulaic, but probably not necessary.
-        public static final double kMinRotationConstrained = 0;
-
-            // Feedforward Constants
-        public static final double kS = 0;
-        public static final double kG = 0.088858; // recalc: 0.55
-        public static final double kV = 0.00025; // recalc: 0.39
-        public static final double kA = 0.001; // recalc: 0.02
-
-            // PID Constants
-        public static final double kP = 0.002058; //0.003058;
-        public static final double kI = 0;
-        public static final double kD = 0;
-
-            // Smart Motion Constants
-        public static final double kMaxVelocity = 300;
-        public static final double kMaxAcceleration = 3000;
-        public static final double kMaxError = 2;
-        
-            // Encoder Constants
-        public static final boolean kIsInverted = false;
-        public static final double kZeroOffset = 99.473 - 129.315 + 155.841 + 26.106 - 21.8443;
-        // public static final double kConversionFactor = 360 * (22.0/84.0);
-        // public static final double kConversionFactor = 180.0 / 7.15;
-        public static final double kConversionFactor = ((180.0 / 7.15) / 1.21915) * (90.0 / 93.415);
-
-            // Input Constants
-        public static final double kInputSensitivity = 10; // degrees per second
-        
-        // Presets
-        public static final Rotation2d CORAL_L1_ANGLE = Rotation2d.fromDegrees(95);
-        public static final Rotation2d CORAL_L2_ANGLE = Rotation2d.fromDegrees(95);
-        public static final Rotation2d CORAL_L3_ANGLE = Rotation2d.fromDegrees(95);
-        public static final Rotation2d CORAL_L4_ANGLE = Rotation2d.fromDegrees(100); // it was 90 before type shi
-
-        // public static final Rotation2d CORAL_L1_ANGLE_FLIPPED = new Rotation2d(0);
-        // public static final Rotation2d CORAL_L2_ANGLE_FLIPPED = new Rotation2d(0);
-        // public static final Rotation2d CORAL_L3_ANGLE_FLIPPED = new Rotation2d(0);
-        // public s\tatic final Rotation2d CORAL_L4_ANGLE_FLIPPED = new Rotation2d(0);
-
-        public static final Rotation2d CORAL_INTAKE_ANGLE = Rotation2d.fromDegrees(125);
-        
-        public static final Rotation2d ALGAE_L2_ANGLE = Rotation2d.fromDegrees(-30); // was -45
-        public static final Rotation2d ALGAE_L3_ANGLE = Rotation2d.fromDegrees(-30); // was -45
-        public static final Rotation2d ALGAE_GROUND_ANGLE = new Rotation2d(0);
-        public static final Rotation2d ALGAE_ON_CORAL_ANGLE = new Rotation2d(0);
-        public static final Rotation2d ALGAE_NET_ANGLE = new Rotation2d(0);
-        public static final Rotation2d ALGAE_PRO_ANGLE = new Rotation2d(0);
-
-        public static final Rotation2d CLIMB_ANGLE = new Rotation2d(0);
-
-        public static final double kMaxInputAccel = 10;
-
-
-        public static final int NORMAL_OPERATION_CURRENT = 30;
-        public static final int NORMAL_OPERATION_TEMP = 40;
-        public static final int CURRENT_SPIKE_THRESHOLD = 20;
-        public static final int TEMP_SPIKE_THRESHOLD = 20;
-
-    }
-
-    public static class Ports {
-
-        public enum DIO {
-            ALGAE_BEAM_BREAK(1, "Algae Beam Break");
-
-            private final int id;
-            private final String name;
-
-            private static final Map<Integer, String> DIO_ID_MAP = new HashMap<>();
-
-            static {
-                for (DIO dioID : DIO.values()) {
-                    DIO_ID_MAP.put(dioID.getId(), dioID.getName());
-                }
-            }
-
-            DIO(int id, String name) {
-                this.id = id;
-                this.name = name;
-            }
-
-            public int getId() {
-                return id;
-            }
-
-            public String getName() {
-                return name;
-            }
-
-            public static String getNameById(int id) {
-                return DIO_ID_MAP.getOrDefault(id, "Unknown DIO ID");
-            }
-        }
-
-        public static class VisionConstants {
-
-            public static final double ACCURACY_LIMIT = 4;
-            public static final double DEBOUNCE_TIME_SEC = Milliseconds.of(15).in(Seconds);
-        }
-
-        public enum CANID {
-            PDH(1, "Power Distribution Hub"),
-
-            FRONT_LEFT_CANCODER(11, "Front Left Cancoder"),
-            FRONT_RIGHT_CANCODER(12, "Front Right Cancoder"),
-            BACK_LEFT_CANCODER(13, "Back Left Cancoder"),
-            BACK_RIGHT_CANCODER(14, "Back Right Cancoder"),
-
-            FRONT_LEFT_DRIVE(3, "Front Left Drive"),
-            FRONT_LEFT_TURN(4, "Front Left Turn"),
-
-            FRONT_RIGHT_DRIVE(5, "Front Right Drive"),
-            FRONT_RIGHT_TURN(6, "Front Right Turn"),
-
-            BACK_LEFT_DRIVE(7, "Back Left Drive"),
-            BACK_LEFT_TURN(8, "Back Left Turn"),
-
-            BACK_RIGHT_DRIVE(9, "Back Right Drive"),
-            BACK_RIGHT_TURN(10, "Back Right Turn"),
-
-            ELEVATOR_DRIVE_LEADER(17, "Elevator Drive Leader"),
-            ELEVATOR_DRIVE_FOLLOWER(18, "Elevator Drive Follower"),
-
-            GRABBER_DRIVE(15, "Grabber Drive"),
-            CORAL_TOF_BACK(72, "Coral Back Time of Flight"),
-            CORAL_TOF_FRONT(73, "Coral Front Time of Flight"),
-            ARM_ANGLE(19, "Arm Angle"),
-
-            PIGEON_GYRO(30, "Gyro"),
-
-            CLIMB_PORT(16, "Climb Motor");
-
-            private final int id;
-            private final String name;
-
-            private static final Map<Integer, String> CAN_ID_MAP = new HashMap<>();
-
-            /*
-             * Order:
-             * 0 - Front Left
-             * 1 - Front Right
-             * 2 - Back Left
-             * 3 - Back Right
-             */
-
-            // Drive ID, Turn ID
-            public static final int[][] SWERVE_IDS = {
-            { FRONT_LEFT_DRIVE.id, FRONT_LEFT_TURN.id },
-            { FRONT_RIGHT_DRIVE.id, FRONT_RIGHT_TURN.id },
-            { BACK_LEFT_DRIVE.id, BACK_LEFT_TURN.id },
-            { BACK_RIGHT_DRIVE.id, BACK_RIGHT_TURN.id }
-            };
-
-            // public static final int[] CANCODER_IDS = {
-            // FRONT_LEFT_CANCODER.id,
-            // FRONT_RIGHT_CANCODER.id,
-            // BACK_LEFT_CANCODER.id,
-            // BACK_RIGHT_CANCODER.id
-            // };
-
-            static {
-                for (CANID canId : CANID.values()) {
-                    CAN_ID_MAP.put(canId.getId(), canId.getName());
-                }
-            }
-
-            CANID(int id, String name) {
-                this.id = id;
-                this.name = name;
-            }
-
-            public int getId() {
-                return id;
-            }
-
-            public String getName() {
-                return name;
-            }
-
-            public static String getNameById(int id) {
-                return CAN_ID_MAP.getOrDefault(id, "Unknown CAN ID");
-            }
+        public static final class VisionConstants {
+            public static final double ACCURACY_LIMIT = frc.robot.constants.VisionConstants.ACCURACY_LIMIT;
+            public static final double DEBOUNCE_TIME_SEC = frc.robot.constants.VisionConstants.DEBOUNCE_TIME_SEC;
         }
     }
-    public static class LEDConstants {
-
-        public static int rainbowFirstPixelHue = 0;
-
-        public static final int LED_PORT = 0;
-
-        public static final int LED_COUNT = 69;
-
-
+    
+    public static final class LEDConstants {
+        public static int rainbowFirstPixelHue = frc.robot.constants.subsystems.LEDConstants.rainbowFirstPixelHue;
+        public static final int LED_PORT = frc.robot.constants.subsystems.LEDConstants.LED_PORT;
+        public static final int LED_COUNT = frc.robot.constants.subsystems.LEDConstants.LED_COUNT;
     }
+    
+    // Robot-wide constants
+    public static final java.util.List<String> KNOWN_PD_FAULTS = frc.robot.constants.RobotConstants.KNOWN_PD_FAULTS;
+    public static final double ROBOT_MASS = frc.robot.constants.RobotConstants.ROBOT_MASS;
+    public static final swervelib.math.Matter CHASSIS = frc.robot.constants.RobotConstants.CHASSIS;
+    public static final double LOOP_TIME = frc.robot.constants.RobotConstants.LOOP_TIME;
+    public static final double MAX_SPEED = frc.robot.constants.RobotConstants.MAX_SPEED;
 
+    private Constants() {
+        throw new UnsupportedOperationException("This is a utility class!");
+    }
 }

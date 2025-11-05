@@ -17,7 +17,7 @@ import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
 import frc.robot.subsystems.led.LedSubsystem;
-import frc.robot.util.Faults.FaultManager;
+import frc.robot.util.diagnostics.Faults.FaultManager;
 
 public class Robot extends TimedRobot {
     private final LedSubsystem LEDSubsystem = new LedSubsystem();

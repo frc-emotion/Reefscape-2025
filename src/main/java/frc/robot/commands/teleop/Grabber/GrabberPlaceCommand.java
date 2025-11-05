@@ -3,7 +3,7 @@ package frc.robot.commands.teleop.Grabber;
 import static edu.wpi.first.units.Units.Micro;
 
 import edu.wpi.first.wpilibj2.command.Command;
-import frc.robot.Constants.GrabberConstants;
+import frc.robot.constants.subsystems.GrabberConstants;
 import frc.robot.subsystems.grabber.GrabberSubsystem;
 import frc.robot.subsystems.grabber.GrabberSubsystem.GrabType;
 

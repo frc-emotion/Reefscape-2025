@@ -1,4 +1,4 @@
-package frc.robot.util;
+package frc.robot.util.helpers;
 
 import java.util.function.DoubleConsumer;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;

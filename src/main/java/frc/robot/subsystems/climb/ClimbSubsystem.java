@@ -8,10 +8,9 @@ import com.revrobotics.spark.config.SparkBaseConfig.IdleMode;
 import com.revrobotics.spark.config.SparkMaxConfig;
 
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants;
-import frc.robot.Constants.Ports.CANID;
-import frc.robot.util.Configs;
-import frc.robot.util.Configs.ClimbConfigs;
+import frc.robot.config.subsystems.ClimbConfig;
+import frc.robot.constants.PortMap;
+import frc.robot.constants.PortMap.CANID;
 
 public class ClimbSubsystem extends SubsystemBase {
 
@@ -26,8 +25,8 @@ public class ClimbSubsystem extends SubsystemBase {
     }
 
     public ClimbSubsystem() {
-        climbMotor = new SparkMax(CANID.CLIMB_PORT.getId(), MotorType.kBrushless);
-        climbMotor.configure(ClimbConfigs.CLIMB_CONFIG, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
+        climbMotor = new SparkMax(PortMap.CANID.CLIMB_PORT.getId(), MotorType.kBrushless);
+        climbMotor.configure(ClimbConfig.CLIMB_CONFIG, ResetMode.kResetSafeParameters, PersistMode.kPersistParameters);
 
         currentClimbState = ClimbState.STOWED;
     }

@@ -1,4 +1,4 @@
-package frc.robot.util.Faults;
+package frc.robot.util.diagnostics.Faults;
 
 import com.revrobotics.REVLibError;
 import com.revrobotics.spark.SparkBase;
@@ -13,13 +13,13 @@ import edu.wpi.first.networktables.StringArrayPublisher;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.DutyCycleEncoder;
 import edu.wpi.first.wpilibj.PowerDistribution;
-import frc.robot.Constants;
-import frc.robot.Constants.Ports;
-import frc.robot.Constants.Ports.CANID;
-import frc.robot.util.Faults.FaultTypes.FaultType;
-import frc.robot.util.Faults.FaultTypes.PDFaults;
-import frc.robot.util.Faults.FaultTypes.PDStickyFaults;
-import frc.robot.util.Faults.FaultTypes.SparkFaults;
+import frc.robot.constants.RobotConstants;
+import frc.robot.constants.PortMap;
+import frc.robot.constants.PortMap.CANID;
+import frc.robot.util.diagnostics.Faults.FaultTypes.FaultType;
+import frc.robot.util.diagnostics.Faults.FaultTypes.PDFaults;
+import frc.robot.util.diagnostics.Faults.FaultTypes.PDStickyFaults;
+import frc.robot.util.diagnostics.Faults.FaultTypes.SparkFaults;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -231,7 +231,7 @@ public final class FaultManager {
         return String.format(
                 "Spark [%d] - %s",
                 spark.getDeviceId(),
-                Ports.CANID.getNameById(spark.getDeviceId()));
+                PortMap.CANID.getNameById(spark.getDeviceId()));
     }
 
     /**
@@ -295,7 +295,7 @@ public final class FaultManager {
             String identifier = "Power Distribution Hub";
             for (PDFaults fault : PDFaults.values()) {
 
-                if (Constants.KNOWN_PD_FAULTS.contains(fault.name())) {
+                if (RobotConstants.KNOWN_PD_FAULTS.contains(fault.name())) {
                     System.out.println("Skipping fault: " + fault.name() + "for PowerDistribution");
                     continue;
                 }
@@ -310,7 +310,7 @@ public final class FaultManager {
 
             PowerDistributionStickyFaults stickyFaults = powerDistribution.getStickyFaults();
             for (PDStickyFaults fault : PDStickyFaults.values()) {
-                if (Constants.KNOWN_PD_FAULTS.contains(fault.name())) {
+                if (RobotConstants.KNOWN_PD_FAULTS.contains(fault.name())) {
                     continue;
                 }
 

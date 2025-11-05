@@ -1,32 +1,30 @@
-package frc.robot.util;
+package frc.robot.auto;
 
-import java.io.IOException;
 import java.util.List;
 
-import org.json.simple.parser.ParseException;
-
 import com.pathplanner.lib.auto.AutoBuilder;
-import com.pathplanner.lib.commands.FollowPathCommand;
-import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.path.EventMarker;
 import com.pathplanner.lib.path.PathPlannerPath;
 
-import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.ParallelDeadlineGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
 import frc.robot.commands.functional.MainCommandFactory;
+import frc.robot.game.Task;
+import frc.robot.game.field.HumanPlayerPosition;
+import frc.robot.game.field.Position;
+import frc.robot.game.field.StartPosition;
+import frc.robot.game.tasks.PickupCoral;
+import frc.robot.game.tasks.ScoreAlgae;
+import frc.robot.game.tasks.ScoreCoral;
 import frc.robot.subsystems.arm.ArmSubsystem;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.grabber.GrabberSubsystem;
-import frc.robot.util.tasks.*;
-import frc.robot.util.tasks.auto.ScoreAlgae;
-import frc.robot.util.tasks.general.ScoreCoral;
-import frc.robot.util.tasks.positions.HumanPlayerPosition;
-import frc.robot.util.tasks.positions.Position;
-import frc.robot.util.tasks.positions.StartPosition;
-import frc.robot.util.tasks.teleop.PickupCoral;
 
+/**
+ * Manages autonomous routine creation and path planning.
+ * Builds command sequences from task lists and integrates with PathPlanner.
+ */
 public class AutoManager {
     private GrabberSubsystem m_GrabberSubsystem;
     private ElevatorSubsystem m_ElevatorSubsystem;
@@ -38,6 +36,13 @@ public class AutoManager {
         m_ArmSubsystem = armSubsystem;
     }
     
+    /**
+     * Creates an autonomous command sequence from a list of tasks.
+     * @param startPosition Starting position on the field
+     * @param humanPlayerPosition Human player station position
+     * @param tasks List of tasks to execute
+     * @return Sequential command group for autonomous
+     */
     public Command createAuto(StartPosition startPosition, HumanPlayerPosition humanPlayerPosition, List<Task> tasks) {
         SequentialCommandGroup autoCommandGroup = new SequentialCommandGroup();
 
@@ -55,7 +60,6 @@ public class AutoManager {
             PathPlannerPath scorePath = getPath(humanPlayerPosition, coralTask.position);
             
             if(scorePath == null || pickupPath == null) {
-                // TODO: Maybe log an alert here 
                 return null;
             }
 
@@ -98,8 +102,6 @@ public class AutoManager {
                     AutoBuilder.followPath(pickupPath)
                 ),
                 AutoBuilder.followPath(scorePath)
-                
-                // insert score command
             );
             
         } else if(task instanceof ScoreAlgae) {
@@ -108,17 +110,14 @@ public class AutoManager {
             PathPlannerPath scorePath = getPath(algaeTask.position, algaeTask.scorePosition);
 
             if(pickupPath == null || scorePath == null) {
-                // TODO: Maybe log an alert here 
                 return null;
             }
 
             return new SequentialCommandGroup(
                 AutoBuilder.followPath(pickupPath),
-                // insert pickup command
                 AutoBuilder.followPath(scorePath)
             );
         } else {
-            // TODO: Maybe log an alert here
             return null;
         }
     }
@@ -130,9 +129,9 @@ public class AutoManager {
             ex.printStackTrace();
             return null;
         }
-        
     }
 
+    @SuppressWarnings("unused")
     private EventMarker findEventMarker(List<EventMarker> markers, String eventName) {
         for(EventMarker marker : markers) {
             if(marker.triggerName().equals(eventName)) {

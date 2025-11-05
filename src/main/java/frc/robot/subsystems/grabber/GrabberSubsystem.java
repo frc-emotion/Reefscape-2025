@@ -10,11 +10,11 @@ import edu.wpi.first.epilogue.Logged;
 import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import frc.robot.Constants.GrabberConstants;
-import frc.robot.Constants.Ports;
-import frc.robot.util.Configs.GrabberConfigs;
-import frc.robot.util.Faults.FaultManager;
-import frc.robot.util.Faults.FaultTypes.FaultType;
+import frc.robot.config.subsystems.GrabberConfig;
+import frc.robot.constants.PortMap;
+import frc.robot.constants.subsystems.GrabberConstants;
+import frc.robot.util.diagnostics.Faults.FaultManager;
+import frc.robot.util.diagnostics.Faults.FaultTypes.FaultType;
 
 @Logged
 public class GrabberSubsystem extends SubsystemBase {
@@ -37,14 +37,14 @@ public class GrabberSubsystem extends SubsystemBase {
     }
 
     public GrabberSubsystem() {
-        grabberMotor = new SparkMax(Ports.CANID.GRABBER_DRIVE.getId(), MotorType.kBrushless);
+        grabberMotor = new SparkMax(PortMap.CANID.GRABBER_DRIVE.getId(), MotorType.kBrushless);
 
-        grabberMotor.configure(GrabberConfigs.GRABBER_CONFIG, ResetMode.kResetSafeParameters,
+        grabberMotor.configure(GrabberConfig.GRABBER_CONFIG, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
 
-        coralSensorFront = new TimeOfFlight(Ports.CANID.CORAL_TOF_FRONT.getId());
-        coralSensorBack = new TimeOfFlight(Ports.CANID.CORAL_TOF_BACK.getId());
-        algaeSensor = new DigitalInput(Ports.DIO.ALGAE_BEAM_BREAK.getId());
+        coralSensorFront = new TimeOfFlight(PortMap.CANID.CORAL_TOF_FRONT.getId());
+        coralSensorBack = new TimeOfFlight(PortMap.CANID.CORAL_TOF_BACK.getId());
+        algaeSensor = new DigitalInput(PortMap.DIO.ALGAE_BEAM_BREAK.getId());
 
         targetType = GrabType.NONE;
 

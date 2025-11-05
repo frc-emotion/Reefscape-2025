@@ -42,12 +42,12 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine;
 import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Direction;
-import frc.robot.Constants.Ports;
-import frc.robot.util.Configs.ElevatorConfigs;
-import frc.robot.util.PIDHelper;
-import frc.robot.util.Faults.FaultManager;
-import frc.robot.util.Faults.FaultTypes.FaultType;
-import frc.robot.Constants.ElevatorConstants;;
+import frc.robot.config.subsystems.ElevatorConfig;
+import frc.robot.constants.PortMap;
+import frc.robot.constants.subsystems.ElevatorConstants;
+import frc.robot.util.helpers.PIDHelper;
+import frc.robot.util.diagnostics.Faults.FaultManager;
+import frc.robot.util.diagnostics.Faults.FaultTypes.FaultType;
 
 @Logged
 public class ElevatorSubsystem extends SubsystemBase {
@@ -71,14 +71,14 @@ public class ElevatorSubsystem extends SubsystemBase {
     private MutDistance position = Meters.mutable(0);
 
     public ElevatorSubsystem(boolean useTrapezoidal) {
-        driveMotor = new SparkMax(Ports.CANID.ELEVATOR_DRIVE_LEADER.getId(), MotorType.kBrushless);
-        driveMotor2 = new SparkMax(Ports.CANID.ELEVATOR_DRIVE_FOLLOWER.getId(), MotorType.kBrushless);
+        driveMotor = new SparkMax(PortMap.CANID.ELEVATOR_DRIVE_LEADER.getId(), MotorType.kBrushless);
+        driveMotor2 = new SparkMax(PortMap.CANID.ELEVATOR_DRIVE_FOLLOWER.getId(), MotorType.kBrushless);
 
-        driveMotor.configure(ElevatorConfigs.ELEVATOR_CONFIG, ResetMode.kResetSafeParameters,
+        driveMotor.configure(ElevatorConfig.ELEVATOR_CONFIG, ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
 
         driveMotor2.configure(
-                ElevatorConfigs.ELEVATOR_FOLLOWER_CONFIG,
+                ElevatorConfig.ELEVATOR_FOLLOWER_CONFIG,
                 ResetMode.kResetSafeParameters,
                 PersistMode.kPersistParameters);
 
