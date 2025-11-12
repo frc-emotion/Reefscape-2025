@@ -14,6 +14,7 @@ import frc.robot.subsystems.arm.ArmSubsystem;
 public class ArmManualCommand extends Command {
     private final ArmSubsystem armSubsystem;
     private final Supplier<Double> inputSupplier;
+    private Command currentCommand;
     
     /**
      * Creates a manual arm control command.
@@ -31,11 +32,21 @@ public class ArmManualCommand extends Command {
     @Override
     public void execute() {
         double input = MathUtil.applyDeadband(inputSupplier.get(), 0.1);
-        armSubsystem.setWithFeedforward(input * ArmConstants.kMaxOutput);
+        double output = input * ArmConstants.kMaxOutput;
+        
+        if (currentCommand != null) {
+            currentCommand.end(true);
+        }
+        currentCommand = armSubsystem.armCmd(output);
+        currentCommand.initialize();
+        currentCommand.execute();
     }
     
     @Override
     public void end(boolean interrupted) {
-        armSubsystem.stop();
+        if (currentCommand != null) {
+            currentCommand.end(true);
+        }
+        armSubsystem.armCmd(0).schedule();
     }
 }

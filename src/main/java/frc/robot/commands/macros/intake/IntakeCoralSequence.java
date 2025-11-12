@@ -59,8 +59,8 @@ public class IntakeCoralSequence extends SequentialCommandGroup {
             
             // 3. Move to intake position (parallel)
             new ParallelCommandGroup(
-                new MoveElevatorToHeight(elevatorSubsystem, task.getElevatorHeight(), true),
-                new MoveArmToAngle(armSubsystem, task.getArmAngle(), () -> Inches.of(90), true)
+                new MoveElevatorToHeight(elevatorSubsystem, task.getElevatorHeight()),
+                new MoveArmToAngle(armSubsystem, task.getArmAngle())
             ),
             
             // 4. Activate intake until game piece acquired (max 2 seconds)

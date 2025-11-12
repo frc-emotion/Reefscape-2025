@@ -8,11 +8,12 @@ import frc.robot.constants.subsystems.ArmConstants;
 import frc.robot.subsystems.arm.ArmSubsystem;
 
 public class ArmManualCommand extends Command {
-    private final ArmSubsystem m_ArmSubsystem;
-    private Supplier<Double> armSupplier;
+    private final ArmSubsystem armSubsystem;
+    private final Supplier<Double> armSupplier;
+    private Command currentCommand;
 
     public ArmManualCommand(ArmSubsystem armSubsystem, Supplier<Double> armSupplier) {
-        m_ArmSubsystem = armSubsystem;
+        this.armSubsystem = armSubsystem;
         this.armSupplier = armSupplier;
 
         addRequirements(armSubsystem);
@@ -20,11 +21,22 @@ public class ArmManualCommand extends Command {
 
     @Override
     public void execute() {
-        m_ArmSubsystem.setWithFeedforward(MathUtil.applyDeadband(armSupplier.get(), 0.1) * ArmConstants.kMaxOutput);
+        double input = MathUtil.applyDeadband(armSupplier.get(), 0.1);
+        double output = input * ArmConstants.kMaxOutput;
+        
+        if (currentCommand != null) {
+            currentCommand.end(true);
+        }
+        currentCommand = armSubsystem.armCmd(output);
+        currentCommand.initialize();
+        currentCommand.execute();
     }
 
     @Override
     public void end(boolean interrupted) {
-        m_ArmSubsystem.stop();
+        if (currentCommand != null) {
+            currentCommand.end(true);
+        }
+        armSubsystem.armCmd(0).schedule();
     }
 }

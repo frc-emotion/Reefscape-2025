@@ -9,8 +9,6 @@ import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
 
-import java.util.function.Supplier;
-
 import com.revrobotics.spark.SparkLowLevel;
 import com.revrobotics.spark.SparkMax;
 
@@ -111,5 +109,13 @@ public class ElevatorSubsystem extends SubsystemBase {
     
     public Command sysId() {
         return elevator.sysId(Volts.of(12), Volts.of(12).per(Second), Second.of(30));
+    }
+
+    public Elevator getElevator() {
+        return elevator;
+    }
+
+    public double getMotorCurrent() {
+        return elevatorMotor.getOutputCurrent();
     }
 }

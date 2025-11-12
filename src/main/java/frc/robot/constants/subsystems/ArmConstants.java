@@ -13,6 +13,7 @@ public final class ArmConstants {
     
     // Motor Configuration
     public static final int kSmartCurrentLimit = 45;
+    public static final double kMaxOutput = 1.0;
 
     // Physical Constraints
     /** Minimum arm rotation in degrees */

@@ -1,19 +1,15 @@
 package frc.robot.commands.teleop.Elevator;
 
-import java.util.function.Supplier;
-
-import edu.wpi.first.units.Units;
-import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.constants.subsystems.ElevatorConstants;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 
 public class ZeroElevatorCurrent extends Command {
-    private ElevatorSubsystem elevatorSubsystem;
+    private final ElevatorSubsystem elevatorSubsystem;
     private final double slowSpeed = -0.2;
     private final double timeoutSeconds = 5.0; // Safety
     private double startTime;
-
+    private Command currentCommand;
 
     public ZeroElevatorCurrent(ElevatorSubsystem elevatorSubsystem) {
         this.elevatorSubsystem = elevatorSubsystem;
@@ -21,27 +17,33 @@ public class ZeroElevatorCurrent extends Command {
     }
 
     @Override
-    public void end(boolean interrupted) {
-        elevatorSubsystem.resetSensorPosition(Units.Inches.of(0));
-        elevatorSubsystem.stop();
+    public void initialize() {
+        startTime = System.currentTimeMillis() / 1000.0;
     }
 
     @Override
     public void execute() {
-        elevatorSubsystem.set(slowSpeed);
-    }
-
-    @Override
-    public void initialize() {
-        elevatorSubsystem.stop();
-        startTime = System.currentTimeMillis() / 1000.0;
+        if (currentCommand != null) {
+            currentCommand.end(true);
+        }
+        currentCommand = elevatorSubsystem.elevCmd(slowSpeed);
+        currentCommand.initialize();
+        currentCommand.execute();
     }
 
     @Override
     public boolean isFinished() {
         double currentTime = System.currentTimeMillis() / 1000.0;
-        return elevatorSubsystem.getCurrentDraw(true) > ElevatorConstants.CURRENT_SPIKE_THRESHOLD ||
+        return elevatorSubsystem.getMotorCurrent() > ElevatorConstants.CURRENT_SPIKE_THRESHOLD ||
                (currentTime - startTime) >= timeoutSeconds;
     }
 
+    @Override
+    public void end(boolean interrupted) {
+        if (currentCommand != null) {
+            currentCommand.end(true);
+        }
+        // Stop elevator - YAMS handles position internally
+        elevatorSubsystem.elevCmd(0).schedule();
+    }
 }

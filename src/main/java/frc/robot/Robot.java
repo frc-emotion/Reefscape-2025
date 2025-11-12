@@ -16,11 +16,9 @@ import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.CommandScheduler;
-import frc.robot.subsystems.led.LedSubsystem;
 import frc.robot.util.diagnostics.Faults.FaultManager;
 
 public class Robot extends TimedRobot {
-    private final LedSubsystem LEDSubsystem = new LedSubsystem();
     private Command m_autonomousCommand;
 
     // @Logged(name="RobotContainer")
@@ -45,7 +43,6 @@ public class Robot extends TimedRobot {
     public void robotPeriodic() {
         // Switch thread to high priority to improve loop timing
         Threads.setCurrentThreadPriority(true, 99);
-        // Constants.AutonConstants.updateFromDashboard();
         CommandScheduler.getInstance().run();
 
         // Return to normal thread priority     
@@ -71,8 +68,6 @@ public class Robot extends TimedRobot {
         if (m_autonomousCommand != null) {
         m_autonomousCommand.schedule();
         }
-        
-        LEDSubsystem.setLedAlliance();
     }
 
     @Override
@@ -86,8 +81,6 @@ public class Robot extends TimedRobot {
         if (m_autonomousCommand != null) {
             m_autonomousCommand.cancel();
         }
-
-        LEDSubsystem.setLedAlliance();
     }
 
     @Override

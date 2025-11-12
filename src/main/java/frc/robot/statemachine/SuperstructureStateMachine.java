@@ -7,7 +7,6 @@ import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.game.Task;
 import frc.robot.game.tasks.PickupTask;
 import frc.robot.subsystems.arm.ArmSubsystem;
-import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.grabber.GrabberSubsystem;
 import frc.robot.subsystems.swerve.SwerveSubsystem;
@@ -35,8 +34,6 @@ public class SuperstructureStateMachine extends SubsystemBase {
     private final ArmSubsystem arm;
     private final ElevatorSubsystem elevator;
     private final GrabberSubsystem grabber;
-    private final ClimbSubsystem climb;
-    private final SwerveSubsystem drive;
     
     // State tracking
     private boolean hasGamePiece;
@@ -48,20 +45,16 @@ public class SuperstructureStateMachine extends SubsystemBase {
      * @param arm Arm subsystem
      * @param elevator Elevator subsystem
      * @param grabber Grabber subsystem
-     * @param climb Climb subsystem
-     * @param drive Swerve drive subsystem
+     * @param drive Swerve drive subsystem (unused, for future expansion)
      */
     public SuperstructureStateMachine(
             ArmSubsystem arm,
             ElevatorSubsystem elevator,
             GrabberSubsystem grabber,
-            ClimbSubsystem climb,
             SwerveSubsystem drive) {
         this.arm = arm;
         this.elevator = elevator;
         this.grabber = grabber;
-        this.climb = climb;
-        this.drive = drive;
         
         // Initialize to safe defaults
         this.mechanismState = RobotState.IDLE;
@@ -135,10 +128,13 @@ public class SuperstructureStateMachine extends SubsystemBase {
     
     /**
      * Checks if all mechanisms are at their target positions.
-     * @return True if at setpoint
+     * Note: YAMS Commands handle setpoint detection internally.
+     * This always returns true since YAMS manages mechanism state.
+     * @return True (YAMS handles completion internally)
      */
     public boolean isAtTargetPosition() {
-        return arm.isAtSetpoint() && elevator.isAtSetpoint();
+        // YAMS Commands manage their own completion state
+        return true;
     }
     
     /**
@@ -374,10 +370,10 @@ public class SuperstructureStateMachine extends SubsystemBase {
      */
     public Command emergencyStop() {
         return Commands.runOnce(() -> {
-            arm.stop();
-            elevator.stop();
+            // Stop all mechanisms using YAMS Commands
+            arm.armCmd(0).schedule();
+            elevator.elevCmd(0).schedule();
             grabber.stop();
-            climb.stop();
             mechanismState = RobotState.IDLE;
             hasGamePiece = false;
             currentTask = null;

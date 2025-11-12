@@ -55,8 +55,8 @@ public class ScoreCoralSequence extends SequentialCommandGroup {
             
             // 2. Move to scoring position (parallel)
             new ParallelCommandGroup(
-                new MoveElevatorToHeight(elevatorSubsystem, task.getElevatorHeight(), true),
-                new MoveArmToAngle(armSubsystem, task.getArmAngle(), () -> Inches.of(90), true)
+                new MoveElevatorToHeight(elevatorSubsystem, task.getElevatorHeight()),
+                new MoveArmToAngle(armSubsystem, task.getArmAngle())
             ),
             
             // 3. Transition to scoring

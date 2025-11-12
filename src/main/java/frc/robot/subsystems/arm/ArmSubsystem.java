@@ -98,6 +98,10 @@ public class ArmSubsystem extends SubsystemBase {
         return arm.setAngle(angle);
     }
 
+    public Arm getArm() {
+        return arm;
+    }
+
     @Override
     public void periodic() {
         arm.updateTelemetry();

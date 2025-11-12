@@ -1,51 +1,38 @@
 package frc.robot.commands.teleop.arm;
 
-import java.util.function.Supplier;
+import static edu.wpi.first.units.Units.Degrees;
 
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.arm.ArmSubsystem;
 
 public class MoveArmPosition extends Command {
-    private final ArmSubsystem m_ArmSubsystem;
+    private final Command yamsCommand;
 
-    private final Rotation2d targetRotation;
-
-    private final Supplier<Distance> elevatorHeightSupplier;
-
-    private boolean shouldFinish;
-
-    public MoveArmPosition(ArmSubsystem armSubsystem, Rotation2d targetRotation2d, Supplier<Distance> elevatorHeight, boolean shouldFinish) {
-        this.m_ArmSubsystem = armSubsystem;
-        this.targetRotation = targetRotation2d;
-        this.elevatorHeightSupplier = elevatorHeight;
-        this.shouldFinish = shouldFinish;
-        
+    public MoveArmPosition(ArmSubsystem armSubsystem, Rotation2d targetRotation2d) {
+        this.yamsCommand = armSubsystem.setAngle(Degrees.of(targetRotation2d.getDegrees()));
         addRequirements(armSubsystem);
     }
 
-    public MoveArmPosition(ArmSubsystem armSubsystem, Rotation2d targetRotation2d, Supplier<Distance> elevatorHeight) {
-        this(armSubsystem, targetRotation2d, elevatorHeight, false);
-    }
-
     @Override
-    public void end(boolean interrupted){
-        m_ArmSubsystem.stop();
-        System.out.println("Arm command ended");
+    public void initialize() {
+        yamsCommand.initialize();
+        System.out.println("Arm command started");
     }
 
     @Override
     public void execute() {
-        System.out.println("Arm command ran");
-        m_ArmSubsystem.setTargetAngle(
-            targetRotation,
-            elevatorHeightSupplier.get()
-        );
+        yamsCommand.execute();
     }
 
     @Override
     public boolean isFinished() {
-        return shouldFinish && m_ArmSubsystem.isAtSetpoint();
+        return yamsCommand.isFinished();
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        yamsCommand.end(interrupted);
+        System.out.println("Arm command ended");
     }
 }

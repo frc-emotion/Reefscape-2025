@@ -19,7 +19,6 @@ import frc.robot.controls.DriverControls;
 import frc.robot.controls.OperatorControls;
 import frc.robot.statemachine.SuperstructureStateMachine;
 import frc.robot.subsystems.arm.ArmSubsystem;
-import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.grabber.GrabberSubsystem;
 import frc.robot.subsystems.grabber.GrabberSubsystem.GrabType;
@@ -42,7 +41,6 @@ public class RobotContainer {
     private final ElevatorSubsystem elevatorSubsystem;
     private final GrabberSubsystem grabberSubsystem;
     private final ArmSubsystem armSubsystem;
-    private final ClimbSubsystem climbSubsystem;
     
     // State machine coordinator
     private final SuperstructureStateMachine stateMachine;
@@ -63,14 +61,12 @@ public class RobotContainer {
         elevatorSubsystem = new ElevatorSubsystem(true);
         grabberSubsystem = new GrabberSubsystem();
         armSubsystem = new ArmSubsystem();
-        climbSubsystem = new ClimbSubsystem();
         
         // Initialize state machine coordinator
         stateMachine = new SuperstructureStateMachine(
                 armSubsystem,
                 elevatorSubsystem,
                 grabberSubsystem,
-                climbSubsystem,
                 drivebase);
         
         // Initialize control managers with state machine
@@ -80,8 +76,7 @@ public class RobotContainer {
                 stateMachine,
                 armSubsystem,
                 elevatorSubsystem,
-                grabberSubsystem,
-                climbSubsystem);
+                grabberSubsystem);
         
         // Configure everything
         autoChooser = new SendableChooser<>();

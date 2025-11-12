@@ -7,18 +7,34 @@ import edu.wpi.first.wpilibj2.command.Command;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 
 public class MoveElevatorManual extends Command {
-    private ElevatorSubsystem m_ElevatorSubsystem;
-    private Supplier<Double> inputSupplier;
+    private final ElevatorSubsystem elevatorSubsystem;
+    private final Supplier<Double> inputSupplier;
+    private Command currentCommand;
 
     public MoveElevatorManual(ElevatorSubsystem elevatorSubsystem, Supplier<Double> inSupplier) {
-        m_ElevatorSubsystem = elevatorSubsystem;
-        inputSupplier = inSupplier;
+        this.elevatorSubsystem = elevatorSubsystem;
+        this.inputSupplier = inSupplier;
 
-        addRequirements(m_ElevatorSubsystem);
+        addRequirements(elevatorSubsystem);
     }
 
     @Override
     public void execute() {
-        m_ElevatorSubsystem.setWithFeedforward(MathUtil.applyDeadband(inputSupplier.get(), 0.1));
+        double input = MathUtil.applyDeadband(inputSupplier.get(), 0.1);
+        
+        if (currentCommand != null) {
+            currentCommand.end(true);
+        }
+        currentCommand = elevatorSubsystem.elevCmd(input);
+        currentCommand.initialize();
+        currentCommand.execute();
+    }
+
+    @Override
+    public void end(boolean interrupted) {
+        if (currentCommand != null) {
+            currentCommand.end(true);
+        }
+        elevatorSubsystem.elevCmd(0).schedule();
     }
 }

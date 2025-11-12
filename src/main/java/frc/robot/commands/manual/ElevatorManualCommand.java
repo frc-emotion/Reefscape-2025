@@ -13,6 +13,7 @@ import frc.robot.subsystems.elevator.ElevatorSubsystem;
 public class ElevatorManualCommand extends Command {
     private final ElevatorSubsystem elevatorSubsystem;
     private final Supplier<Double> inputSupplier;
+    private Command currentCommand;
     
     /**
      * Creates a manual elevator control command.
@@ -30,11 +31,20 @@ public class ElevatorManualCommand extends Command {
     @Override
     public void execute() {
         double input = MathUtil.applyDeadband(inputSupplier.get(), 0.1);
-        elevatorSubsystem.setWithFeedforward(input);
+        
+        if (currentCommand != null) {
+            currentCommand.end(true);
+        }
+        currentCommand = elevatorSubsystem.elevCmd(input);
+        currentCommand.initialize();
+        currentCommand.execute();
     }
     
     @Override
     public void end(boolean interrupted) {
-        elevatorSubsystem.stop();
+        if (currentCommand != null) {
+            currentCommand.end(true);
+        }
+        elevatorSubsystem.elevCmd(0).schedule();
     }
 }

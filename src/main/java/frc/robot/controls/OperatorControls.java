@@ -6,7 +6,6 @@ import frc.robot.commands.macros.scoring.ScoreCoralSequence;
 import frc.robot.commands.macros.scoring.ScoreAlgaeSequence;
 import frc.robot.commands.manual.ArmManualCommand;
 import frc.robot.commands.manual.ElevatorManualCommand;
-import frc.robot.commands.manual.ClimbManualCommand;
 import frc.robot.commands.atomic.grabber.IntakeGamePiece;
 import frc.robot.commands.atomic.grabber.EjectGamePiece;
 import frc.robot.constants.OperatorConstants;
@@ -14,14 +13,13 @@ import frc.robot.game.GameElement.CoralLevel;
 import frc.robot.game.field.AlgaeScorePosition;
 import frc.robot.statemachine.SuperstructureStateMachine;
 import frc.robot.subsystems.arm.ArmSubsystem;
-import frc.robot.subsystems.climb.ClimbSubsystem;
 import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.grabber.GrabberSubsystem;
 import frc.robot.subsystems.grabber.GrabberSubsystem.GrabType;
 
 /**
  * Manages operator Xbox controller bindings for manipulator subsystems.
- * Controls arm, elevator, grabber, and climb mechanisms.
+ * Controls arm, elevator, and grabber mechanisms.
  */
 public class OperatorControls {
     
@@ -30,7 +28,6 @@ public class OperatorControls {
     private final ArmSubsystem armSubsystem;
     private final ElevatorSubsystem elevatorSubsystem;
     private final GrabberSubsystem grabberSubsystem;
-    private final ClimbSubsystem climbSubsystem;
     
     // Arm manual control scaling
     private static final double ARM_MANUAL_SCALE = 0.58;
@@ -43,21 +40,18 @@ public class OperatorControls {
      * @param armSubsystem The arm subsystem
      * @param elevatorSubsystem The elevator subsystem
      * @param grabberSubsystem The grabber subsystem
-     * @param climbSubsystem The climb subsystem
      */
     public OperatorControls(
             CommandXboxController controller,
             SuperstructureStateMachine stateMachine,
             ArmSubsystem armSubsystem,
             ElevatorSubsystem elevatorSubsystem,
-            GrabberSubsystem grabberSubsystem,
-            ClimbSubsystem climbSubsystem) {
+            GrabberSubsystem grabberSubsystem) {
         this.controller = controller;
         this.stateMachine = stateMachine;
         this.armSubsystem = armSubsystem;
         this.elevatorSubsystem = elevatorSubsystem;
         this.grabberSubsystem = grabberSubsystem;
-        this.climbSubsystem = climbSubsystem;
     }
     
     /**
@@ -67,7 +61,6 @@ public class OperatorControls {
         configureDefaultCommands();
         configureCoralScoringButtons();
         configureAlgaeScoringButtons();
-        configureClimbButtons();
         configureGrabberButtons();
     }
     
@@ -153,19 +146,6 @@ public class OperatorControls {
                         elevatorSubsystem,
                         grabberSubsystem,
                         AlgaeScorePosition.R1));
-    }
-    
-    /**
-     * Configures A and B buttons for climb control.
-     */
-    private void configureClimbButtons() {
-        // Button A: Extend climb
-        controller.a().whileTrue(
-                new ClimbManualCommand(climbSubsystem, () -> 1.0));
-        
-        // Button B: Retract climb
-        controller.b().whileTrue(
-                new ClimbManualCommand(climbSubsystem, () -> -1.0));
     }
     
     /**
