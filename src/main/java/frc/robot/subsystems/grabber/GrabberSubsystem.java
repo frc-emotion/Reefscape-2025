@@ -127,7 +127,7 @@ public class GrabberSubsystem extends SubsystemBase {
     }
 
     public boolean hasGamePiece() {
-        return getCurrentGrabType() == GrabType.NONE;
+        return getCurrentGrabType() != GrabType.NONE;
     }
 
     @Override

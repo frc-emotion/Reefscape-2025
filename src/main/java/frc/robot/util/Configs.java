@@ -2,9 +2,8 @@ package frc.robot.util;
 
 import com.revrobotics.spark.config.SparkMaxConfig;
 
-import frc.robot.config.subsystems.ArmConfig;
+// Note: ArmConfig and ElevatorConfig removed - now managed by YAMS subsystems
 import frc.robot.config.subsystems.ClimbConfig;
-import frc.robot.config.subsystems.ElevatorConfig;
 import frc.robot.config.subsystems.GrabberConfig;
 
 /**
@@ -13,14 +12,8 @@ import frc.robot.config.subsystems.GrabberConfig;
  */
 @Deprecated(since = "2025", forRemoval = true)
 public class Configs {
-    /**
-     * @deprecated Use {@link frc.robot.config.subsystems.ElevatorConfig} instead
-     */
-    @Deprecated(since = "2025", forRemoval = true)
-    public static class ElevatorConfigs {
-        public static final SparkMaxConfig ELEVATOR_CONFIG = ElevatorConfig.ELEVATOR_CONFIG;
-        public static final SparkMaxConfig ELEVATOR_FOLLOWER_CONFIG = ElevatorConfig.ELEVATOR_FOLLOWER_CONFIG;
-    }
+    // Note: ElevatorConfigs and ArmConfigs removed - now managed by YAMS subsystems
+    // YAMS uses its own configuration system via SmartMotorControllerConfig
 
     /**
      * @deprecated Use {@link frc.robot.config.subsystems.GrabberConfig} instead
@@ -36,13 +29,5 @@ public class Configs {
     @Deprecated(since = "2025", forRemoval = true)
     public static class ClimbConfigs {
         public static final SparkMaxConfig CLIMB_CONFIG = ClimbConfig.CLIMB_CONFIG;
-    }
-
-    /**
-     * @deprecated Use {@link frc.robot.config.subsystems.ArmConfig} instead
-     */
-    @Deprecated(since = "2025", forRemoval = true)
-    public static class ArmConfigs {
-        public static final SparkMaxConfig ARM_CONFIG = ArmConfig.ARM_CONFIG;
     }
 }

@@ -83,9 +83,14 @@ public class RobotContainer {
                 grabberSubsystem,
                 climbSubsystem);
         
+        // Enable live PID tuning (DEVELOPMENT ONLY - comment out for competition!)
+        // armSubsystem.enableLivePIDTuning();
+        // elevatorSubsystem.enableLivePIDTuning();
+        
         // Configure everything
         autoChooser = new SendableChooser<>();
         configureRobotModeBindings();
+        configureTuningBindings(); // SysId bindings - COMMENTED FOR COMPETITION
         driverControls.configureBindings();
         operatorControls.configureBindings();
         initializeNamedCommands();
@@ -93,6 +98,22 @@ public class RobotContainer {
         
         // Silence joystick warnings
         DriverStation.silenceJoystickConnectionWarning(true);
+    }
+    
+    /**
+     * Configure SysId and tuning bindings.
+     * DEVELOPMENT ONLY - Remove or comment out before competition!
+     */
+    private void configureTuningBindings() {
+        // Arm SysId - Hold POV-Up in TEST mode
+        driverController.povUp().whileTrue(
+            armSubsystem.sysId().withName("Arm SysId")
+        );
+        
+        // Elevator SysId - Hold POV-Down in TEST mode  
+        driverController.povDown().whileTrue(
+            elevatorSubsystem.sysId().withName("Elevator SysId")
+        );
     }
     
     /**

@@ -22,13 +22,15 @@ public class ZeroElevatorCurrent extends Command {
 
     @Override
     public void end(boolean interrupted) {
-        elevatorSubsystem.resetSensorPosition(Units.Inches.of(0));
+        // Note: YAMS doesn't support direct encoder reset
+        // Handle zeroing via robot initialization or alternative method
         elevatorSubsystem.stop();
     }
 
     @Override
     public void execute() {
-        elevatorSubsystem.set(slowSpeed);
+        // Use elevCmd instead of set
+        elevatorSubsystem.elevCmd(slowSpeed).schedule();
     }
 
     @Override

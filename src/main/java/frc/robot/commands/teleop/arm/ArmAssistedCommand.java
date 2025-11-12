@@ -1,5 +1,7 @@
 package frc.robot.commands.teleop.arm;
 
+import static edu.wpi.first.units.Units.Degrees;
+
 import java.util.function.Supplier;
 
 import edu.wpi.first.math.filter.SlewRateLimiter;
@@ -25,8 +27,9 @@ public class ArmAssistedCommand extends Command {
 
     @Override
     public void execute() {
+        // Use getCurrentAngle() instead of getRotation()
         Rotation2d targetRotation = Rotation2d.fromDegrees(
-            m_ArmSubsystem.getRotation().getDegrees() + (armSupplier.get() * 360)
+            m_ArmSubsystem.getCurrentAngle().in(Degrees) + (armSupplier.get() * 360)
         );
 
         m_ArmSubsystem.setTargetAngle(targetRotation, elevatorHeightSupplier.get());

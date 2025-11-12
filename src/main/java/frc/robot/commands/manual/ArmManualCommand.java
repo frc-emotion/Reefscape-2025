@@ -31,7 +31,7 @@ public class ArmManualCommand extends Command {
     @Override
     public void execute() {
         double input = MathUtil.applyDeadband(inputSupplier.get(), 0.1);
-        armSubsystem.setWithFeedforward(input * ArmConstants.kMaxOutput);
+        armSubsystem.armCmd(input * ArmConstants.kMaxOutput).schedule();
     }
     
     @Override

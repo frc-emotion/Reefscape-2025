@@ -30,7 +30,7 @@ public class ElevatorManualCommand extends Command {
     @Override
     public void execute() {
         double input = MathUtil.applyDeadband(inputSupplier.get(), 0.1);
-        elevatorSubsystem.setWithFeedforward(input);
+        elevatorSubsystem.elevCmd(input).schedule();
     }
     
     @Override

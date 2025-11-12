@@ -19,6 +19,12 @@ public class MoveElevatorManual extends Command {
 
     @Override
     public void execute() {
-        m_ElevatorSubsystem.setWithFeedforward(MathUtil.applyDeadband(inputSupplier.get(), 0.1));
+        double input = MathUtil.applyDeadband(inputSupplier.get(), 0.1);
+        m_ElevatorSubsystem.elevCmd(input).schedule();
+    }
+    
+    @Override
+    public void end(boolean interrupted) {
+        m_ElevatorSubsystem.stop();
     }
 }

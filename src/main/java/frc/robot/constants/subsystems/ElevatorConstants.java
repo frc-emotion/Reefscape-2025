@@ -14,6 +14,29 @@ import static edu.wpi.first.units.Units.Inches;
  */
 public final class ElevatorConstants {
     
+    // Motor Configuration
+    public static final int kSmartCurrentLimit = 40; // amps
+    public static final int kSecondaryCurrentLimit = 60; // amps
+    
+    // Mechanical Configuration
+    public static final int kEncoderCPR = 42; // counts per revolution
+    public static final double kPulleyDiameterInches = 1.5; // MEASURE THIS!
+    public static final double kpulleyDiameterInches = kPulleyDiameterInches; // Alias for backward compatibility
+    public static final double kPulleyCircumInches = Math.PI * kPulleyDiameterInches;
+    public static final double kGearRatio = 15.0; // MEASURE THIS!
+    public static final double TOLERABLE_ERROR = 1.0; // inches
+    public static final double effectiveCountsPerRevolution = kEncoderCPR * kGearRatio;
+    public static final double inchesPerCount = kPulleyCircumInches / effectiveCountsPerRevolution;
+    
+    // Physical Constraints
+    public static final edu.wpi.first.units.measure.Mass kCarriageMass = Units.Pounds.of(16);
+    public static final edu.wpi.first.units.measure.Distance kDrumRadius = Units.Inches.of(kPulleyDiameterInches / 2);
+    public static final edu.wpi.first.units.measure.Distance kMinHeight = Units.Inches.of(0);
+    public static final edu.wpi.first.units.measure.Distance kMaxHeight = Units.Inches.of(70);
+    public static final edu.wpi.first.units.measure.Distance kStartingHeight = Units.Inches.of(0);
+    public static final double MAX_MOTOR_RPM = 5700; // NEO max RPM
+    public static final double MAX_MOTOR_ACCELERATION = 1000; // RPM/s
+    
     // Feedforward Constants
     public static final double kS = 0.0; // Static gain (volts)
     public static final double kG = 0.36; // Gravity gain (volts)
@@ -48,6 +71,7 @@ public final class ElevatorConstants {
     public static final int CURRENT_SPIKE_THRESHOLD = 20; // amps
     public static final int NORMAL_OPERATION_TEMP = 40; // celsius
     public static final int TEMP_SPIKE_THRESHOLD = 20; // celsius
+    public static final double TOLERABLE_ERROR_INCHES = TOLERABLE_ERROR; // Alias for backward compatibility
 
     private ElevatorConstants() {
         throw new UnsupportedOperationException("This is a utility class!");
