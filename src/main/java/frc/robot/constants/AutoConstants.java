@@ -11,12 +11,15 @@ import com.pathplanner.lib.config.PIDConstants;
  */
 public final class AutoConstants {
     
-    // Default PID values for translation
-    private static final double DEFAULT_TRANSLATION_P = 0.005;
+    // Translation PID values (tune these for path following accuracy)
+    // Start with kP = 5.0, increase if robot is slow to correct position errors
+    // Decrease if robot oscillates around the path
+    private static final double DEFAULT_TRANSLATION_P = 5.0;  // Was 0.005 - FIXED!
     private static final double DEFAULT_TRANSLATION_I = 0.0;
     private static final double DEFAULT_TRANSLATION_D = 0.0;
     
-    // Default PID values for rotation
+    // Rotation PID values (tune these for heading accuracy)
+    // kP = 5.0 is a good starting point for most swerve drives
     private static final double DEFAULT_ANGLE_P = 5.0;
     private static final double DEFAULT_ANGLE_I = 0.0;
     private static final double DEFAULT_ANGLE_D = 0.0;

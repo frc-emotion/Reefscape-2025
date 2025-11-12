@@ -4,8 +4,10 @@ import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.commands.macros.scoring.ScoreCoralSequence;
 import frc.robot.commands.macros.scoring.ScoreAlgaeSequence;
-import frc.robot.commands.manual.ArmManualCommand;
-import frc.robot.commands.manual.ElevatorManualCommand;
+import frc.robot.commands.teleop.arm.ArmManualCommand;
+import frc.robot.commands.teleop.Elevator.MoveElevatorManual;
+import frc.robot.commands.manual.GrabberManualCommand;
+import frc.robot.commands.atomic.arm.ReturnArmToSafe;
 import frc.robot.commands.atomic.grabber.IntakeGamePiece;
 import frc.robot.commands.atomic.grabber.EjectGamePiece;
 import frc.robot.constants.OperatorConstants;
@@ -62,6 +64,28 @@ public class OperatorControls {
         configureCoralScoringButtons();
         configureAlgaeScoringButtons();
         configureGrabberButtons();
+        configureSysIdButtons();
+    }
+    
+    /**
+     * Configures SysId buttons for mechanism tuning.
+     * SAFETY: Requires holding LEFT STICK to prevent accidental activation.
+     * 
+     * Instructions:
+     * 1. Open WPILib SysId tool
+     * 2. Connect to robot
+     * 3. Hold Left Stick + D-Pad Up for ARM SysId
+     * 4. Hold Left Stick + D-Pad Right for ELEVATOR SysId
+     * 5. Follow WPILib SysId documentation to run tests
+     */
+    private void configureSysIdButtons() {
+        // ARM SysId - Hold Left Stick + D-Pad Up
+        controller.leftStick().and(controller.povUp()).whileTrue(
+                armSubsystem.sysId());
+        
+        // ELEVATOR SysId - Hold Left Stick + D-Pad Right
+        controller.leftStick().and(controller.povRight()).whileTrue(
+                elevatorSubsystem.sysId());
     }
     
     /**
@@ -79,7 +103,7 @@ public class OperatorControls {
         
         // Elevator manual control
         elevatorSubsystem.setDefaultCommand(
-                new ElevatorManualCommand(elevatorSubsystem, () -> -controller.getRightY()));
+                new MoveElevatorManual(elevatorSubsystem, () -> -controller.getRightY()));
     }
     
     /**
@@ -152,6 +176,14 @@ public class OperatorControls {
      * Configures bumpers and triggers for grabber control.
      */
     private void configureGrabberButtons() {
+        // EMERGENCY: Back button - snap arm back to safe vertical position
+        controller.back().onTrue(
+                new ReturnArmToSafe(armSubsystem));
+        
+        // FALLBACK: Start button - manual grabber control (hold for direct motor control)
+        controller.start().whileTrue(
+                new GrabberManualCommand(grabberSubsystem, () -> -controller.getRightX()));
+        
         // Right bumper: Set target type to Coral
         controller.rightBumper().whileTrue(
                 Commands.runOnce(() -> grabberSubsystem.setTargetType(GrabType.CORAL)));
@@ -167,5 +199,8 @@ public class OperatorControls {
         // Left trigger: Grab/intake game piece
         controller.leftTrigger(OperatorConstants.DEADBAND).whileTrue(
                 new IntakeGamePiece(grabberSubsystem));
+        
+        // Note: Manual control is default - driver can move arm freely
+        // If arm goes too low while elevator is up, press BACK to return to safe vertical
     }
 }

@@ -1,12 +1,7 @@
 package frc.robot.commands.macros.scoring;
 
-import static edu.wpi.first.units.Units.Inches;
-
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import edu.wpi.first.wpilibj2.command.WaitUntilCommand;
-import frc.robot.commands.atomic.arm.MoveArmToAngle;
-import frc.robot.commands.atomic.elevator.MoveElevatorToHeight;
+import frc.robot.commands.atomic.SafeMoveToPosition;
 import frc.robot.commands.atomic.grabber.EjectGamePiece;
 import frc.robot.game.GameElement.CoralLevel;
 import frc.robot.game.tasks.ScoreCoral;
@@ -16,16 +11,14 @@ import frc.robot.subsystems.elevator.ElevatorSubsystem;
 import frc.robot.subsystems.grabber.GrabberSubsystem;
 
 /**
- * Macro sequence to score coral at a specific level.
+ * Simplified macro sequence to score coral at a specific level.
  * 
  * Sequence:
- * 1. Transition state machine to POSITIONING
- * 2. Move arm and elevator to target position (parallel)
- * 3. Wait until at setpoint
- * 4. Transition to SCORING
- * 5. Eject game piece
- * 6. Transition back to IDLE
+ * 1. Safe anti-tip movement: Arm vertical -> Elevator move -> Arm dunk (prevents tipping!)
+ * 2. Eject game piece
  * 
+ * Game piece detection automatically updates in state machine periodic().
+ * YAMS commands handle their own completion and lifecycle.
  * Works in both teleop and autonomous modes.
  */
 public class ScoreCoralSequence extends SequentialCommandGroup {
@@ -33,7 +26,7 @@ public class ScoreCoralSequence extends SequentialCommandGroup {
     /**
      * Creates a coral scoring sequence for a specific level.
      * 
-     * @param stateMachine The state machine coordinator
+     * @param stateMachine The state machine coordinator (kept for compatibility)
      * @param armSubsystem The arm subsystem
      * @param elevatorSubsystem The elevator subsystem
      * @param grabberSubsystem The grabber subsystem
@@ -50,23 +43,18 @@ public class ScoreCoralSequence extends SequentialCommandGroup {
         ScoreCoral task = new ScoreCoral(level);
         
         addCommands(
-            // 1. Transition to positioning state
-            stateMachine.transitionToPositioning(task),
-            
-            // 2. Move to scoring position (parallel)
-            new ParallelCommandGroup(
-                new MoveElevatorToHeight(elevatorSubsystem, task.getElevatorHeight()),
-                new MoveArmToAngle(armSubsystem, task.getArmAngle())
+            // 1. Safe anti-tip movement: vertical -> elevator -> dunk (YAMS handles completion)
+            new SafeMoveToPosition(
+                armSubsystem,
+                elevatorSubsystem,
+                task.getArmAngle(),
+                task.getElevatorHeight()
             ),
             
-            // 3. Transition to scoring
-            stateMachine.transitionToScoring(),
+            // 2. Eject game piece (run for 0.5 seconds)
+            new EjectGamePiece(grabberSubsystem).withTimeout(0.5)
             
-            // 4. Eject game piece (run for 0.5 seconds)
-            new EjectGamePiece(grabberSubsystem).withTimeout(0.5),
-            
-            // 5. Return to idle
-            stateMachine.transitionScoringComplete()
+            // That's it! hasGamePiece auto-updates from sensors in state machine periodic()
         );
     }
     

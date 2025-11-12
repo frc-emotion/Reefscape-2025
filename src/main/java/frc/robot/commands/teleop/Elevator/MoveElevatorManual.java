@@ -22,6 +22,7 @@ public class MoveElevatorManual extends Command {
     public void execute() {
         double input = MathUtil.applyDeadband(inputSupplier.get(), 0.1);
         
+        // End previous command and create new one
         if (currentCommand != null) {
             currentCommand.end(true);
         }
@@ -35,6 +36,7 @@ public class MoveElevatorManual extends Command {
         if (currentCommand != null) {
             currentCommand.end(true);
         }
-        elevatorSubsystem.elevCmd(0).schedule();
+        Command stopCommand = elevatorSubsystem.elevCmd(0);
+        stopCommand.schedule();
     }
 }

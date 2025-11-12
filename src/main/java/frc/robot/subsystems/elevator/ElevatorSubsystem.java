@@ -1,11 +1,5 @@
 package frc.robot.subsystems.elevator;
 
-import static edu.wpi.first.units.Units.Amps;
-import static edu.wpi.first.units.Units.Inches;
-import static edu.wpi.first.units.Units.Meters;
-import static edu.wpi.first.units.Units.MetersPerSecond;
-import static edu.wpi.first.units.Units.MetersPerSecondPerSecond;
-import static edu.wpi.first.units.Units.Pounds;
 import static edu.wpi.first.units.Units.Second;
 import static edu.wpi.first.units.Units.Volts;
 
@@ -14,11 +8,11 @@ import com.revrobotics.spark.SparkMax;
 
 import edu.wpi.first.math.Pair;
 import edu.wpi.first.math.controller.ElevatorFeedforward;
-import edu.wpi.first.math.geometry.Translation3d;
 import edu.wpi.first.math.system.plant.DCMotor;
 import edu.wpi.first.units.measure.Distance;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import frc.robot.constants.PortMap;
 import frc.robot.constants.subsystems.ElevatorConstants;
 import yams.gearing.GearBox;
@@ -47,51 +41,88 @@ public class ElevatorSubsystem extends SubsystemBase {
         elevatorFollower = new SparkMax(PortMap.CANID.ELEVATOR_DRIVE_FOLLOWER.getId(), SparkLowLevel.MotorType.kBrushless);
         
         motorConfig = new SmartMotorControllerConfig(this)
-            .withMechanismCircumference(Meters.of(Inches.of(0.25).in(Meters) * 22))
+            .withControlMode(ControlMode.CLOSED_LOOP)
+            // Mechanism Circumference converts rotations to meters
+            .withMechanismCircumference(ElevatorConstants.MECHANISM_CIRCUMFERENCE)
+            // Real robot PID
             .withClosedLoopController(
                 ElevatorConstants.kP,
                 ElevatorConstants.kI,
                 ElevatorConstants.kD,
-                MetersPerSecond.of(0.5),
-                MetersPerSecondPerSecond.of(0.5)
+                ElevatorConstants.MAX_VELOCITY,
+                ElevatorConstants.MAX_ACCELERATION
             )
-            .withSoftLimit(Meters.of(0), Meters.of(2))
-            .withGearing(new MechanismGearing(GearBox.fromReductionStages(3, 4)))
-            .withIdleMode(MotorMode.BRAKE)
-            .withTelemetry("ElevatorMotor", TelemetryVerbosity.HIGH)
-            .withStatorCurrentLimit(Amps.of(40))
-            .withMotorInverted(false)
-            .withFollowers(
-                Pair.of(elevatorFollower, true) // Inverted relative to leader
+            // Simulation PID (can be different from real)
+            .withSimClosedLoopController(
+                ElevatorConstants.kP,
+                ElevatorConstants.kI,
+                ElevatorConstants.kD,
+                ElevatorConstants.MAX_VELOCITY,
+                ElevatorConstants.MAX_ACCELERATION
             )
+            // Real robot feedforward
             .withFeedforward(new ElevatorFeedforward(
                 ElevatorConstants.kS,
                 ElevatorConstants.kG,
                 ElevatorConstants.kV,
                 ElevatorConstants.kA
             ))
-            .withControlMode(ControlMode.CLOSED_LOOP);
+            // Simulation feedforward
+            .withSimFeedforward(new ElevatorFeedforward(
+                ElevatorConstants.kS,
+                ElevatorConstants.kG,
+                ElevatorConstants.kV,
+                ElevatorConstants.kA
+            ))
+            .withTelemetry("ElevatorMotor", TelemetryVerbosity.HIGH)
+            // Gearing from the motor rotor to final shaft
+            .withGearing(new MechanismGearing(GearBox.fromReductionStages(
+                ElevatorConstants.GEAR_RATIO_STAGE_1,
+                ElevatorConstants.GEAR_RATIO_STAGE_2
+            )))
+            .withMotorInverted(false)
+            .withIdleMode(MotorMode.BRAKE)
+            .withStatorCurrentLimit(ElevatorConstants.STATOR_CURRENT_LIMIT)
+            .withFollowers(
+                Pair.of(elevatorFollower, true) // Inverted relative to leader
+            );
             
         motor = new SparkWrapper(elevatorMotor, DCMotor.getNEO(2), motorConfig);
         
         robotToMechanism = new MechanismPositionConfig()
-            .withMaxRobotHeight(Meters.of(1.5))
-            .withMaxRobotLength(Meters.of(0.75))
-            .withRelativePosition(new Translation3d(Meters.of(-0.25), Meters.of(0), Meters.of(0.5)));
+            .withMaxRobotHeight(ElevatorConstants.MAX_ROBOT_HEIGHT)
+            .withMaxRobotLength(ElevatorConstants.MAX_ROBOT_LENGTH)
+            .withRelativePosition(ElevatorConstants.ELEVATOR_POSITION);
             
         elevatorConfig = new ElevatorConfig(motor)
-            .withStartingHeight(Meters.of(0.5))
-            .withHardLimits(Meters.of(0), Meters.of(3))
+            .withStartingHeight(ElevatorConstants.STARTING_HEIGHT)
+            .withHardLimits(ElevatorConstants.MIN_HEIGHT, ElevatorConstants.MAX_HEIGHT)
             .withTelemetry("Elevator", TelemetryVerbosity.HIGH)
             .withMechanismPositionConfig(robotToMechanism)
-            .withMass(Pounds.of(16));
+            .withMass(ElevatorConstants.CARRIAGE_MASS);
             
         elevator = new Elevator(elevatorConfig);
+        
+        // Publish PID values to SmartDashboard for monitoring
+        SmartDashboard.putNumber("Elevator PID kP", ElevatorConstants.kP);
+        SmartDashboard.putNumber("Elevator PID kI", ElevatorConstants.kI);
+        SmartDashboard.putNumber("Elevator PID kD", ElevatorConstants.kD);
+        
+        // Publish feedforward values to SmartDashboard for monitoring
+        SmartDashboard.putNumber("Elevator FF kS", ElevatorConstants.kS);
+        SmartDashboard.putNumber("Elevator FF kG", ElevatorConstants.kG);
+        SmartDashboard.putNumber("Elevator FF kV", ElevatorConstants.kV);
+        SmartDashboard.putNumber("Elevator FF kA", ElevatorConstants.kA);
     }
 
     @Override
     public void periodic() {
+        // YAMS handles telemetry automatically
         elevator.updateTelemetry();
+        
+        // Note: YAMS doesn't support runtime PID/FF updates
+        // Values must be changed in Constants files and redeployed
+        // Telemetry is published automatically by YAMS with TelemetryVerbosity.HIGH
     }
     
     @Override
@@ -108,11 +139,23 @@ public class ElevatorSubsystem extends SubsystemBase {
     }
     
     public Command sysId() {
-        return elevator.sysId(Volts.of(12), Volts.of(12).per(Second), Second.of(30));
+        return elevator.sysId(
+            ElevatorConstants.SYSID_STEP_VOLTAGE,
+            Volts.of(ElevatorConstants.SYSID_RAMP_RATE_VALUE).per(Second),
+            ElevatorConstants.SYSID_TIMEOUT
+        );
     }
 
     public Elevator getElevator() {
         return elevator;
+    }
+    
+    /**
+     * Gets the current elevator height from the bottom position.
+     */
+    public Distance getCurrentHeight() {
+        // Get current height from YAMS elevator mechanism
+        return elevator.getHeight();
     }
 
     public double getMotorCurrent() {

@@ -24,7 +24,12 @@ public final class GrabberConstants {
 
     // General
     public static final double ZERO_SPEED = 0;
-    public static final double CORAL_DETECT_RANGE = 0;
+    public static final double CORAL_DETECT_RANGE = 100; // mm - tune based on sensor placement
+    
+    // Smart intake speeds for coral centering
+    public static final double CORAL_FAST_INTAKE = GRABBER_CORAL_INTAKE;
+    public static final double CORAL_SLOW_INTAKE = GRABBER_CORAL_INTAKE * 0.5;
+    public static final double CORAL_REVERSE_SLOW = -GRABBER_CORAL_INTAKE * 0.3;
 
     // Diagnostic Thresholds
     public static final int NORMAL_OPERATION_CURRENT = 40; // amps

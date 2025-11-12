@@ -24,6 +24,7 @@ public class ArmManualCommand extends Command {
         double input = MathUtil.applyDeadband(armSupplier.get(), 0.1);
         double output = input * ArmConstants.kMaxOutput;
         
+        // End previous command and create new one
         if (currentCommand != null) {
             currentCommand.end(true);
         }
@@ -37,6 +38,7 @@ public class ArmManualCommand extends Command {
         if (currentCommand != null) {
             currentCommand.end(true);
         }
-        armSubsystem.armCmd(0).schedule();
+        Command stopCommand = armSubsystem.armCmd(0);
+        stopCommand.schedule();
     }
 }

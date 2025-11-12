@@ -112,7 +112,7 @@ public class RobotContainer {
         
         NamedCommands.registerCommand(
                 "PrepL4",
-                MainCommandFactory.getAutoArmElevatorPositionCommand(
+                MainCommandFactory.getArmElevatorPositionCommand(
                         armSubsystem,
                         elevatorSubsystem,
                         ElevatorConstants.CORAL_L4_HEIGHT,
@@ -120,7 +120,7 @@ public class RobotContainer {
         
         NamedCommands.registerCommand(
                 "PrepL3",
-                MainCommandFactory.getAutoArmElevatorPositionCommand(
+                MainCommandFactory.getArmElevatorPositionCommand(
                         armSubsystem,
                         elevatorSubsystem,
                         ElevatorConstants.CORAL_L3_HEIGHT,
@@ -128,7 +128,7 @@ public class RobotContainer {
         
         NamedCommands.registerCommand(
                 "PrepL2",
-                MainCommandFactory.getAutoArmElevatorPositionCommand(
+                MainCommandFactory.getArmElevatorPositionCommand(
                         armSubsystem,
                         elevatorSubsystem,
                         ElevatorConstants.CORAL_L2_HEIGHT,
@@ -136,7 +136,7 @@ public class RobotContainer {
         
         NamedCommands.registerCommand(
                 "ResetIntake",
-                MainCommandFactory.getAutoArmElevatorPositionCommand(
+                MainCommandFactory.getArmElevatorPositionCommand(
                         armSubsystem,
                         elevatorSubsystem,
                         ElevatorConstants.CORAL_INTAKE_HEIGHT,

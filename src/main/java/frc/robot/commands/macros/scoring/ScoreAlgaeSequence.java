@@ -1,11 +1,7 @@
 package frc.robot.commands.macros.scoring;
 
-import static edu.wpi.first.units.Units.Inches;
-
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.commands.atomic.arm.MoveArmToAngle;
-import frc.robot.commands.atomic.elevator.MoveElevatorToHeight;
+import frc.robot.commands.atomic.SafeMoveToPosition;
 import frc.robot.commands.atomic.grabber.EjectGamePiece;
 import frc.robot.game.field.AlgaeScorePosition;
 import frc.robot.game.tasks.ScoreAlgae;
@@ -49,23 +45,18 @@ public class ScoreAlgaeSequence extends SequentialCommandGroup {
         ScoreAlgae task = new ScoreAlgae(scorePosition);
         
         addCommands(
-            // 1. Transition to positioning state
-            stateMachine.transitionToPositioning(task),
-            
-            // 2. Move to scoring position (parallel)
-            new ParallelCommandGroup(
-                new MoveElevatorToHeight(elevatorSubsystem, task.getElevatorHeight()),
-                new MoveArmToAngle(armSubsystem, task.getArmAngle())
+            // 1. Safe anti-tip movement: vertical -> elevator -> dunk (YAMS handles completion)
+            new SafeMoveToPosition(
+                armSubsystem,
+                elevatorSubsystem,
+                task.getArmAngle(),
+                task.getElevatorHeight()
             ),
             
-            // 3. Transition to scoring
-            stateMachine.transitionToScoring(),
+            // 2. Eject game piece (run for 0.5 seconds)
+            new EjectGamePiece(grabberSubsystem).withTimeout(0.5)
             
-            // 4. Eject game piece (run for 0.5 seconds)
-            new EjectGamePiece(grabberSubsystem).withTimeout(0.5),
-            
-            // 5. Return to idle
-            stateMachine.transitionScoringComplete()
+            // That's it! hasGamePiece auto-updates from sensors in state machine periodic()
         );
     }
 }

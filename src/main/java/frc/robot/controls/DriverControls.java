@@ -98,6 +98,32 @@ public class DriverControls {
         } else {
             configureTeleopBindings(driveFieldOrientedMedium, driveFieldOrientedSlow, driveFieldOrientedTurbo);
         }
+        
+        // Add SysId bindings for all modes (safe with 3-button combo)
+        configureSysIdBindings();
+    }
+    
+    /**
+     * Configures SysId bindings for drivetrain characterization.
+     * SAFETY: Requires holding BOTH bumpers + another button to prevent accidental activation.
+     * 
+     * Instructions:
+     * 1. Open WPILib SysId tool
+     * 2. Connect to robot
+     * 3. Hold Left Bumper + Right Bumper + Y for DRIVE SysId
+     * 4. Hold Left Bumper + Right Bumper + X for ANGLE SysId
+     * 5. Follow SysId documentation to run tests
+     */
+    private void configureSysIdBindings() {
+        // DRIVE MOTOR SysId - Hold Both Bumpers + Y
+        controller.leftBumper().and(controller.rightBumper()).and(controller.y()).whileTrue(
+            drivebase.sysIdDriveMotorCommand()
+        );
+        
+        // ANGLE MOTOR SysId - Hold Both Bumpers + X  
+        controller.leftBumper().and(controller.rightBumper()).and(controller.x()).whileTrue(
+            drivebase.sysIdAngleMotorCommand()
+        );
     }
     
     /**

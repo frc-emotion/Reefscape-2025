@@ -1,13 +1,9 @@
 package frc.robot.commands.macros.intake;
 
-import static edu.wpi.first.units.Units.Inches;
-
 import edu.wpi.first.wpilibj2.command.Commands;
-import edu.wpi.first.wpilibj2.command.ParallelCommandGroup;
 import edu.wpi.first.wpilibj2.command.SequentialCommandGroup;
-import frc.robot.commands.atomic.arm.MoveArmToAngle;
-import frc.robot.commands.atomic.elevator.MoveElevatorToHeight;
 import frc.robot.commands.atomic.grabber.IntakeGamePiece;
+import frc.robot.commands.atomic.SafeMoveToPosition;
 import frc.robot.game.GameElement.AlgaeLevel;
 import frc.robot.game.field.AlgaePosition;
 import frc.robot.game.tasks.PickupAlgae;
@@ -22,11 +18,12 @@ import frc.robot.subsystems.grabber.GrabberSubsystem.GrabType;
  * 
  * Sequence:
  * 1. Set grabber type to ALGAE
- * 2. Transition state machine to INTAKING
- * 3. Move arm and elevator to intake position (parallel)
- * 4. Activate intake
- * 5. Wait for game piece detection (or timeout)
- * 6. Transition to HOLDING
+ * 2. Transition state machine to POSITIONING
+ * 3. Safe anti-tip movement to intake position
+ * 4. Transition state machine to INTAKING
+ * 5. Activate intake
+ * 6. Wait for game piece detection (or timeout)
+ * 7. Transition to HOLDING
  * 
  * Works in both teleop and autonomous modes.
  */
@@ -53,24 +50,24 @@ public class IntakeAlgaeSequence extends SequentialCommandGroup {
         // Create task to get positions
         PickupAlgae task = new PickupAlgae(algaePosition, targetLevel);
         
+        var intakeCommand = new IntakeGamePiece(grabberSubsystem, true).withTimeout(2.0);
+        
         addCommands(
             // 1. Set target type
             Commands.runOnce(() -> grabberSubsystem.setTargetType(GrabType.ALGAE)),
             
-            // 2. Transition to intaking state
-            stateMachine.transitionToIntaking(task),
-            
-            // 3. Move to intake position (parallel)
-            new ParallelCommandGroup(
-                new MoveElevatorToHeight(elevatorSubsystem, task.getElevatorHeight()),
-                new MoveArmToAngle(armSubsystem, task.getArmAngle())
+            // 2. Safe anti-tip movement to intake position (YAMS handles completion)
+            new SafeMoveToPosition(
+                armSubsystem,
+                elevatorSubsystem,
+                task.getArmAngle(),
+                task.getElevatorHeight()
             ),
             
-            // 4. Activate intake until game piece acquired (max 2 seconds)
-            new IntakeGamePiece(grabberSubsystem, true).withTimeout(2.0),
+            // 3. Run intake until game piece detected (timeout after 2s)
+            intakeCommand
             
-            // 5. Transition to holding
-            stateMachine.transitionToHolding()
+            // That's it! hasGamePiece auto-updates from sensors in state machine periodic()
         );
     }
 }

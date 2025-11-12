@@ -31,12 +31,13 @@ public class GrabberGrabCommand extends Command {
 
     @Override
     public boolean isFinished() {
-        return false;
-        // if(m_GrabberSubsystem.getTargetGrabType() == GrabType.CORAL) {
-        //     return m_GrabberSubsystem.getBackCoralState();
-        // } else {
-        //     return m_GrabberSubsystem.hasGamePiece();
-        // }
+        // Finish when we have the game piece
+        if(m_GrabberSubsystem.getTargetGrabType() == GrabType.CORAL) {
+            return m_GrabberSubsystem.getBackCoralState();
+        } else if(m_GrabberSubsystem.getTargetGrabType() == GrabType.ALGAE) {
+            return m_GrabberSubsystem.getAlgaeState();
+        }
+        return false; // If target is NONE, run forever (manual control)
     }
 
     @Override
