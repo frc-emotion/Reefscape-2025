@@ -53,8 +53,8 @@ public final class ArmConstants {
     public static final double GEAR_RATIO_STAGE_2 = 4.0;
 
     // Physical Constraints (relative to hopper rest = 0°)
-    /** Minimum arm rotation in degrees (full forward to bumper) */
-    public static final double kMinRotation = -45;
+    /** Minimum arm rotation in degrees (safe travel position) */
+    public static final double kMinRotation = 0;
     /** Maximum arm rotation in degrees (full back/up for high scoring) */
     public static final double kMaxRotation = 125;
     

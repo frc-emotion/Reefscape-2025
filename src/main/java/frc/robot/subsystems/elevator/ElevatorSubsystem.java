@@ -81,7 +81,7 @@ public class ElevatorSubsystem extends SubsystemBase {
                 ElevatorConstants.GEAR_RATIO_STAGE_2
             )))
             .withMotorInverted(false)
-            .withIdleMode(MotorMode.BRAKE)
+            .withIdleMode(MotorMode.COAST)
             .withStatorCurrentLimit(ElevatorConstants.STATOR_CURRENT_LIMIT)
             .withFollowers(
                 Pair.of(elevatorFollower, true) // Inverted relative to leader
