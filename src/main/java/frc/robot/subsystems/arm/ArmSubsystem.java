@@ -36,79 +36,73 @@ public class ArmSubsystem extends SubsystemBase {
     private final MechanismPositionConfig robotToMechanism;
     private final ArmConfig armConfig;
     private final Arm arm;
-    
+
     public ArmSubsystem() {
         armMotor = new SparkMax(PortMap.CANID.ARM_ANGLE.getId(), MotorType.kBrushless);
-        
+
         motorConfig = new SmartMotorControllerConfig(this)
-            .withControlMode(ControlMode.CLOSED_LOOP)
-            // Real robot PID
-            .withClosedLoopController(
-                ArmConstants.kP,
-                ArmConstants.kI,
-                ArmConstants.kD,
-                ArmConstants.MAX_VELOCITY,
-                ArmConstants.MAX_ACCELERATION
-            )
-            // Simulation PID (can be different from real)
-            .withSimClosedLoopController(
-                ArmConstants.kP,
-                ArmConstants.kI,
-                ArmConstants.kD,
-                ArmConstants.MAX_VELOCITY,
-                ArmConstants.MAX_ACCELERATION
-            )
-            // Real robot feedforward
-            .withFeedforward(new ArmFeedforward(
-                ArmConstants.kS,
-                ArmConstants.kG,
-                ArmConstants.kV,
-                ArmConstants.kA
-            ))
-            // Simulation feedforward
-            .withSimFeedforward(new ArmFeedforward(
-                ArmConstants.kS,
-                ArmConstants.kG,
-                ArmConstants.kV,
-                ArmConstants.kA
-            ))
-            .withTelemetry("ArmMotor", TelemetryVerbosity.HIGH)
-            // Gearing from the motor rotor to final shaft
-            .withGearing(new MechanismGearing(GearBox.fromReductionStages(
-                ArmConstants.GEAR_RATIO_STAGE_1,
-                ArmConstants.GEAR_RATIO_STAGE_2
-            )))
-            .withMotorInverted(false)
-            .withIdleMode(MotorMode.BRAKE)
-            .withStatorCurrentLimit(Amps.of(ArmConstants.kSmartCurrentLimit))
-            .withClosedLoopRampRate(ArmConstants.CLOSED_LOOP_RAMP_RATE)
-            .withOpenLoopRampRate(ArmConstants.OPEN_LOOP_RAMP_RATE);
-            
+                .withControlMode(ControlMode.CLOSED_LOOP)
+                // Real robot PID
+                .withClosedLoopController(
+                        ArmConstants.kP,
+                        ArmConstants.kI,
+                        ArmConstants.kD,
+                        ArmConstants.MAX_VELOCITY,
+                        ArmConstants.MAX_ACCELERATION)
+                // Simulation PID (can be different from real)
+                .withSimClosedLoopController(
+                        ArmConstants.kP,
+                        ArmConstants.kI,
+                        ArmConstants.kD,
+                        ArmConstants.MAX_VELOCITY,
+                        ArmConstants.MAX_ACCELERATION)
+                // Real robot feedforward
+                .withFeedforward(new ArmFeedforward(
+                        ArmConstants.kS,
+                        ArmConstants.kG,
+                        ArmConstants.kV,
+                        ArmConstants.kA))
+                // Simulation feedforward
+                .withSimFeedforward(new ArmFeedforward(
+                        ArmConstants.kS,
+                        ArmConstants.kG,
+                        ArmConstants.kV,
+                        ArmConstants.kA))
+                .withTelemetry("ArmMotor", TelemetryVerbosity.HIGH)
+                // Gearing from the motor rotor to final shaft
+                .withGearing(new MechanismGearing(GearBox.fromReductionStages(
+                        ArmConstants.GEAR_RATIO_STAGE_1,
+                        ArmConstants.GEAR_RATIO_STAGE_2)))
+                .withMotorInverted(true) // CHANGED: Invert motor to fix coordinate system
+                .withIdleMode(MotorMode.BRAKE)
+                .withStatorCurrentLimit(Amps.of(ArmConstants.kSmartCurrentLimit))
+                .withClosedLoopRampRate(ArmConstants.CLOSED_LOOP_RAMP_RATE)
+                .withOpenLoopRampRate(ArmConstants.OPEN_LOOP_RAMP_RATE);
+
         motor = new SparkWrapper(armMotor, DCMotor.getNEO(1), motorConfig);
-        
+
         robotToMechanism = new MechanismPositionConfig()
-            .withMaxRobotHeight(ArmConstants.MAX_ROBOT_HEIGHT)
-            .withMaxRobotLength(ArmConstants.MAX_ROBOT_LENGTH)
-            .withRelativePosition(ArmConstants.ARM_PIVOT_POSITION);
-        
+                .withMaxRobotHeight(ArmConstants.MAX_ROBOT_HEIGHT)
+                .withMaxRobotLength(ArmConstants.MAX_ROBOT_LENGTH)
+                .withRelativePosition(ArmConstants.ARM_PIVOT_POSITION);
+
         armConfig = new ArmConfig(motor)
-            .withLength(ArmConstants.ARM_LENGTH)
-            .withHardLimit(Degrees.of(ArmConstants.kMinRotation), Degrees.of(ArmConstants.kMaxRotation))
-            // SOFT LIMITS: Prevent SysId from going into danger zone
-            // TODO: For SysId, set to safe range like (0, 125). After SysId, can expand if needed.
-            .withSoftLimits(Degrees.of(0), Degrees.of(ArmConstants.kMaxRotation))
-            .withTelemetry("ArmExample", TelemetryVerbosity.HIGH)
-            .withMass(ArmConstants.ARM_MASS)
-            .withStartingPosition(ArmConstants.ARM_STARTING_POSITION)
-            .withMechanismPositionConfig(robotToMechanism);
-            
+                .withLength(ArmConstants.ARM_LENGTH)
+                .withHardLimit(Degrees.of(ArmConstants.kMinRotation), Degrees.of(ArmConstants.kMaxRotation))
+                // SOFT LIMITS: Add 10° buffer above hopper and 10° below max to prevent crashes
+                .withSoftLimits(Degrees.of(10), Degrees.of(195))
+                .withTelemetry("ArmExample", TelemetryVerbosity.HIGH)
+                .withMass(ArmConstants.ARM_MASS)
+                .withStartingPosition(ArmConstants.ARM_STARTING_POSITION)
+                .withMechanismPositionConfig(robotToMechanism);
+
         arm = new Arm(armConfig);
-        
+
         // Publish PID values to SmartDashboard for monitoring
         SmartDashboard.putNumber("Arm PID kP", ArmConstants.kP);
         SmartDashboard.putNumber("Arm PID kI", ArmConstants.kI);
         SmartDashboard.putNumber("Arm PID kD", ArmConstants.kD);
-        
+
         // Publish feedforward values to SmartDashboard for monitoring
         SmartDashboard.putNumber("Arm FF kS", ArmConstants.kS);
         SmartDashboard.putNumber("Arm FF kG", ArmConstants.kG);
@@ -122,10 +116,9 @@ public class ArmSubsystem extends SubsystemBase {
 
     public Command sysId() {
         return arm.sysId(
-            ArmConstants.SYSID_STEP_VOLTAGE,
-            Volts.of(ArmConstants.SYSID_RAMP_RATE_VALUE).per(Second),
-            ArmConstants.SYSID_TIMEOUT
-        );
+                ArmConstants.SYSID_STEP_VOLTAGE,
+                Volts.of(ArmConstants.SYSID_RAMP_RATE_VALUE).per(Second),
+                ArmConstants.SYSID_TIMEOUT);
     }
 
     public Command setAngle(Angle angle) {
@@ -135,7 +128,7 @@ public class ArmSubsystem extends SubsystemBase {
     public Arm getArm() {
         return arm;
     }
-    
+
     /**
      * Gets the current arm angle.
      * Zero (0°) = Arm resting on hopper
@@ -151,22 +144,22 @@ public class ArmSubsystem extends SubsystemBase {
     public void periodic() {
         // YAMS handles telemetry automatically
         arm.updateTelemetry();
-        
+
         // Note: YAMS doesn't support runtime PID/FF updates
         // Values must be changed in Constants files and redeployed
         // Telemetry is published automatically by YAMS with TelemetryVerbosity.HIGH
-        
+
         // TEMPORARY: Gear ratio measurement helper
         double motorRotations = armMotor.getEncoder().getPosition();
         double armDegrees = getCurrentAngle().getDegrees();
         double armRotations = armDegrees / 360.0;
         double measuredGearRatio = (armRotations != 0) ? motorRotations / armRotations : 0;
-        
+
         SmartDashboard.putNumber("ARM_DEBUG/MotorRotations", motorRotations);
         SmartDashboard.putNumber("ARM_DEBUG/ArmDegrees", armDegrees);
         SmartDashboard.putNumber("ARM_DEBUG/MeasuredGearRatio", measuredGearRatio);
     }
-    
+
     @Override
     public void simulationPeriodic() {
         arm.simIterate();

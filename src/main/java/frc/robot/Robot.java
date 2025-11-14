@@ -7,6 +7,8 @@ package frc.robot;
 import org.ironmaple.simulation.SimulatedArena;
 
 // import edu.wpi.first.epilogue.Epilogue;
+import edu.wpi.first.wpilibj.DataLogManager;
+import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.RobotController;
 import edu.wpi.first.wpilibj.Threads;
 import edu.wpi.first.wpilibj.TimedRobot;
@@ -22,6 +24,10 @@ public class Robot extends TimedRobot {
 
     public Robot() {
         //Epilogue.bind(this);
+
+        // Start data logging for SysId and analysis
+        DataLogManager.start();
+        DriverStation.startDataLog(DataLogManager.getLog());
 
         RobotController.setBrownoutVoltage(6.0);
 
