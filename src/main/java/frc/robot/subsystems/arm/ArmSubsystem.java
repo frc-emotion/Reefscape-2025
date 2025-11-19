@@ -140,6 +140,15 @@ public class ArmSubsystem extends SubsystemBase {
         return Rotation2d.fromDegrees(arm.getAngle().in(Degrees));
     }
 
+    /**
+     * Gets the current draw of the arm motor.
+     * 
+     * @return Current in amps
+     */
+    public double getMotorCurrent() {
+        return armMotor.getOutputCurrent();
+    }
+
     @Override
     public void periodic() {
         // YAMS handles telemetry automatically
@@ -148,16 +157,6 @@ public class ArmSubsystem extends SubsystemBase {
         // Note: YAMS doesn't support runtime PID/FF updates
         // Values must be changed in Constants files and redeployed
         // Telemetry is published automatically by YAMS with TelemetryVerbosity.HIGH
-
-        // TEMPORARY: Gear ratio measurement helper
-        double motorRotations = armMotor.getEncoder().getPosition();
-        double armDegrees = getCurrentAngle().getDegrees();
-        double armRotations = armDegrees / 360.0;
-        double measuredGearRatio = (armRotations != 0) ? motorRotations / armRotations : 0;
-
-        SmartDashboard.putNumber("ARM_DEBUG/MotorRotations", motorRotations);
-        SmartDashboard.putNumber("ARM_DEBUG/ArmDegrees", armDegrees);
-        SmartDashboard.putNumber("ARM_DEBUG/MeasuredGearRatio", measuredGearRatio);
     }
 
     @Override

@@ -50,10 +50,10 @@ public final class ArmConstants {
     public static final Time OPEN_LOOP_RAMP_RATE = Units.Seconds.of(0.25);
 
     // Gearing
-    /** First gear reduction stage ratio (e.g., 3 means 3:1) */
-    public static final double GEAR_RATIO_STAGE_1 = 3.0;
-    /** Second gear reduction stage ratio (e.g., 4 means 4:1) */
-    public static final double GEAR_RATIO_STAGE_2 = 4.0;
+    /** Total gear reduction ratio from motor to arm (motor rotations : arm rotations) */
+    public static final double GEAR_RATIO_STAGE_1 = 36; // Measured by counting teeth
+    /** No second stage - all reduction in STAGE_1 */
+    public static final double GEAR_RATIO_STAGE_2 = 1.0;
 
     // Physical Constraints (relative to hopper rest = 0°)
     /** Minimum arm rotation in degrees (hopper at 10 o'clock) */
@@ -71,11 +71,11 @@ public final class ArmConstants {
     /** Hopper rest position - ONLY use when elevator is at bottom! */
     public static final Rotation2d HOPPER_REST_ANGLE = Rotation2d.fromDegrees(0);
 
-    // Feedforward Constants
-    public static final double kS = 0; // Static friction (volts)
-    public static final double kG = 0.088858; // Gravity compensation (volts)
-    public static final double kV = 0.00025; // Velocity gain (volts per deg/s)
-    public static final double kA = 0.001; // Acceleration gain (volts per deg/s²)
+    // Feedforward Constants (FROM SYSID - UPDATE AFTER RUNNING SYSID!)
+    public static final double kS = 0.0;      // TODO: Replace with SysId value (expect 0.1-0.3)
+    public static final double kG = 0.088858; // TODO: Replace with SysId value (expect 0.3-0.8) - CRITICAL!
+    public static final double kV = 0.00025;  // TODO: Replace with SysId value (expect 0.001-0.01)
+    public static final double kA = 0.001;    // TODO: Replace with SysId value (expect 0.001-0.01)
 
     // PID Constants
     public static final double kP = 0.002058;

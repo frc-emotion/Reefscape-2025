@@ -9,7 +9,6 @@ import static edu.wpi.first.units.Units.Meter;
 import com.pathplanner.lib.auto.AutoBuilder;
 import com.pathplanner.lib.commands.PathPlannerAuto;
 import com.pathplanner.lib.commands.PathfindingCommand;
-import com.pathplanner.lib.config.PIDConstants;
 import com.pathplanner.lib.config.RobotConfig;
 import com.pathplanner.lib.controllers.PPHolonomicDriveController;
 import com.pathplanner.lib.path.PathConstraints;
@@ -21,34 +20,29 @@ import edu.wpi.first.apriltag.AprilTagFieldLayout;
 import edu.wpi.first.apriltag.AprilTagFields;
 import edu.wpi.first.math.controller.SimpleMotorFeedforward;
 import edu.wpi.first.math.geometry.Pose2d;
-import edu.wpi.first.math.geometry.Pose3d;
 import edu.wpi.first.math.geometry.Rotation2d;
-import edu.wpi.first.math.geometry.Rotation3d;
 import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.kinematics.ChassisSpeeds;
 import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.DriverStation.Alliance;
 import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
-import edu.wpi.first.wpilibj2.command.button.RobotModeTriggers;
-import edu.wpi.first.wpilibj2.command.sysid.SysIdRoutine.Config;
 import frc.robot.constants.AutoConstants;
+import frc.robot.util.helpers.PIDHelper;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import java.io.File;
 import java.io.IOException;
 import java.util.Arrays;
-import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.DoubleSupplier;
 import java.util.function.Supplier;
 import org.json.simple.parser.ParseException;
 import swervelib.SwerveController;
 import swervelib.SwerveDrive;
-import swervelib.SwerveDriveTest;
 import swervelib.math.SwerveMath;
 import swervelib.parser.SwerveControllerConfiguration;
 import swervelib.parser.SwerveDriveConfiguration;
@@ -82,6 +76,11 @@ public class SwerveSubsystem extends SubsystemBase
    * @param directory Directory of swerve drive config files.
    */
   private PPHolonomicDriveController autoPathFollower;
+  
+  /**
+   * PID helper for live tuning of rotation PID via NetworkTables
+   */
+  private PIDHelper rotationPIDHelper;
   public SwerveSubsystem(File directory)
   {
     // Configure the Telemetry before creating the SwerveDrive to avoid unnecessary objects being created.
@@ -151,6 +150,23 @@ public class SwerveSubsystem extends SubsystemBase
     {
       swerveDrive.updateOdometry();
       //vision.updatePoseEstimation(swerveDrive);
+    }
+    
+    // Update rotation PID from NetworkTables (live tuning without restart)
+    if (rotationPIDHelper != null) {
+      rotationPIDHelper.update();
+    }
+    
+    // Telemetry: Show actual PID values being used by the controller
+    try {
+      var controller = swerveDrive.swerveController.getClass().getDeclaredField("headingController");
+      controller.setAccessible(true);
+      var pidController = (edu.wpi.first.math.controller.PIDController) controller.get(swerveDrive.swerveController);
+      SmartDashboard.putNumber("Heading PID/Actual kP", pidController.getP());
+      SmartDashboard.putNumber("Heading PID/Actual kI", pidController.getI());
+      SmartDashboard.putNumber("Heading PID/Actual kD", pidController.getD());
+    } catch (Exception e) {
+      // Silently fail - this is just telemetry
     }
   }
 
@@ -231,6 +247,50 @@ public class SwerveSubsystem extends SubsystemBase
     //Preload PathPlanner Path finding
     // IF USING CUSTOM PATHFINDER ADD BEFORE THIS LINE
     PathfindingCommand.warmupCommand().schedule();
+    
+    // Initialize live PID tuning for rotation (NetworkTables)
+    rotationPIDHelper = new PIDHelper(
+        "Swerve Rotation",
+        swerveDrive.swerveController.config.headingPIDF.p,
+        swerveDrive.swerveController.config.headingPIDF.i,
+        swerveDrive.swerveController.config.headingPIDF.d,
+        (p) -> {
+            // Update config
+            swerveDrive.swerveController.config.headingPIDF.p = p;
+            // Force YAGSL to recreate the heading controller with new values
+            try {
+                var controller = swerveDrive.swerveController.getClass().getDeclaredField("headingController");
+                controller.setAccessible(true);
+                var pidController = (edu.wpi.first.math.controller.PIDController) controller.get(swerveDrive.swerveController);
+                pidController.setP(p);
+            } catch (Exception e) {
+                // Fallback: just update config and hope YAGSL picks it up
+                System.out.println("Could not update heading PID directly: " + e.getMessage());
+            }
+        },
+        (i) -> {
+            swerveDrive.swerveController.config.headingPIDF.i = i;
+            try {
+                var controller = swerveDrive.swerveController.getClass().getDeclaredField("headingController");
+                controller.setAccessible(true);
+                var pidController = (edu.wpi.first.math.controller.PIDController) controller.get(swerveDrive.swerveController);
+                pidController.setI(i);
+            } catch (Exception e) {
+                System.out.println("Could not update heading PID directly: " + e.getMessage());
+            }
+        },
+        (d) -> {
+            swerveDrive.swerveController.config.headingPIDF.d = d;
+            try {
+                var controller = swerveDrive.swerveController.getClass().getDeclaredField("headingController");
+                controller.setAccessible(true);
+                var pidController = (edu.wpi.first.math.controller.PIDController) controller.get(swerveDrive.swerveController);
+                pidController.setD(d);
+            } catch (Exception e) {
+                System.out.println("Could not update heading PID directly: " + e.getMessage());
+            }
+        }
+    );
   }
 
   /**
@@ -347,32 +407,24 @@ public class SwerveSubsystem extends SubsystemBase
   }
 
 
-  /**
-   * Command to characterize the robot drive motors using SysId
-   *
-   * @return SysId Drive Command
-   */
-  public Command sysIdDriveMotorCommand()
-  {
-    return SwerveDriveTest.generateSysIdCommand(
-        SwerveDriveTest.setDriveSysIdRoutine(
-            new Config(),
-            this, swerveDrive, 12, true),
-        3.0, 5.0, 3.0);
-  }
+  // SysId commands removed - YAGSL handles feedforward internally via JSON config
+  // Feedforward values are in: /deploy/swerve/neo/modules/physicalproperties.json
+  // If you need to tune, modify the JSON file and redeploy
 
   /**
-   * Command to characterize the robot angle motors using SysId
-   *
-   * @return SysId Angle Command
+   * Command to rotate robot to a target heading (for PID tuning).
+   * Robot will hold position while rotating to the target angle.
+   * 
+   * @param targetAngleDegrees Target heading in degrees (0 = forward, 90 = left, etc.)
+   * @return Command to rotate to target
    */
-  public Command sysIdAngleMotorCommand()
-  {
-    return SwerveDriveTest.generateSysIdCommand(
-        SwerveDriveTest.setAngleSysIdRoutine(
-            new Config(),
-            this, swerveDrive),
-        3.0, 5.0, 3.0);
+  public Command rotateToAngle(double targetAngleDegrees) {
+    Rotation2d targetAngle = Rotation2d.fromDegrees(targetAngleDegrees);
+    return run(() -> {
+      // Get target speeds using YAGSL's built-in heading controller
+      ChassisSpeeds speeds = getTargetSpeeds(0, 0, targetAngle);
+      swerveDrive.setChassisSpeeds(speeds);
+    });
   }
 
   /**

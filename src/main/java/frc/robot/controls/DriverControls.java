@@ -99,32 +99,10 @@ public class DriverControls {
             configureTeleopBindings(driveFieldOrientedMedium, driveFieldOrientedSlow, driveFieldOrientedTurbo);
         }
         
-        // Add SysId bindings for all modes (safe with 3-button combo)
-        configureSysIdBindings();
+        // SysId bindings removed - YAGSL handles swerve feedforward automatically via JSON
     }
     
-    /**
-     * Configures SysId bindings for drivetrain characterization.
-     * SAFETY: Requires holding BOTH bumpers + another button to prevent accidental activation.
-     * 
-     * Instructions:
-     * 1. Open WPILib SysId tool
-     * 2. Connect to robot
-     * 3. Hold Left Bumper + Right Bumper + Y for DRIVE SysId
-     * 4. Hold Left Bumper + Right Bumper + X for ANGLE SysId
-     * 5. Follow SysId documentation to run tests
-     */
-    private void configureSysIdBindings() {
-        // DRIVE MOTOR SysId - Hold Both Bumpers + Y
-        controller.leftBumper().and(controller.rightBumper()).and(controller.y()).whileTrue(
-            drivebase.sysIdDriveMotorCommand()
-        );
-        
-        // ANGLE MOTOR SysId - Hold Both Bumpers + X  
-        controller.leftBumper().and(controller.rightBumper()).and(controller.x()).whileTrue(
-            drivebase.sysIdAngleMotorCommand()
-        );
-    }
+    // SysId methods removed - YAGSL handles swerve feedforward via /deploy/swerve/neo/modules/physicalproperties.json
     
     /**
      * Configures bindings for simulation mode.
@@ -134,7 +112,6 @@ public class DriverControls {
         
         controller.start().onTrue(Commands.runOnce(() -> 
                 drivebase.resetOdometry(new Pose2d(3, 3, new Rotation2d()))));
-        controller.button(1).whileTrue(drivebase.sysIdDriveMotorCommand());
     }
     
     /**
@@ -170,6 +147,13 @@ public class DriverControls {
         // Bumpers: Speed control
         controller.rightBumper().whileTrue(driveTurbo);  // Turbo mode
         controller.leftBumper().whileTrue(driveSlow);     // Slow mode
+        
+        // D-Pad: Rotation PID testing (hold to rotate to angle)
+        // Tune PID values via NetworkTables: "Swerve Rotation PID kP/kI/kD"
+        controller.povUp().whileTrue(drivebase.rotateToAngle(0));      // Forward
+        controller.povRight().whileTrue(drivebase.rotateToAngle(90));  // Left
+        controller.povDown().whileTrue(drivebase.rotateToAngle(180));  // Backward
+        controller.povLeft().whileTrue(drivebase.rotateToAngle(270));  // Right
         
         // Start: Toggle manual/macro control mode
         controller.start().onTrue(stateMachine.toggleControlMode());
