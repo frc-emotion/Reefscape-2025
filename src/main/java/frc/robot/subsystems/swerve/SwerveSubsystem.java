@@ -165,6 +165,13 @@ public class SwerveSubsystem extends SubsystemBase
       SmartDashboard.putNumber("Heading PID/Actual kP", pidController.getP());
       SmartDashboard.putNumber("Heading PID/Actual kI", pidController.getI());
       SmartDashboard.putNumber("Heading PID/Actual kD", pidController.getD());
+      
+      // Calculate current heading error for debugging
+      double currentHeading = getHeading().getRadians();
+      double headingErrorRadians = swerveDrive.swerveController.config.headingPIDF.p > 0 ? 
+          (currentHeading - swerveDrive.getOdometryHeading().getRadians()) : 0;
+      double headingErrorDegrees = Math.toDegrees(headingErrorRadians);
+      SmartDashboard.putNumber("Heading PID/Error (degrees)", headingErrorDegrees);
     } catch (Exception e) {
       // Silently fail - this is just telemetry
     }
@@ -420,11 +427,60 @@ public class SwerveSubsystem extends SubsystemBase
    */
   public Command rotateToAngle(double targetAngleDegrees) {
     Rotation2d targetAngle = Rotation2d.fromDegrees(targetAngleDegrees);
+    return startRun(
+        // Initialize: Reset the heading PID controller to clear any accumulated error
+        () -> {
+          try {
+            var controller = swerveDrive.swerveController.getClass().getDeclaredField("headingController");
+            controller.setAccessible(true);
+            var pidController = (edu.wpi.first.math.controller.PIDController) controller.get(swerveDrive.swerveController);
+            pidController.reset();
+          } catch (Exception e) {
+            System.out.println("Warning: Could not reset heading PID: " + e.getMessage());
+          }
+        },
+        // Execute: Drive to target heading
+        () -> {
+          ChassisSpeeds speeds = getTargetSpeeds(0, 0, targetAngle);
+          swerveDrive.setChassisSpeeds(speeds);
+        }
+    );
+  }
+
+  /**
+   * Command to lock robot to a target heading while allowing translation.
+   * Driver can move in any direction, and the robot will maintain the target heading.
+   * This is commonly called "heading lock" or "cardinal lock".
+   * 
+   * @param targetAngleDegrees Target heading in degrees (0 = forward, 90 = left, etc.)
+   * @param translationXSupplier Supplier for X translation input (-1 to 1)
+   * @param translationYSupplier Supplier for Y translation input (-1 to 1)
+   * @return Command to drive with locked heading
+   */
+  public Command driveWithHeadingLock(double targetAngleDegrees, 
+                                      DoubleSupplier translationXSupplier,
+                                      DoubleSupplier translationYSupplier) {
+    Rotation2d targetAngle = Rotation2d.fromDegrees(targetAngleDegrees);
     return run(() -> {
-      // Get target speeds using YAGSL's built-in heading controller
-      ChassisSpeeds speeds = getTargetSpeeds(0, 0, targetAngle);
-      swerveDrive.setChassisSpeeds(speeds);
-    });
+          // Read joystick inputs and scale to velocity
+          double xInput = translationXSupplier.getAsDouble();
+          double yInput = translationYSupplier.getAsDouble();
+          
+          // Get target speeds with translation AND heading control
+          ChassisSpeeds speeds = getTargetSpeeds(xInput, yInput, targetAngle);
+          swerveDrive.setChassisSpeeds(speeds);
+        })
+        .beforeStarting(() -> {
+          // Reset the heading PID controller to clear any accumulated error
+          try {
+            var controller = swerveDrive.swerveController.getClass().getDeclaredField("headingController");
+            controller.setAccessible(true);
+            var pidController = (edu.wpi.first.math.controller.PIDController) controller.get(swerveDrive.swerveController);
+            pidController.reset();
+          } catch (Exception e) {
+            System.out.println("Warning: Could not reset heading PID: " + e.getMessage());
+          }
+        });
   }
 
   /**

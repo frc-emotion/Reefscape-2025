@@ -148,12 +148,25 @@ public class DriverControls {
         controller.rightBumper().whileTrue(driveTurbo);  // Turbo mode
         controller.leftBumper().whileTrue(driveSlow);     // Slow mode
         
-        // D-Pad: Rotation PID testing (hold to rotate to angle)
+        // D-Pad: Heading lock (hold to lock heading while driving)
+        // Allows translation while maintaining cardinal directions
         // Tune PID values via NetworkTables: "Swerve Rotation PID kP/kI/kD"
-        controller.povUp().whileTrue(drivebase.rotateToAngle(0));      // Forward
-        controller.povRight().whileTrue(drivebase.rotateToAngle(90));  // Left
-        controller.povDown().whileTrue(drivebase.rotateToAngle(180));  // Backward
-        controller.povLeft().whileTrue(drivebase.rotateToAngle(270));  // Right
+        controller.povUp().whileTrue(
+                drivebase.driveWithHeadingLock(0, 
+                        () -> -controller.getLeftY(), 
+                        () -> -controller.getLeftX()));      // Lock forward
+        controller.povRight().whileTrue(
+                drivebase.driveWithHeadingLock(45, 
+                        () -> -controller.getLeftY(), 
+                        () -> -controller.getLeftX()));  // Lock left
+        controller.povDown().whileTrue(
+                drivebase.driveWithHeadingLock(180, 
+                        () -> -controller.getLeftY(), 
+                        () -> -controller.getLeftX()));  // Lock backward
+        controller.povLeft().whileTrue(
+                drivebase.driveWithHeadingLock(270, 
+                        () -> -controller.getLeftY(), 
+                        () -> -controller.getLeftX()));  // Lock right
         
         // Start: Toggle manual/macro control mode
         controller.start().onTrue(stateMachine.toggleControlMode());
